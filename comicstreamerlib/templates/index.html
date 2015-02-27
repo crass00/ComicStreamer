@@ -94,9 +94,13 @@
                 <div id="main_random">
                     <span><h3>Random Pull</h3></span>
                     <a href="/comic/{{random_comic.id}}/reader" target="_blank">
-                                   <img src="/comic/{{random_comic.id}}/thumbnail?api_key={{api_key}}">
-                                   <span class="comic_caption">{{random_comic.series}} #{{random_comic.issue}}</span>
-                               </a>
+                       <img src="/comic/{{random_comic.id}}/thumbnail?api_key={{api_key}}">
+                        {% if random_comic.issue == None %}
+                            <span class="comic_caption">{{random_comic.series}}</span>
+                        {% else %}
+                            <span class="comic_caption">{{random_comic.series}} #{{random_comic.issue}}</span>
+                        {% end %}
+                    </a>
 
                 </div>
             </div>
@@ -110,7 +114,11 @@
                             <li>
                                 <a href="/comic/{{comic.id}}/reader" target="_blank">
                                    <img src="/comic/{{comic.id}}/thumbnail?api_key={{api_key}}">
-                                   <span class="comic_caption">{{comic.series}} #{{comic.issue}}</span>
+                                    {% if comic.issue == None %}
+                                        <span class="comic_caption">{{comic.series}}</span>
+                                    {% else %}
+                                        <span class="comic_caption">{{comic.series}} #{{comic.issue}}</span>
+                                    {% end %}
                                </a>
                             </li>
                         {% end %}
@@ -128,7 +136,11 @@
                             <li>
                                 <a href="/comic/{{comic.id}}/reader" target="_blank">
                                    <img src="/comic/{{comic.id}}/thumbnail?api_key={{api_key}}">
-                                   <span class="comic_caption">{{comic.series}} #{{comic.issue}}</span>
+                                    {% if comic.issue == None %}
+                                        <span class="comic_caption">{{comic.series}}</span>
+                                    {% else %}
+                                        <span class="comic_caption">{{comic.series}} #{{comic.issue}}</span>
+                                    {% end %}
                                </a>
                             </li>
                         {% end %}
