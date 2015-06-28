@@ -1,11 +1,7 @@
-#### Work on this fork (april 5 2015)
+#### Work on this fork (June 25 2015)
 
- - refactoring database access in a Library object (see library branch)
- - fulltext indexing and faceting support using whoosh (see whoosh branch)
- - mobile optimized user interface based on angularjs and bootstrap. Designed
-   to work with the new search api with facet support
+-add Alternate Series to db and enties to be used for reading list ordering 
 
-All of these features are **experimental** and still unfinished.
 
 -----
 #### Introduction
