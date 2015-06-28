@@ -124,6 +124,11 @@ comics_storyarcs_table = Table('comics_storyarcs', Base.metadata,
 )
 
 # Junction table
+comics_alternateseries_table = Table('comics_alternateseries', Base.metadata,
+    Column('comic_id', Integer, ForeignKey('comics.id')),
+    Column('alternateseries_id', Integer, ForeignKey('alternateseries.id'))
+)
+# Junction table
 comics_generictags_table = Table('comics_generictags', Base.metadata,
      Column('comic_id', Integer, ForeignKey('comics.id')),
      Column('generictags_id', Integer, ForeignKey('generictags.id'))
@@ -164,6 +169,7 @@ class Comic(Base):
     folder = Column(String)
     file = Column(String)
     series = Column(String)
+
     issue = Column(String)
     issue_num = Column(Float)
     date = Column(DateTime)  # will be a composite of month,year,day for sorting/filtering
@@ -183,11 +189,16 @@ class Comic(Base):
     lastread_ts = Column(DateTime)
     lastread_page = Column(Integer)
     thumbnail = deferred(Column(LargeBinary))
-    
+    alternateIssue = Column(String)
+    alternateNumber = Column(Float)
     #hash = Column(String)
     added_ts = Column(DateTime, default=datetime.utcnow)  # when the comic was added to the DB
     mod_ts = Column(DateTime)  # the last modified date of the file
-    
+
+
+    alternateseries_raw = relationship('AlternateSeries', secondary=comics_alternateseries_table,
+                                cascade="save-update,delete") #, backref='comics')
+
     credits_raw = relationship('Credit', #secondary=credits_,
                                 cascade="all, delete", )#, backref='comics')
     characters_raw = relationship('Character', secondary=comics_characters_table,
@@ -216,7 +227,8 @@ class Comic(Base):
                 viewonly=True               
                 )
 
-    #credits = association_proxy('credits_raw', 'person_role_dict')
+    #credits = association_proxy('credits_raw', 'person_role_dict'
+    alternateseries = association_proxy('alternateseries_raw', 'name')
     characters = association_proxy('characters_raw', 'name')
     teams = association_proxy('teams_raw', 'name')
     locations = association_proxy('locations_raw', 'name')
@@ -327,6 +339,13 @@ class StoryArc(Base):
                     Column('name', String, unique = True),
                     comparator_factory=MyComparator)
 
+class AlternateSeries(Base):
+    __tablename__ = "alternateseries"
+    id = Column(Integer, primary_key=True)
+    name = ColumnProperty(
+                    Column('name', String, unique = True),
+                    comparator_factory=MyComparator)
+
 class GenericTag(Base):
     __tablename__ = "generictags"
     id = Column(Integer, primary_key=True)
@@ -404,8 +423,8 @@ class SchemaVersionException(Exception):
 
 class DataManager():
     def __init__(self):
-        self.dbfile = os.path.join(AppFolders.appData(), "comicdb.sqlite")
-
+        # self.dbfile = os.path.join(AppFolders.appData(), "comicdb.sqlite")
+        self.dbfile =  "comicdb.sqlite"
         self.engine = create_engine('sqlite:///'+ self.dbfile, echo=False)
 
         session_factory = sessionmaker(bind=self.engine)

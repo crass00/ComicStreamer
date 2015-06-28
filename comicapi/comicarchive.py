@@ -29,47 +29,47 @@ import locale
 import shutil
 
 from natsort import natsorted
-from unrar import rarfile
-from unrar import unrarlib
+# from unrar import rarfile
+# from unrar import unrarlib
 import unrar.constants
 import ctypes
 import io
-from unrar import constants
+# from unrar import constants
 
-class OpenableRarFile(rarfile.RarFile):
-    def open(self, member):
-        #print "opening %s..." % member
-        # based on https://github.com/matiasb/python-unrar/pull/4/files
-        res = []
-        if isinstance(member, rarfile.RarInfo):
-            member = member.filename
-        archive = unrarlib.RAROpenArchiveDataEx(self.filename, mode=constants.RAR_OM_EXTRACT)
-        handle = self._open(archive)
-        found, buf = False, []
-        def _callback(msg, UserData, P1, P2):
-            if msg == constants.UCM_PROCESSDATA:
-                data = (ctypes.c_char*P2).from_address(P1).raw
-                buf.append(data)
-            return 1
-        c_callback = unrarlib.UNRARCALLBACK(_callback)
-        unrarlib.RARSetCallback(handle, c_callback, 1)
-        try:
-            rarinfo = self._read_header(handle)
-            while rarinfo is not None:
-                #print "checking rar archive %s against %s" % (rarinfo.filename, member)
-                if rarinfo.filename == member:
-                    self._process_current(handle, constants.RAR_TEST)
-                    found = True
-                else:
-                    self._process_current(handle, constants.RAR_SKIP)
-                rarinfo = self._read_header(handle)
-        except unrarlib.UnrarException:
-            raise rarfile.BadRarFile("Bad RAR archive data.")
-        finally:
-            self._close(handle)
-        if not found:
-            raise KeyError('There is no item named %r in the archive' % member)
-        return ''.join(buf)
+# class OpenableRarFile(rarfile.RarFile):
+#     def open(self, member):
+#         #print "opening %s..." % member
+#         # based on https://github.com/matiasb/python-unrar/pull/4/files
+#         res = []
+#         if isinstance(member, rarfile.RarInfo):
+#             member = member.filename
+#         archive = unrarlib.RAROpenArchiveDataEx(self.filename, mode=constants.RAR_OM_EXTRACT)
+#         handle = self._open(archive)
+#         found, buf = False, []
+#         def _callback(msg, UserData, P1, P2):
+#             if msg == constants.UCM_PROCESSDATA:
+#                 data = (ctypes.c_char*P2).from_address(P1).raw
+#                 buf.append(data)
+#             return 1
+#         c_callback = unrarlib.UNRARCALLBACK(_callback)
+#         unrarlib.RARSetCallback(handle, c_callback, 1)
+#         try:
+#             rarinfo = self._read_header(handle)
+#             while rarinfo is not None:
+#                 #print "checking rar archive %s against %s" % (rarinfo.filename, member)
+#                 if rarinfo.filename == member:
+#                     self._process_current(handle, constants.RAR_TEST)
+#                     found = True
+#                 else:
+#                     self._process_current(handle, constants.RAR_SKIP)
+#                 rarinfo = self._read_header(handle)
+#         except unrarlib.UnrarException:
+#             raise rarfile.BadRarFile("Bad RAR archive data.")
+#         finally:
+#             self._close(handle)
+#         if not found:
+#             raise KeyError('There is no item named %r in the archive' % member)
+#         return ''.join(buf)
 
 
 if platform.system() == "Windows":
@@ -84,7 +84,7 @@ except ImportError:
     pil_available = False
 
 sys.path.insert(0, os.path.abspath(".") )
-#import UnRAR2
+import UnRAR2
 #from UnRAR2.rar_exceptions import *
 
 #from settings import ComicTaggerSettings
@@ -468,8 +468,8 @@ class RarArchiver:
         while tries < 7:
             try:
                 tries = tries+1
-                #rarc = UnRAR2.RarFile( self.path )
-                rarc = OpenableRarFile(self.path)
+                rarc = UnRAR2.RarFile( self.path )
+                #rarc = OpenableRarFile(self.path)
 
             except (OSError, IOError) as e:
                 print >> sys.stderr, u"getRARObj(): [{0}] {1} attempt#{2}".format(str(e), self.path, tries)

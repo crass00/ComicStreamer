@@ -152,11 +152,13 @@ class JSONResultAPIHandler(GenericAPIHandler):
         team = self.get_argument(u"team", default=None)
         location = self.get_argument(u"location", default=None)
         storyarc = self.get_argument(u"storyarc", default=None)
+        alternateseries = self.get_argument(u"alternateseries", default=None)
         volume = self.get_argument(u"volume", default=None)
         publisher = self.get_argument(u"publisher", default=None)
         credit_filter = self.get_argument(u"credit", default=None)
         tag = self.get_argument(u"tag", default=None)
         genre = self.get_argument(u"genre", default=None)
+
 
         if folder_filter != "":
             folder_filter = os.path.normcase(os.path.normpath(folder_filter))
@@ -215,6 +217,7 @@ class JSONResultAPIHandler(GenericAPIHandler):
         query = addQueryOnList(query, Comic.teams_raw, Team.name, team)
         query = addQueryOnList(query, Comic.locations_raw, Location.name, location)
         query = addQueryOnList(query, Comic.storyarcs_raw, StoryArc.name, storyarc)
+        query = addQueryOnList(query, Comic.alternateseries_raw, AlternateSeries.name, alternateseries)
         query = addQueryOnList(query, Comic.genres_raw, Genre.name, genre)
         #if hasValue(series_filter):
         #    query = query.filter( Comic.series.ilike(unicode(series_filter).replace("*","%") ))
@@ -402,7 +405,7 @@ class ComicListAPIHandler(ZippableAPIHandler):
             u"keyphrase", u"series", u"path", u"folder", u"title", u"start_date",
             u"end_date", u"added_since", u"modified_since", u"lastread_since",
             u"order", u"character", u"team", u"location", u"storyarc", u"volume",
-            u"publisher", u"credit", u"tag", u"genre"
+            u"publisher", u"credit", u"tag", u"genre", u"alternateseries"
         ]
 
         criteria = {key: self.get_argument(key, default=None) for key in criteria_args}
@@ -638,7 +641,8 @@ class EntityAPIHandler(JSONResultAPIHandler):
                     'genres' : Genre.name,
                     'locations' : Location.name,
                     'generictags' : GenericTag.name,            
-                    'comics' : Comic
+                    'comics' : Comic,
+                    'alternateseries' : AlternateSeries.name
                     }
         #logging.debug("In EntityAPIHandler {0}".format(arglist))
         #/entity1/filter1/entity2/filter2...
@@ -702,6 +706,7 @@ class EntityAPIHandler(JSONResultAPIHandler):
 
                 query = query.options(subqueryload('characters_raw'))
                 query = query.options(subqueryload('storyarcs_raw'))
+                query = query.options(subqueryload('alternateseries_raw'))
                 query = query.options(subqueryload('locations_raw'))
                 query = query.options(subqueryload('teams_raw'))
                 #query = query.options(subqueryload('credits_raw'))                
@@ -736,6 +741,8 @@ class EntityAPIHandler(JSONResultAPIHandler):
                 querybase = querybase.join(comics_teams_table).join(Comic)
             if entity == 'storyarcs':
                 querybase = querybase.join(comics_storyarcs_table).join(Comic)
+            if entity == 'alternateseries':
+                querybase = querybase.join(comics_alternateseries_table).join(Comic)
             if entity == 'genres':
                 querybase = querybase.join(comics_genres_table).join(Comic)
             if entity == 'locations':
@@ -763,6 +770,9 @@ class EntityAPIHandler(JSONResultAPIHandler):
                 query = query.join(comics_teams_table).join(Team)
             if e == 'storyarcs':
                 query = query.join(comics_storyarcs_table).join(StoryArc)
+            if e == 'alternateseries':
+                query = query.join(comics_alternateseries_table).join(AlternateSeries)
+
             if e == 'genres':
                 query = query.join(comics_genres_table).join(Genre)
             if e == 'locations':
