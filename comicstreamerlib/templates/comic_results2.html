@@ -102,6 +102,11 @@
             function myAttributeWriter(record)
             {
                 var val = record[this.id];
+                if (this.id == 'thumb_url')
+		{
+		    val = '<img src="/comic/'+ record.id +'/thumbnail?api_key={{api_key}}" />';
+
+		}
                 if (this.id == 'datex')
                 {
 		    if (record['day'] != "" && record['month'] != "" && record['year'] != "")
@@ -264,6 +269,7 @@
                         <th data-dynatable-column="series">Series</th>
                         <th>Volume</th>
                         <th >Issue</th>
+			<th data-dynatable-column="thumb_url"></th>
                         <th data-dynatable-sorts="date" data-dynatable-column="datex">Date</th>
                         <th>Title</th>
                         <th>Publisher</th>
