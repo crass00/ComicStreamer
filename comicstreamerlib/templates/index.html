@@ -100,7 +100,15 @@
 
                 </div>
             </div>
-            <br>
+            <div id="main_browse">
+                <h3>Entity Browser</h3>
+                Browse through the comic database by clicking entity types, then values, to narrow down the list of comics.
+                Clicking "comics" will give the filtered-down list.<br>
+
+                <center><b><a href="entities/browse/">
+                    Entity browser
+                </a></b></center>
+            </div>           
             <div class="main_recent">
                 <h3>Most Recent Additions</h3>
                 <div class="cover_list">
@@ -150,7 +158,7 @@
             <div id="main_search">
                 <h3>Search Comics</h3>
                 <div>
-                    <div id="main_search_form" onsubmit="searchSubmit()">
+                   <div id="main_search_form" onsubmit="searchSubmit()">
                         <form action="{{handler.webroot}}/comiclist/browse" method="get">
                             <span class="param"><label>Series</label><input type="text" name="series"></span>
                             <span class="param"><label>Publisher</label><input type="text" name="publisher"></span>
