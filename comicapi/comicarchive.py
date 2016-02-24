@@ -34,6 +34,8 @@ from unrar import unrarlib
 import unrar.constants
 import ctypes
 import io
+import pylzma
+from py7zlib import Archive7z
 from unrar import constants
 
 class OpenableRarFile(rarfile.RarFile):
@@ -277,6 +279,54 @@ class ZipArchiver:
             return False
         else:
             return True
+
+class SevenZipArchiver:
+
+    def __init__( self, path ):
+        self.path = path
+
+    def getArchiveComment( self ):
+	#fp = open( self.path, 'r' )
+        #szf = Archive7z( fp )
+        #comment = szf.comment
+	#fp.close()
+        #return comment
+	return ""
+
+    def setArchiveComment( self, comment ):
+	return False
+
+    def readArchiveFile( self, archive_file ):
+        data = ""
+	fp = open( self.path, 'r' )
+
+        try:
+	    szf = Archive7z( fp )
+	    data = szf.getmember( archive_file ).read()
+        except Exception as e:
+            fp.close()
+            print >> sys.stderr, u"bad 7zip file [{0}]: {1} :: {2}".format(e, self.path, archive_file)
+            raise IOError
+        finally:
+            fp.close()
+        return data
+
+    def removeArchiveFile( self, archive_file ):
+	return False
+        
+    def writeArchiveFile( self, archive_file, data ):
+	return False
+
+    def getArchiveFilenameList( self ):
+        try:
+            fp = open( self.path, 'r' )
+	    szf = Archive7z( fp )
+            namelist = list(szf.getnames())
+            fp.close()
+            return namelist
+        except Exception as e:
+            print >> sys.stderr, u"Unable to get 7zipfile list [{0}]: {1}".format(e, self.path)
+            return []
 
 
 #------------------------------------------
@@ -591,7 +641,7 @@ class ComicArchive:
     logo_data = None
 
     class ArchiveType:
-        Zip, Rar, Folder, Pdf, Unknown = range(5)
+        Zip, SevenZip, Rar, Folder, Pdf, Unknown = range(6)
     
     def __init__( self, path, rar_exe_path=None, default_image_path=None ):
         self.path = path
@@ -616,6 +666,10 @@ class ComicArchive:
             elif self.zipTest():
                 self.archive_type =  self.ArchiveType.Zip
                 self.archiver = ZipArchiver( self.path )
+	elif ext == ".cb7" or ext == ".7z":
+	    if self.sevenZipTest():
+		self.archive_type = self.ArchiveType.SevenZip
+		self.archiver = SevenZipArchiver( self.path )
         else:
             if self.zipTest():
                 self.archive_type =  self.ArchiveType.Zip
@@ -656,6 +710,14 @@ class ComicArchive:
 
     def zipTest( self ):
         return zipfile.is_zipfile( self.path )
+    
+    def sevenZipTest( self ):
+	try: 
+	    Archive7z(open(self.path)).getnames()
+	except:
+	    return False
+	else: 
+	    return True
 
     def rarTest( self ):
         try:
@@ -668,7 +730,8 @@ class ComicArchive:
 
     def isZip( self ):
         return self.archive_type ==  self.ArchiveType.Zip
-
+    def isSevenZip( self ):
+        return self.archive_type ==  self.ArchiveType.SevenZip
     def isRar( self ):
         return self.archive_type ==  self.ArchiveType.Rar
     def isPdf(self):
@@ -682,6 +745,9 @@ class ComicArchive:
 
         elif check_rar_status and self.isRar() and self.rar_exe_path is None:
             return False
+
+	elif self.isSevenZip():
+	    return False
 
         elif not os.access(self.path, os.W_OK):
             return False
@@ -705,7 +771,7 @@ class ComicArchive:
         ext = os.path.splitext(self.path)[1].lower()
 
         if (
-              ( self.isZip() or  self.isRar() or self.isPdf()) #or self.isFolder() )
+              ( self.isZip() or  self.isRar() or self.isPdf() or self.isSevenZip() ) #or self.isFolder() )
               and
               ( self.getNumberOfPages() > 0)
 
