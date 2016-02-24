@@ -601,7 +601,7 @@ class FolderAPIHandler(JSONResultAPIHandler):
                 # create a list of subfolders    
                 for o in os.listdir(path):
                     if os.path.isdir(os.path.join(path,o)):
-                        sub_path = u"/folders" + args + u"/" + o
+                        sub_path = u""+self.webroot+"/folders" + args + u"/" + o
                         sub_path = urllib.quote(sub_path.encode("utf-8"))
                         item = {
                             'name': o,
