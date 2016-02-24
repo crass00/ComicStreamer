@@ -104,7 +104,7 @@
                 var val = record[this.id];
                 if (this.id == 'thumb_url')
 		{
-		    val = '<img src="/comic/'+ record.id +'/thumbnail?api_key={{api_key}}" />';
+		    val = '<img src="{{handler.webroot}}/comic/'+ record.id +'/thumbnail?api_key={{api_key}}" />';
 
 		}
                 if (this.id == 'datex')
