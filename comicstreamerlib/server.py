@@ -161,6 +161,7 @@ class JSONResultAPIHandler(GenericAPIHandler):
         storyarc = self.get_argument(u"storyarc", default=None)
         volume = self.get_argument(u"volume", default=None)
         publisher = self.get_argument(u"publisher", default=None)
+        language = self.get_argument(u"language", default=None)
         credit_filter = self.get_argument(u"credit", default=None)
         tag = self.get_argument(u"tag", default=None)
         genre = self.get_argument(u"genre", default=None)
@@ -190,6 +191,7 @@ class JSONResultAPIHandler(GenericAPIHandler):
             query = query.filter( Comic.series.ilike(keyphrase_filter) 
                                 | Comic.title.ilike(keyphrase_filter)
                                 | Comic.publisher.ilike(keyphrase_filter)
+                                | Comic.language.ilike(keyphrase_filter)
                                 | Comic.path.ilike(keyphrase_filter)
                                 | Comic.comments.ilike(keyphrase_filter)
                                 #| Comic.characters_raw.any(Character.name.ilike(keyphrase_filter))
@@ -217,6 +219,7 @@ class JSONResultAPIHandler(GenericAPIHandler):
         query = addQueryOnScalar(query, Comic.path, path_filter)
         query = addQueryOnScalar(query, Comic.folder, folder_filter)
         query = addQueryOnScalar(query, Comic.publisher, publisher)
+        query = addQueryOnScalar(query, Comic.language, language)
         query = addQueryOnList(query, Comic.characters_raw, Character.name, character)
         query = addQueryOnList(query, Comic.generictags_raw, GenericTag.name, tag)
         query = addQueryOnList(query, Comic.teams_raw, Team.name, team)
@@ -317,7 +320,9 @@ class JSONResultAPIHandler(GenericAPIHandler):
                 order_key = Comic.date
             elif order == "publisher":
                 order_key = Comic.publisher
-            elif order == "title":
+            elif order == "language":
+                order_key = Comic.language
+	    elif order == "title":
                 order_key = Comic.title
             elif order == "path":
                 order_key = Comic.path
@@ -409,7 +414,7 @@ class ComicListAPIHandler(ZippableAPIHandler):
             u"keyphrase", u"series", u"path", u"folder", u"title", u"start_date",
             u"end_date", u"added_since", u"modified_since", u"lastread_since",
             u"order", u"character", u"team", u"location", u"storyarc", u"volume",
-            u"publisher", u"credit", u"tag", u"genre"
+            u"publisher", u"language", u"credit", u"tag", u"genre"
         ]
 
         criteria = {key: self.get_argument(key, default=None) for key in criteria_args}

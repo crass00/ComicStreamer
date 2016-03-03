@@ -60,6 +60,11 @@
                     str = '"' + comic.title + '"';
                     $(cd).find(".cd_title").text(str);
                 }
+		if (comic.language !== "") {
+                    str = '"' + comic.language + '"';
+
+                    $(cd).find(".cd_language").text(str);
+                }
 
                 if (comic.volume !== "") {
                     str = "vol. " + comic.volume.toString() + ", ";
@@ -274,6 +279,7 @@
                         <th>Title</th>
                         <th>Publisher</th>
                         <th data-dynatable-column="path">Server Path</th>
+			<th>Language</th>
                     </tr>
                 </thead>
                 <tbody>

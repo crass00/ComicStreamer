@@ -317,6 +317,9 @@ ui-tooltip .ui-tooltip-content,
 .cd_title {
     font-style: italic;
 }
+.cd_language {
+    font-weight: bold;
+}
 .cd_volume {
     display: inline;
 }
