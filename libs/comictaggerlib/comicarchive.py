@@ -768,7 +768,7 @@ class ComicArchive:
 					#basename=os.path.split(k)[1]
 					#if basename < '0':
 					#	k = os.path.join(os.path.split(k)[0], "z" + basename)
-					return k.lower()
+					return (unicode(k, errors='replace') if not isinstance(k, unicode) else k).lower()
 				
 				files = natsorted(files, key=keyfunc,signed=False)
 			

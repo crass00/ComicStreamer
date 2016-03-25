@@ -20,6 +20,14 @@ import utils
 
 from database import *
 
+def getmtime(file_):
+    try:
+        res = os.path.getmtime(file_)
+        return res
+    except:
+        return time.time()
+
+
 class  MonitorEventHandler(watchdog.events.FileSystemEventHandler):
     
     def __init__(self, monitor):
@@ -478,7 +486,7 @@ class Monitor():
 
         filelist = utils.get_recursive_filelist( dirs )
         self.setStatusDetail(u"Monitor: sorting recursive file list ({0} items)".format(len(filelist)))
-        filelist = sorted(filelist, key=os.path.getmtime)
+        filelist = sorted(filelist, key=getmtime)
         
         self.setStatusDetail(u"Monitor: done listing files.")
         
