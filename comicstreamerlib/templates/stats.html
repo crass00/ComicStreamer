@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+{% set title = "ComicStreamer" %}
+<html>
+    <head>
+        <meta charset="utf8">
+        <link rel="icon" href="{{handler.webroot}}/favicon_blindpet.ico" />
+
+		{% include head_links.html %}
+
+        <title>{{title}}</title>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+
+        <style type="text/css">
+          @import "{{ static_url('comicstreamer.css') }}";
+        </style>
+        <script type="text/javascript" language="javascript">
+            function searchSubmit()
+            {
+                var role = $('#roles_select').val();
+                var person = $('#person_input').val();
+
+                if (person != "")
+                {
+                    if (role != "")
+                    {
+                        person = person+":"+role
+                    }
+                }
+                $('#credit_input').val(person);
+            }
+
+            function processs_status(scanstatus)
+            {
+                // if new scan complete time is newer than this page, reload the page
+                if (page_load_time < scanstatus.last_complete)
+                {
+                    location.reload();
+                }
+
+                // update some elements here
+                $('#scan_status').text("Scan status: " + scanstatus.status)
+                $('#scan_status_detail').text(scanstatus.detail)
+                var delay = 5000;
+                if (scanstatus.status != 'IDLE')
+                {
+                    delay = 1000;
+                }
+                setTimeout(fetch_status, delay);
+            }
+            function fetch_status()
+            {
+                $.getJSON( '{{handler.webroot}}/scanstatus?api_key={{api_key}}', processs_status);
+            }
+
+            //var date = new Date();
+            //var utc_offset = date.getTimezoneOffset() * 60 * 1000;
+            var page_load_time = {{ server_time }};
+            $(document).ready(
+
+                function()
+                {
+                    setTimeout(fetch_status, 1000);
+                }
+            );
+        </script>
+
+    </head>
+    <body>
+        <div id="header">
+            {% include header.html %}
+        </div>
+        <div id="headersub">
+            {% include headersub_configure.html %}
+        </div>
+        <div id=content>
+            <br>
+            <div id="main_topbar">
+                <div id="main_stats">
+                    <h3>Comic Library Info</h3>
+                    <ul>
+                        <li>Library last updated: {{ stats['last_updated'] }}</li>
+                        <li>Library created: {{ stats['created'] }}</li>
+                        <li>{{ stats['total'] }} comics, including {{ stats['series'] }} series and {{ stats['persons'] }} creators/contributors</li>
+                    </ul>
+                    <div id="scan_status">
+                    </div>
+                    <div id="scan_status_detail">
+                    </div>
+                </div>
+              
+            </div>
+            <br>
+
+        </div>
+
+    </body>
+</html>
+

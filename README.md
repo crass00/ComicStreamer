@@ -1,3 +1,42 @@
+Tristan79 Work on this fork (may 15 2016)
+
+- Lot of bug fixes, 
+- New (tryout gui) the old gui is still there for use
+- Fixes for jpg, bmp, 7z, pdf & other bugfull stuff
+- Added option to have alternative mobile site for android/ipad/etc...
+
+Broken Mac Download (requires brew already installed )
+
+https://cloud.catmonkey.nl/s/mws5KVMs8xaMM5y
+
+Remeber new version of database, please backup your old one and delete it before running...
+
+So open location with the Terminal:
+
+open ~/Application\ Support\ComicStreamer\
+
+Needs Brew Stuff. So after installing brew type on the Terminal:
+
+brew install mupdf-tools
+
+brew unlink mupdf-tools
+
+brew install homebrew/x11/mupdf
+
+(stupid thing needs x11 so install XQuartz :/ or download package and place lib & commandline tool yourself)
+
+
+Open DMG copy app to application folder. Start the package in the terminal with: 
+
+cd /Applications/ComicStreamer.app/Contents/MacOS/
+
+./ComicStreamer
+
+CTRL-C to quit
+
+It's broken because I can not get it to start with a simple double click...
+
+
 #### Work on this fork (september 5 2015)
  - added webroot option to configuration, useful for proxy pass configurations (issue #24)
  - little unrar automation: after pip installation, run `paver libunrar'

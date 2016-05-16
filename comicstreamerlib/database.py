@@ -183,6 +183,7 @@ class Comic(Base):
     lastread_ts = Column(DateTime)
     lastread_page = Column(Integer)
     thumbnail = deferred(Column(LargeBinary))
+    language = Column(String)
     
     #hash = Column(String)
     added_ts = Column(DateTime, default=datetime.utcnow)  # when the comic was added to the DB

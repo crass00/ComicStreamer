@@ -33,4 +33,62 @@ Some tweaks that were neeeded:
 	Needed to add extra "import" statements to rumps.py: AppKit, Foundation
 	Needed to rebuild the Pyinstaller Mac 32-bit bootloader after removing the line to run the app in the foreground
 
+------------------------
+My Question was how to compile it under osx but I almost already answered that myself.
 
+Stuck with the init patch and the other one...
+
+Hi! how do I compile this under OSX (and I mean fork 0.8 https://github.com/kounch/ComicStreamer)
+
+http://catmonkey.nl/Share/ComicStreamer-0.0.9.dmg
+
+Update It runs!
+
+I followed the two hints there where resulting in:
+osx 10.11
+xcode 7.3 & brew
+
+brew install git
+brew install webp
+brew install pyqt
+brew install unrar
+brew install homebrew/python/pillow
+brew install libyaml
+pip install PyPDF2
+pip install pylzma
+pip install configobj
+pip install configparser
+pip install python-dateutil
+pip install watchdog
+pip install tornado
+pip install sqlalchemy
+pip install pybonjour --allow-external pybonjour --allow-unverified pybonjour
+pip install natsort
+pip install pyinstaller
+pip install pillow
+pip install unrar
+pip install pyobjc-core
+pip install pyobjc
+
+-- PDF stuff (should probably be included in the OSX version)
+brew install mupdf-tools
+brew unlink mupdf-tools
+brew install homebrew/x11/mupdf
+
+Download 3.2 and developer version from http://www.pyinstaller.org
+Unzip in same parent folder as the ComicsStreamer folder (not "in" the ComicStreamer folder) 
+Rename developer folder to pyinstaller-develop
+Patch mac/Makefile replace pyinstaller-2.0 with pyinstaller-3.2
+Patch mac/Makefile replace 'which rar' with '-a ../libunrar' thus making/reading cp -a ../libunrar $(APP_BUNDLE)/Contents/MacOS
+Download http://www.rarlab.com/rar_add.htm unrar source http://www.rarlab.com/rar/unrarsrc-5.3.11.tar.gz (or newer)
+Compile libunrar.so with make lib -f makefile
+Move libunrar.so to libunrar folder in the ComicStreamer source
+
+Goto: mac/Makefile folder run make...
+
+I did nothing with the init or rumps whatever... runs when I start it from within the Contents/MacOSX folder :-) 
+Ow I get it... the icon is not hidden and the package will not start but.. unless you run it from the terminal... and it does not contain the mudraw tool...
+
+So now what? how do i fix that...
+
+Maybe somebody add this to a readme!

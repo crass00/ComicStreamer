@@ -21,7 +21,7 @@ dist:
 	cp -a $(STREAMER_SRC)/templates $(APP_BUNDLE)/Contents/MacOS
 	cp -a $(STREAMER_SRC)/static $(APP_BUNDLE)/Contents/MacOS
 	cp $(MAC_BASE)/app.icns $(APP_BUNDLE)/Contents/Resources/icon-windowed.icns
-	cp `which unrar` $(APP_BUNDLE)/Contents/MacOS
+	cp -a ../libunrar $(APP_BUNDLE)/Contents/MacOS
 	
 	rm -rf $(APP_BUNDLE)/Contents/MacOS/static/HTML5-Comic-Book-Reader
 

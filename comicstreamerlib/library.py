@@ -38,7 +38,7 @@ class Library:
                                  .filter(Comic.id == int(comic_id)).first()
 
         image_data = None
-        default_img_file = AppFolders.imagePath("default.jpg")
+        default_img_file = AppFolders.imagePath("notfound.png")
 
         if path is not None:
             if int(page_number) < page_count:
@@ -297,6 +297,7 @@ class Library:
         storyarc = criteria.get(u"storyarc", None)
         volume = criteria.get(u"volume", None)
         publisher = criteria.get(u"publisher", None)
+        language_filter = criteria.get(u"language", None)
         credit_filter = criteria.get(u"credit", None)
         tag = criteria.get(u"tag", None)
         genre = criteria.get(u"genre", None)
@@ -328,6 +329,7 @@ class Library:
             query = query.filter( Comic.series.ilike(keyphrase_filter)
                                 | Comic.title.ilike(keyphrase_filter)
                                 | Comic.publisher.ilike(keyphrase_filter)
+                                | Comic.language.ilike(keyphrase_filter)
                                 | Comic.path.ilike(keyphrase_filter)
                                 | Comic.comments.ilike(keyphrase_filter)
                                 #| Comic.characters_raw.any(Character.name.ilike(keyphrase_filter))
@@ -356,6 +358,7 @@ class Library:
         query = addQueryOnScalar(query, Comic.path, path_filter)
         query = addQueryOnScalar(query, Comic.folder, folder_filter)
         query = addQueryOnScalar(query, Comic.publisher, publisher)
+        query = addQueryOnScalar(query, Comic.language, language_filter)
         query = addQueryOnList(query, Comic.characters_raw, Character.name, character)
         query = addQueryOnList(query, Comic.generictags_raw, GenericTag.name, tag)
         query = addQueryOnList(query, Comic.teams_raw, Team.name, team)
@@ -437,6 +440,8 @@ class Library:
                 order_key = Comic.date
             elif order == "publisher":
                 order_key = Comic.publisher
+            elif order == "language":
+                order_key = Comic.language
             elif order == "title":
                 order_key = Comic.title
             elif order == "path":
@@ -458,7 +463,7 @@ class Library:
                 self.comicArchiveList.append(ca)
                 return ca
         else:
-            ca = ComicArchive(path, default_image_path=AppFolders.imagePath("default.jpg"))
+            ca = ComicArchive(path, default_image_path=AppFolders.imagePath("notfound.png"))
             self.comicArchiveList.append(ca)
             if len(self.comicArchiveList) > 10:
                 self.comicArchiveList.pop(0)

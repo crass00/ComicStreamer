@@ -161,7 +161,7 @@ class Monitor():
 
     def getComicMetadata(self, path):
 
-        ca = ComicArchive(path,  default_image_path=AppFolders.imagePath("default.jpg"))
+        ca = ComicArchive(path,  default_image_path=AppFolders.imagePath("notfound.png"))
         
         if ca.seemsToBeAComicArchive():
             logging.debug(u"Reading in {0} {1}\r".format(self.read_count, path))
