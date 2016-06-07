@@ -1,4 +1,4 @@
-ComicStreamer 0.9.4
+ComicStreamer
 
 "ToiletStreamer Edition"
 
