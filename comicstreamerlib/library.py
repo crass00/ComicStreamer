@@ -8,7 +8,7 @@ from sqlalchemy.orm import subqueryload
 
 import utils
 from database import Comic, DatabaseInfo, Person, Role, Credit, Character, GenericTag, Team, Location, \
-    StoryArc, Genre, DeletedComic
+    StoryArc, Genre, DeletedComic,AlternateSeries
 from folders import AppFolders
 from comicapi.comicarchive import ComicArchive
 from comicapi.issuestring import IssueString
@@ -131,6 +131,9 @@ class Library:
                 comic.issue = unicode(md.issue)
                 comic.issue_num = IssueString(unicode(comic.issue)).asFloat()
 
+            if md.alternateNumber is not None:
+                comic.alternateIssue = unicode(md.alternateNumber)
+                comic.alternateNumber = IssueString(unicode(comic.alternateIssue)).asFloat()
             if md.year is not None:
                 try:
                     day = 1
@@ -175,6 +178,11 @@ class Library:
             for l in list(set(md.locations.split(","))):
                 location = self.getNamedEntity(Location, l.strip())
                 comic.locations_raw.append(location)
+
+        if md.alternateSeries is not None:
+                for alt in list(set(md.alternateSeries.split(","))):
+                    alternateseries = self.getNamedEntity(AlternateSeries, alt.strip())
+                    comic.alternateseries_raw.append(alternateseries)
 
         if md.storyArc is not None:
             for sa in list(set(md.storyArc.split(","))):
