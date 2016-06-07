@@ -1,23 +1,3 @@
-"""
-A python class to represent a single comic, be it file or folder of images
-"""
-
-"""
-Copyright 2012-2014  Anthony Beville
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-"""
-
 import zipfile
 import os
 import struct
@@ -630,22 +610,76 @@ class PdfArchiver:
     def setArchiveComment( self, comment ):
         return False
     def readArchiveFile( self, page_num ):
-        return subprocess.check_output(['mudraw', '-o','-', self.path, str(int(os.path.basename(page_num)[:-4]))])
+        resolution = 300
+        #return subprocess.check_output(['pdftopng', '-r', str(resolution), '-f', str(int(os.path.basename(page_num)[:-4])), '-l', str(int(os.path.basename(page_num)[:-4])), self.path,  '-'])
+        return subprocess.check_output(['mudraw', '-r', str(resolution), '-o','-', self.path, str(int(os.path.basename(page_num)[:-4]))])
+
     def writeArchiveFile( self, archive_file, data ):
         return False
     def removeArchiveFile( self, archive_file ):
         return False
     def getArchiveFilenameList( self ):
         out = []
-        pdf = PdfFileReader(open(self.path, 'rb'))
-        if pdf.isEncrypted:
-            try:
-                pdf.decrypt('')
-            except:
-                print 'File Decrypted Failed (BUG?)'
-        else:
-            for page in range(1, pdf.getNumPages() + 1):
-                out.append("/%04d.jpg" % (page))
+        try:
+            pdf = PdfFileReader(open(self.path, 'rb'))
+            if pdf.isEncrypted:
+                try:
+                    pdf.decrypt('')
+                    for page in range(1, pdf.getNumPages() + 1):
+                        out.append(str(page) + ".jpg")
+                except Exception as e:
+                    print >> sys.stderr, u"PDF Decrypted Failed [{0}]: {1}".format(str(e),self.path)
+            else:
+                for page in range(1, pdf.getNumPages() + 1):
+                    #out.append("/%04d.jpg" % (page))
+
+                    out.append(str(page) + ".jpg")
+                    
+        except Exception as e:
+            print >> sys.stderr, u"PDF Unreadable [{0}]: {1}".format(str(e),self.path)
+        return out
+
+class EpubArchiver:
+    def __init__( self, path ):
+        self.path = path
+    
+    def getArchiveComment( self ):
+        return ""
+    def setArchiveComment( self, comment ):
+        return False
+    def readArchiveFile( self, page_num ):
+        corrected_path = self.path
+        if os.path.basename(self.path)[-4:] == 'epub':
+            corrected_path = self.path + u".tmp.pdf"
+        resolution = 300;
+        return subprocess.check_output(['mudraw', '-r', str(resolution), '-o','-', corrected_path, str(int(os.path.basename(page_num)[:-4]))])
+    def writeArchiveFile( self, archive_file, data ):
+        return False
+    def removeArchiveFile( self, archive_file ):
+        return False
+    def getArchiveFilenameList( self ):
+        out = []
+        try:
+            corrected_path = self.path
+            if os.path.basename(self.path)[-4:] == 'epub':
+                if not os.path.isfile(self.path+ u".tmp.pdf"):
+                    subprocess.check_output(['/Applications/calibre.app/Contents/MacOS/ebook-convert', self.path, self.path + u".tmp.pdf"])
+                #rename file after process is done... tmp cache
+                corrected_path = self.path + u".tmp.pdf"
+            pdf = PdfFileReader(open(corrected_path, 'rb'))
+            if pdf.isEncrypted:
+                try:
+                    pdf.decrypt('')
+                    for page in range(1, pdf.getNumPages() + 1):
+                        out.append("/%04d.jpg" % (page))
+                except Exception as e:
+                    print >> sys.stderr, u"PDF Decrypted Failed [{0}]: {1}".format(str(e),self.path)
+            else:
+                for page in range(1, pdf.getNumPages() + 1):
+                    #out.append("/%04d.jpg" % (page))
+                    out.append(str(page))
+        except Exception as e:
+            print >> sys.stderr, u"PDF Unreadable [{0}]: {1}".format(str(e),corrected_path)
         return out
 
 #------------------------------------------------------------------
@@ -654,11 +688,12 @@ class ComicArchive:
     logo_data = None
 
     class ArchiveType:
-        Zip, SevenZip, Rar, Folder, Pdf, Unknown = range(6)
+        Zip, SevenZip, Rar, Folder, Pdf, Epub, Unknown = range(7)
     
     def __init__( self, path, rar_exe_path=None, default_image_path=None ):
         self.path = path
 
+#CACHE PDF,EPUB HERE
         self.rar_exe_path = rar_exe_path
         self.ci_xml_filename = 'ComicInfo.xml'
         self.comet_default_filename = 'CoMet.xml'
@@ -700,8 +735,13 @@ class ComicArchive:
                     self.archiver = RarArchiver( self.path, rar_exe_path=self.rar_exe_path )
             else:
                 if os.path.basename(self.path)[-3:] == 'pdf':
-                    self.archive_type = self.ArchiveType.Pdf
-                    self.archiver = PdfArchiver(self.path)
+                    if os.path.basename(self.path)[-8:] != '.tmp.pdf':
+                        self.archive_type = self.ArchiveType.Pdf
+                        self.archiver = PdfArchiver(self.path)
+
+                elif os.path.basename(self.path)[-4:] == 'epub':
+                    self.archive_type = self.ArchiveType.Epub
+                    self.archiver = EpubArchiver(self.path)
 
                 elif self.zipTest():
                     self.archive_type =  self.ArchiveType.Zip
@@ -716,7 +756,6 @@ class ComicArchive:
                     self.archiver = SevenZipArchiver( self.path )
 
         if ComicArchive.logo_data is None:
-            print self.default_image_path
             #fname = ComicTaggerSettings.getGraphic('nocover.png')
             fname = self.default_image_path
             with open(fname, 'rb') as fd:
@@ -770,6 +809,8 @@ class ComicArchive:
         return self.archive_type ==  self.ArchiveType.Rar
     def isPdf(self):
         return self.archive_type ==  self.ArchiveType.Pdf
+    def isEpub(self):
+        return self.archive_type ==  self.ArchiveType.Epub
     def isFolder( self ):
         return self.archive_type ==  self.ArchiveType.Folder
 
@@ -805,7 +846,7 @@ class ComicArchive:
         ext = os.path.splitext(self.path)[1].lower()
 
         if (
-              ( self.isZip() or  self.isRar() or self.isPdf() or self.isSevenZip() ) #or self.isFolder() )
+              ( self.isZip() or  self.isRar() or self.isPdf() or self.isEpub() or self.isSevenZip() ) #or self.isFolder() )
               and
               ( self.getNumberOfPages() > 0)
 
@@ -863,7 +904,7 @@ class ComicArchive:
         image_data = None
 
         filename = self.getPageName( index )
-
+        
         if filename is not None:
             try:
                 image_data = self.archiver.readArchiveFile( filename )
@@ -960,7 +1001,7 @@ class ComicArchive:
             # make a sub-list of image files
             self.page_list = []
             for name in files:
-                if ( name[-4:].lower() in [ ".bmp", ".jpg", "jpeg", ".png", ".gif", "webp" ] and os.path.basename(name)[0] != "." ):
+                if ( name[-4:].lower() in [".bmp", ".jpg", "jpeg", ".png", ".gif", "webp" ] and os.path.basename(name)[0] != "." ):
                     self.page_list.append(name)
 
         return self.page_list
@@ -1050,7 +1091,7 @@ class ComicArchive:
         try:
             raw_cix = self.archiver.readArchiveFile( self.ci_xml_filename )
         except IOError:
-            print "Error reading in raw CIX!"
+            print  >> sys.stderr, u"Error reading in raw CIX!"
             raw_cix = ""
         return  raw_cix
 
