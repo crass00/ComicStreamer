@@ -16,3 +16,7 @@ test.py
 /mac/dist
 /mac/build
 /mac/ComicStreamer.spec
+
+libunrar/libunrar.so
+
+mudraw
