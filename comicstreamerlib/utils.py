@@ -131,7 +131,7 @@ def resizeImage(max, image_data):
     # disable WebP for now, due a memory leak in python library
     imtype = imghdr.what(StringIO.StringIO(image_data))
     if imtype == "webp":
-        with open(AppFolders.imagePath("default.jpg"), 'rb') as fd:
+        with open(AppFolders.imagePath("notfound.png"), 'rb') as fd:
             image_data = fd.read()
 
     im = Image.open(StringIO.StringIO(image_data)).convert('RGB')
@@ -168,7 +168,10 @@ def resize(img, box, out, fit=False):
     while img.size[0]/factor > 2*box[0] and img.size[1]*2/factor > 2*box[1]:
         factor *=2
     if factor > 1:
-        img.thumbnail((img.size[0]/factor, img.size[1]/factor), Image.NEAREST)
+        try:
+            img.thumbnail((img.size[0]/factor, img.size[1]/factor), Image.NEAREST)
+        except IOError:
+            print >> sys.stderr, u"Error reading in page. Image Corrupted"
 
     #calculate the cropping box and get the cropped part
     if fit:

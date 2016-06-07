@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 """
 ComicStreamer main server classes
@@ -26,6 +27,8 @@ import tornado.ioloop
 import tornado.web
 import urllib
 import mimetypes
+import re
+
 from urllib2 import quote
 
 
@@ -84,6 +87,16 @@ def custom_get_current_user(handler):
     if user:
         user = fix_username(user)
     return  user
+
+def deviceroot(s):
+    if(re.search('(iPhone|iPod).*', s.request.headers["User-Agent"])):
+        return "mobile/"
+    elif(re.search('(Android).*', s.request.headers["User-Agent"])):
+        return "mobile/"
+    elif(re.search('(iPad).*', s.request.headers["User-Agent"])):
+        return "mobile/"
+    else:
+        return ""
 
 class BaseHandler(tornado.web.RequestHandler):
 
@@ -161,6 +174,7 @@ class JSONResultAPIHandler(GenericAPIHandler):
         storyarc = self.get_argument(u"storyarc", default=None)
         volume = self.get_argument(u"volume", default=None)
         publisher = self.get_argument(u"publisher", default=None)
+        language = self.get_argument(u"language", default=None)
         credit_filter = self.get_argument(u"credit", default=None)
         tag = self.get_argument(u"tag", default=None)
         genre = self.get_argument(u"genre", default=None)
@@ -190,6 +204,7 @@ class JSONResultAPIHandler(GenericAPIHandler):
             query = query.filter( Comic.series.ilike(keyphrase_filter) 
                                 | Comic.title.ilike(keyphrase_filter)
                                 | Comic.publisher.ilike(keyphrase_filter)
+                                | Comic.language.ilike(keyphrase_filter)
                                 | Comic.path.ilike(keyphrase_filter)
                                 | Comic.comments.ilike(keyphrase_filter)
                                 #| Comic.characters_raw.any(Character.name.ilike(keyphrase_filter))
@@ -217,6 +232,7 @@ class JSONResultAPIHandler(GenericAPIHandler):
         query = addQueryOnScalar(query, Comic.path, path_filter)
         query = addQueryOnScalar(query, Comic.folder, folder_filter)
         query = addQueryOnScalar(query, Comic.publisher, publisher)
+        query = addQueryOnScalar(query, Comic.language, language)
         query = addQueryOnList(query, Comic.characters_raw, Character.name, character)
         query = addQueryOnList(query, Comic.generictags_raw, GenericTag.name, tag)
         query = addQueryOnList(query, Comic.teams_raw, Team.name, team)
@@ -317,7 +333,9 @@ class JSONResultAPIHandler(GenericAPIHandler):
                 order_key = Comic.date
             elif order == "publisher":
                 order_key = Comic.publisher
-            elif order == "title":
+            elif order == "language":
+                order_key = Comic.language
+	    elif order == "title":
                 order_key = Comic.title
             elif order == "path":
                 order_key = Comic.path
@@ -409,7 +427,7 @@ class ComicListAPIHandler(ZippableAPIHandler):
             u"keyphrase", u"series", u"path", u"folder", u"title", u"start_date",
             u"end_date", u"added_since", u"modified_since", u"lastread_since",
             u"order", u"character", u"team", u"location", u"storyarc", u"volume",
-            u"publisher", u"credit", u"tag", u"genre"
+            u"publisher", u"language", u"credit", u"tag", u"genre"
         ]
 
         criteria = {key: self.get_argument(key, default=None) for key in criteria_args}
@@ -449,7 +467,7 @@ class ComicListBrowserHandler(BaseHandler):
             #    arg_string = '?'+self.request.uri.split('?',1)[1]
             src = default_src + arg_string
         
-        self.render("comic_results2.html",
+        self.render(deviceroot(self)+"comic_results2.html",
                     src=src,
                     api_key=self.application.config['security']['api_key']
                 )
@@ -461,7 +479,7 @@ class FoldersBrowserHandler(BaseHandler):
             args = "/"
         args = utils.collapseRepeats(args, "/")    
             
-        self.render("folders.html",
+        self.render(deviceroot(self)+"folders.html",
                     args=args,
                     api_key = self.application.config['security']['api_key'])
 
@@ -479,7 +497,7 @@ class EntitiesBrowserHandler(BaseHandler):
         #else:
         #    arg_string = arg_string + "&api_key=" + self.application.config['security']['api_key']
             
-        self.render("entities.html",
+        self.render(deviceroot(self)+"entities.html",
                     args=arg_string,
                     api_key = self.application.config['security']['api_key'])
 
@@ -522,13 +540,14 @@ class ThumbnailAPIHandler(ImageAPIHandler):
             self.setContentType('image/jpg')
             self.write(thumbnail)
         else:
-            default_img_file = AppFolders.imagePath("default.jpg")
+            default_img_file = AppFolders.imagePath("notfound.png")
             with open(default_img_file, 'rb') as fd:
                 image_data = fd.read()
             self.setContentType('image/jpg')
             self.write(image_data)
 
 class FileAPIHandler(GenericAPIHandler):
+    @tornado.web.asynchronous
     def get(self, comic_id):
         self.validateAPIKey()
 
@@ -545,10 +564,11 @@ class FileAPIHandler(GenericAPIHandler):
             # TODO: check it doesn't buffer the response, it should send data chunk by chunk
             with open(obj.path, 'rb') as f:
                 while True:
-                    data = f.read(2048 * 1024)
+                    data = f.read(40960 * 1024)
                     if not data:
                         break
                     self.write(data)
+                    self.flush()
             self.finish()
 
 class FolderAPIHandler(JSONResultAPIHandler):
@@ -601,7 +621,7 @@ class FolderAPIHandler(JSONResultAPIHandler):
                 # create a list of subfolders    
                 for o in os.listdir(path):
                     if os.path.isdir(os.path.join(path,o)):
-                        sub_path = u"/folders" + args + u"/" + o
+                        sub_path = u""+self.webroot+"/folders" + args + u"/" + o
                         sub_path = urllib.quote(sub_path.encode("utf-8"))
                         item = {
                             'name': o,
@@ -807,7 +827,7 @@ class ReaderHandler(BaseHandler):
             else:
                 target_page=obj.lastread_page   
                 
-            self.render("cbreader.html",
+            self.render(deviceroot(self)+"cbreader.html",
                         title=title,
                         id=comic_id,
                         count=obj.page_count,
@@ -823,7 +843,7 @@ class ReaderHandler(BaseHandler):
 class UnknownHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self):
-            self.write("Whoops! Four-oh-four.")
+        self.render(deviceroot(self)+"notfound.html", version=self.application.version)
 
 class MainHandler(BaseHandler):
     @tornado.web.authenticated
@@ -841,7 +861,7 @@ class MainHandler(BaseHandler):
             random_comic = type('fakecomic', (object,), 
              {'id':0, 'series':'No Comics', 'issue':0})()
 
-        self.render("index.html", stats=stats,
+        self.render(deviceroot(self)+"index.html", stats=stats,
                     random_comic=random_comic,
                     recently_added = list(recently_added_comics),
                     recently_read = list(recently_read_comics),
@@ -849,21 +869,61 @@ class MainHandler(BaseHandler):
                     server_time =  int(time.mktime(datetime.utcnow().timetuple()) * 1000),
                     api_key = self.application.config['security']['api_key']
                 )
+
+class StatsPageHandler(BaseHandler):
+    @tornado.web.authenticated
+    def get(self):
+        stats = self.library.getStats()
+        stats['last_updated'] = utils.utc_to_local(stats['last_updated']).strftime("%Y-%m-%d %H:%M:%S")
+        stats['created'] = utils.utc_to_local(stats['created']).strftime("%Y-%m-%d %H:%M:%S")
+        self.render(deviceroot(self)+"stats.html", stats=stats,
+                    server_time =  int(time.mktime(datetime.utcnow().timetuple()) * 1000),
+                    api_key = self.application.config['security']['api_key']
+                    )
+
+class RecentlyPageHandler(BaseHandler):
+    @tornado.web.authenticated
+    def get(self):
+        recently_added_comics = self.library.recentlyAddedComics(10)
+        recently_read_comics = self.library.recentlyReadComics(10)
+
+        self.render(deviceroot(self)+"recently.html",
+                    recently_added = list(recently_added_comics),
+                    recently_read = list(recently_read_comics),
+                    api_key = self.application.config['security']['api_key']
+                    )
+
+
+
+class SearchPageHandler(BaseHandler):
+    @tornado.web.authenticated
+    def get(self):
         
+        roles_list = [role.name for role in self.library.getRoles()]
+        random_comic = self.library.randomComic()
+        
+        self.render(deviceroot(self)+"search.html",
+                    roles = roles_list,
+                    api_key = self.application.config['security']['api_key']
+                    )
+
 class GenericPageHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self,page):
-        self.render(page+".html")
+        if os.path.isfile(AppFolders.appBase()+"/"+"templates"+"/"+deviceroot(self)+page+".html"):
+            self.render(deviceroot(self)+page+".html")
+        else:
+            self.render(deviceroot(self)+"notfound.html", version=self.application.version)
 
 class AboutPageHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self):
-        self.render("about.html", version=self.application.version)            
+        self.render(deviceroot(self)+"about.html", version=self.application.version)
 
 class ControlPageHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self):
-        self.render("control.html", api_key=self.application.config['security']['api_key'])     
+        self.render(deviceroot(self)+"control.html", api_key=self.application.config['security']['api_key'])
 
 class LogPageHandler(BaseHandler):
     
@@ -876,7 +936,7 @@ class LogPageHandler(BaseHandler):
         for line in reversed(open(log_file).readlines()):
             logtxt += line.rstrip() + '\n'
 
-        self.render("log.html",
+        self.render(deviceroot(self)+"log.html",
                     logtxt=logtxt)
      
 class ConfigPageHandler(BaseHandler):
@@ -908,7 +968,7 @@ class ConfigPageHandler(BaseHandler):
             formdata['password'] = ""
             formdata['password_confirm'] = ""
             
-        self.render("configure.html",
+        self.render(deviceroot(self)+"configure.html",
                     formdata=formdata,
                     success=success,
                     failure=failure)
@@ -1052,7 +1112,7 @@ class ConfigPageHandler(BaseHandler):
         formdata['password'] = ""
         formdata['password_confirm'] = ""
         logging.info("Config: " + str(self.application.config))
-        self.render_config(formdata, success=success_str, failure=failure_str)
+        self.render_config(deviceroot(self)+formdata, success=success_str, failure=failure_str)
         
 class LoginHandler(BaseHandler):
     def get(self):
@@ -1068,7 +1128,7 @@ class LoginHandler(BaseHandler):
             self.set_secure_cookie("user", fix_username(self.application.config['security']['username']))
             self.redirect(next)
         else:    
-            self.render('login.html', next=next)
+            self.render(deviceroot(self)+'login.html', next=next)
 
     def post(self):
         next = self.get_argument("next")
@@ -1145,6 +1205,9 @@ class APIServer(tornado.web.Application):
             (self.webroot + r"/about", AboutPageHandler),
             (self.webroot + r"/control", ControlPageHandler),
             (self.webroot + r"/configure", ConfigPageHandler),
+            (self.webroot + r"/search", SearchPageHandler),
+            (self.webroot + r"/stats", StatsPageHandler),
+            (self.webroot + r"/recently", RecentlyPageHandler),
             (self.webroot + r"/log", LogPageHandler),
             (self.webroot + r"/comiclist/browse", ComicListBrowserHandler),
             (self.webroot + r"/folders/browse(/.*)*", FoldersBrowserHandler),
@@ -1169,6 +1232,7 @@ class APIServer(tornado.web.Application):
             (self.webroot + r'/.*', UnknownHandler),
             
         ]
+
 
         settings = dict(
             template_path=os.path.join(AppFolders.appBase(), "templates"),
