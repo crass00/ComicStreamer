@@ -424,8 +424,7 @@ class SchemaVersionException(Exception):
 
 class DataManager():
     def __init__(self):
-        # self.dbfile = os.path.join(AppFolders.appData(), "comicdb.sqlite")
-        self.dbfile =  "comicdb.sqlite"
+        self.dbfile = os.path.join(AppFolders.appData(), "comicdb.sqlite")
         self.engine = create_engine('sqlite:///'+ self.dbfile, echo=False)
 
         session_factory = sessionmaker(bind=self.engine)
