@@ -20,6 +20,14 @@ import utils
 from database import *
 from library import Library
 
+
+def getmtime(file_):
+    try:
+        res = os.path.getmtime(file_)
+        return res
+    except:
+        return time.time()
+
 class  MonitorEventHandler(watchdog.events.FileSystemEventHandler):
     
     def __init__(self, monitor):
@@ -151,7 +159,7 @@ class Monitor():
             # file exists.  check the mod date.
             # if it's been modified, remove it, and it'll be re-added
             #curr = datetime.datetime.fromtimestamp(os.path.getmtime(comic.path))
-            curr = datetime.utcfromtimestamp(os.path.getmtime(comic.path))
+            curr = datetime.utcfromtimestamp(getmtime(comic.path))
             prev = comic.mod_ts
             if curr != prev:
                 logging.debug(u"Removed modifed {0}".format(comic.path))
@@ -183,7 +191,7 @@ class Monitor():
                 
             md.path = ca.path 
             md.page_count = ca.page_count
-            md.mod_ts = datetime.utcfromtimestamp(os.path.getmtime(ca.path))
+            md.mod_ts = datetime.utcfromtimestamp(getmtime(ca.path))
             md.filesize = os.path.getsize(md.path)
             md.hash = ""
 
@@ -225,7 +233,7 @@ class Monitor():
         current_set = set()
         filelist = utils.get_recursive_filelist(dirs)
         for path in filelist:
-            current_set.add((path, datetime.utcfromtimestamp(os.path.getmtime(path))))
+            current_set.add((path, datetime.utcfromtimestamp(getmtime(path))))
         logging.info("NEW -- current_set size [%d]" % len(current_set))
 
         for comic_id, path, md_ts in self.library.getComicPaths():
@@ -248,7 +256,6 @@ class Monitor():
 
         self.add_count = 0      
         self.remove_count = 0
-
 
         filelist, to_remove = self.createAddRemoveLists(dirs)
 
