@@ -10,7 +10,6 @@ test.py
 /.idea
 /.project
 /dev_graphics
-/release
 /windows/dist
 /windows/nsis/release.nsh
 /mac/dist
