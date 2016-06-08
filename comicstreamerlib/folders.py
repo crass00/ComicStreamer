@@ -1,28 +1,9 @@
-"""
-foldername retrieval functions for comicstreamer app
-"""
-
-"""
-Copyright 2014  Anthony Beville
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-"""
-
 import os
 import sys
 import platform
 import logging
 
+appname = 'ComicStreamer'
 
 from options import Options
 
@@ -56,11 +37,11 @@ class AppFolders():
         if opts.user_dir is not None:
             folder = opts.user_dir
         elif platform.system() == "Windows":
-            folder = os.path.join( AppFolders.windowsAppDataFolder(), 'ComicStreamer' )
+            folder = os.path.join( AppFolders.windowsAppDataFolder(), appname )
         elif platform.system() == "Darwin":
-            folder = os.path.join( os.path.expanduser('~') , 'Library/Application Support/ComicStreamer')
+            folder = os.path.join( os.path.expanduser('~') , 'Library/Application Support/'+appname)
         else:
-            folder = os.path.join( os.path.expanduser('~') , '.ComicStreamer')
+            folder = os.path.join( os.path.expanduser('~') , '.'+appname)
             
         if folder is not None:
             folder = folder.decode(filename_encoding)
@@ -81,9 +62,9 @@ class AppFolders():
     def logs():
         if AppFolders.runningAtRoolLevel():
             if platform.system() == "Windows":
-                folder = os.path.join( AppFolders.windowsAppDataFolder(), 'ComicStreamer' )
+                folder = os.path.join( AppFolders.windowsAppDataFolder(), appname )
             else:
-                folder = "/var/log/ComicStreamer"
+                folder = "/var/log/"+appname
         else:
             folder = os.path.join(AppFolders.userFolder(), "logs")
         return folder
@@ -92,11 +73,11 @@ class AppFolders():
     def settings():
         if AppFolders.runningAtRoolLevel():
             if platform.system() == "Windows":
-                folder = os.path.join( AppFolders.windowsAppDataFolder(), 'ComicStreamer' )
+                folder = os.path.join( AppFolders.windowsAppDataFolder(), appname )
             elif platform.system() == "Darwin":
-                folder = os.path.join( '/Library/Application Support/ComicStreamer')
+                folder = os.path.join( '/Library/Application Support/'+appname)
             else:
-                folder = "/etc/ComicStreamer"
+                folder = "/etc/"+appname
         else:
             folder = os.path.join(AppFolders.userFolder())
         return folder
@@ -105,11 +86,11 @@ class AppFolders():
     def appData():
         if AppFolders.runningAtRoolLevel():
             if platform.system() == "Windows":
-                folder = os.path.join( AppFolders.windowsAppDataFolder(), 'ComicStreamer' )
+                folder = os.path.join( AppFolders.windowsAppDataFolder(), appname )
             elif platform.system() == "Darwin":
-                folder = os.path.join( '/Library/Application Support/ComicStreamer')
+                folder = os.path.join( '/Library/Application Support/'+appname)
             else:
-                folder = "/var/lib/ComicStreamer"
+                folder = "/var/lib/"+appname
         else:
             folder = os.path.join(AppFolders.userFolder())
         return folder

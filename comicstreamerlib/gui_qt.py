@@ -25,7 +25,7 @@ class QtBasedGui():
         
         self.app = QtGui.QApplication(sys.argv)
         
-        pixmap = QtGui.QPixmap(AppFolders.imagePath("trout.png"))
+        pixmap = QtGui.QPixmap(AppFolders.imagePath("logo.png"))
         icon = QtGui.QIcon( pixmap.scaled(16,16))       
 
         self.trayIcon = SystemTrayIcon(icon,self)

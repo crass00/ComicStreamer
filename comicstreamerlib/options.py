@@ -1,23 +1,3 @@
-"""
-CLI options class for comicstreamer app
-"""
-
-"""
-Copyright 2014  Anthony Beville
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-"""
-
 import sys
 import getopt
 import platform
@@ -59,9 +39,9 @@ for comics to add to the database (persisted)
         self.folder_list = None
         self.reset = False
         self.no_monitor = False
-        self.debug = False
+        self.debug = True
         self.quiet = False
-        self.launch_browser = True
+        self.launch_client = True
         self.reset_and_run = False
         self.webroot = None
         self.user_dir = None;
@@ -116,10 +96,9 @@ for comics to add to the database (persisted)
             if o  == "--nomonitor":
                 self.no_monitor = True
             if o  == "--nobrowser":
-                self.launch_browser = False                
+                self.launch_client = False                
             if o  == "--version":
-                print "ComicStreamer {0}:  Copyright (c) 2014 Anthony Beville".format(csversion.version)
-                print "Distributed under Apache License 2.0 (http://www.apache.org/licenses/LICENSE-2.0)"
+                print "ComicStreamer {0}: ".format(csversion.version)
                 sys.exit(0)
             if o == "--_resetdb_and_run":
                 self.reset_and_run = True
@@ -131,9 +110,11 @@ for comics to add to the database (persisted)
         if len(args) > 0:
             #self.folder_list = [os.path.normpath(a.decode(filename_encoding)) for a in args]
             self.folder_list = [os.path.abspath(os.path.normpath(unicode(a.decode(filename_encoding)))) for a in args]
-        
+    
         # remove certain private flags from args
         try:
             sys.argv.remove("--_resetdb_and_run")
         except:
             pass
+
+

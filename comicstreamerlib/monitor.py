@@ -60,25 +60,30 @@ class Monitor():
         self.thread = threading.Thread(target=self.mainLoop)
         self.thread.daemon = True
         self.quit = False
-        self.thread.start()     
+        self.thread.start()
+
 
     def stop(self):
+        self.observer.stop()
+        self.observer.join()
         self.quit = True
         self.thread.join()
 
     def mainLoop(self):
 
-        logging.debug("Monitor: started main loop.")
+        logging.debug("Monitor: Started")
         self.session = self.dm.Session()
         self.library = Library(self.dm.Session)
-        
-        observer = Observer()
+        self.observer = Observer()
         self.eventHandler = MonitorEventHandler(self)
+        self.status = u"INDEXING"
         for path in self.paths:
             if os.path.exists(path):
-                observer.schedule(self.eventHandler, path, recursive=True)
-        observer.start()
-        
+                self.setStatusDetail(u"Watchdog")
+                logging.debug("Monitor: Watchdog Indexing (BUG)")
+                self.observer.schedule(self.eventHandler, path, recursive=True)
+                logging.debug("Monitor: Watchdog Indexing Finished (BUG)")
+        self.observer.start()
         while True:
             try:
                 (msg, args) = self.queue.get(block=True, timeout=1)
@@ -98,8 +103,9 @@ class Monitor():
             
         self.session.close()
         self.session = None
-        observer.stop()
-        logging.debug("Monitor: stopped main loop.")
+        self.observer.stop()
+        self.observer.join()
+        logging.debug("Monitor: Stopped")
         
     def scan(self):
         self.queue.put(("scan", None))
@@ -115,15 +121,12 @@ class Monitor():
         # changed
         
         self.mutex.acquire()
-        
         if self.eventProcessingTimer is not None:
             self.eventProcessingTimer.cancel()
         self.eventProcessingTimer = threading.Timer(30, self.handleEventProcessing)
         self.eventProcessingTimer.start()
         
         self.mutex.release()
-        
-
     
     def handleEventProcessing(self):
         
@@ -138,7 +141,6 @@ class Monitor():
             
         self.mutex.release()
 
-
     def checkIfRemovedOrModified(self, comic, pathlist):
         remove = False
         
@@ -150,10 +152,12 @@ class Monitor():
         
         if not (os.path.exists(comic.path)):
             # file is missing, remove it from the comic table, add it to deleted table
-            logging.debug(u"Removing missing {0}".format(comic.path))
+            self.setStatusDetail(u"Updating")
+            logging.debug(u"Monitor: Flushing Missing {0}".format(comic.path))
             remove = True
         elif not inFolderlist(comic.path, pathlist):
-            logging.debug(u"Removing unwanted {0}".format(comic.path))
+            self.setStatusDetail(u"Updating")
+            logging.debug(u"Monitor: Flushing Unwanted {0}".format(comic.path))
             remove = True
         else:
             # file exists.  check the mod date.
@@ -162,17 +166,18 @@ class Monitor():
             curr = datetime.utcfromtimestamp(getmtime(comic.path))
             prev = comic.mod_ts
             if curr != prev:
-                logging.debug(u"Removed modifed {0}".format(comic.path))
+                self.setStatusDetail(u"Updating")
+                logging.debug(u"Monitor: Flushing Modifed {0}".format(comic.path))
                 remove = True
            
         return remove
 
     def getComicMetadata(self, path):
 
-        ca = ComicArchive(path,  default_image_path=AppFolders.imagePath("notfound.png"))
+        ca = ComicArchive(path,  default_image_path=AppFolders.imagePath("missing.png"))
         
         if ca.seemsToBeAComicArchive():
-            logging.debug(u"Reading in {0} {1}\r".format(self.read_count, path))
+            logging.debug(u"Monitor: Reading File {0} {1}\r".format(self.read_count, path))
             sys.stdout.flush()
             self.read_count += 1
 
@@ -199,7 +204,7 @@ class Monitor():
             image_data = ca.getPage(0)
             #now resize it
             thumb = StringIO.StringIO()
-            utils.resize(image_data, (200, 200), thumb)
+            utils.resize(image_data, (400, 400), thumb)
             md.thumbnail = thumb.getvalue()
 
             return md
@@ -208,9 +213,9 @@ class Monitor():
     def setStatusDetail(self, detail, level=logging.DEBUG):
         self.statusdetail = detail
         if level == logging.DEBUG:
-            logging.debug(detail)
+            logging.debug("Monitor: "+detail)
         else:
-            logging.info(detail)
+            logging.info("Monitor: "+detail)
 
     def setStatusDetailOnly(self, detail):
         self.statusdetail = detail
@@ -222,58 +227,108 @@ class Monitor():
             comic = self.library.createComicFromMetadata(md)
             comics.append(comic)
             if self.quit:
-                self.setStatusDetail(u"Monitor: halting scan!")
+                self.setStatusDetail(u"Monitor Stopped")
                 return
-
         self.library.addComics(comics)
-
+    
+    def getRecursiveFilelist(self, dirs):
+        filename_encoding = sys.getfilesystemencoding()
+        filelist = []
+        index = 0
+        for p in dirs:
+            # if path is a folder, walk it recursivly, and all files underneath
+            if type(p) == str:
+                #make sure string is unicode
+                p = p.decode(filename_encoding) #, 'replace')
+            elif type(p) != unicode:
+                #it's probably a QString
+                p = unicode(p)
+            if os.path.isdir( p ):
+                for root,dirs,files in os.walk( p ):
+                                # issue #26: try to exclude hidden files and dirs
+                    files = [f for f in files if not f[0] == '.']
+                    dirs[:] = [d for d in dirs if not d[0] == '.']
+                    for f in files:
+                        if type(f) == str:
+                                                #make sure string is unicode
+                            f = f.decode(filename_encoding, 'replace')
+                        elif type(f) != unicode:
+                                                    #it's probably a QString
+                            f = unicode(f)
+                        filelist.append(os.path.join(root,f))
+                        if self.quit:
+                            return filelist
+            else:
+                self.setStatusDetailOnly(u"Monitor: {0} Files Indexed".format(index))
+                index = index + 1
+                filelist.append(p)
+            
+        return filelist
+  
     def createAddRemoveLists(self, dirs):
         ix = {}
         db_set = set()
         current_set = set()
-        filelist = utils.get_recursive_filelist(dirs)
+        self.dbfiles = len(db_set)
+        filelist = self.getRecursiveFilelist(dirs)
+        if self.quit:
+            return [],[]
         for path in filelist:
-            current_set.add((path, datetime.utcfromtimestamp(getmtime(path))))
-        logging.info("NEW -- current_set size [%d]" % len(current_set))
-
-        for comic_id, path, md_ts in self.library.getComicPaths():
-            db_set.add((path, md_ts))
-            ix[path] = comic_id
+            try:
+                current_set.add((path, datetime.utcfromtimestamp(os.path.getmtime(path))))
+            except:
+                logging.debug(u"Monitor: Failed To Access {0}".format(path))
+                filelist.remove(path)
+            
+        logging.info(u"Monitor: %d Files Found " % len(current_set))
+        try:
+            for comic_id, path, md_ts in self.library.getComicPaths():
+                db_set.add((path, md_ts))
+                ix[path] = comic_id
+                if self.quit:
+                    return [],[]
+        except:
+            logging.debug(u"Monitor: Failed To Access {0}".format(path))
         to_add = current_set - db_set
         to_remove = db_set - current_set
-        logging.info("NEW -- db_set size [%d]" % len(db_set))
-        logging.info("NEW -- to_add size [%d]" % len(to_add))
-        logging.info("NEW -- to_remove size [%d]" % len(to_remove))
+        logging.info(u"Monitor: %d Files In Library " % len(db_set))
+        logging.info(u"Monitor: %d Files To Remove" % len(to_remove))
+        logging.info(u"Monitor: %d Files To Scan" % len(to_add))
+
 
         return [r[0] for r in to_add], [ix[r[0]] for r in to_remove]
 
     def dofullScan(self, dirs):
-        
-        self.status = "SCANNING"
-        
-        logging.info(u"Monitor: Beginning file scan...")
-        self.setStatusDetail(u"Monitor: Making a list of all files in the folders...")
+
+        self.status = u"CHECKING"
+
+        self.setStatusDetail(u"Files")
 
         self.add_count = 0      
         self.remove_count = 0
 
         filelist, to_remove = self.createAddRemoveLists(dirs)
+        if self.quit:
+            self.status = u"QUITING"
+            self.setStatusDetailOnly(u"")
+            return
 
-        self.setStatusDetail(u"Monitor: Removing missing or modified files from db ({0} files)".format(len(to_remove)), logging.INFO)
+        self.setStatusDetail(u"Removing {0} Files".format(len(to_remove)), logging.INFO)
         if len(to_remove) > 0:
             self.library.deleteComics(to_remove)
 
-        self.setStatusDetail(u"Monitor: {0} new files to scan...".format(len(filelist)), logging.INFO)
-
+        self.setStatusDetail(u"Scanning {0} Files".format(len(filelist)), logging.INFO)
+        self.status = u"SCANNING"
         md_list = []
         self.read_count = 0
         for filename in filelist:
             md = self.getComicMetadata(filename)
             if md is not None:
                 md_list.append(md)
-            self.setStatusDetailOnly(u"Monitor: {0} files: {1} scanned, {2} added to library...".format(len(filelist), self.read_count,self.add_count))
+            self.setStatusDetailOnly(u"File {0}/{1} Found {2}".format(len(filelist), self.read_count,self.add_count))
             if self.quit:
-                self.setStatusDetail(u"Monitor: halting scan!")
+                self.status = u"QUITING"
+                self.setStatusDetailOnly(u"")
                 return
             
             #every so often, commit to DB
@@ -285,16 +340,16 @@ class Monitor():
         if len(md_list) > 0:
             self.commitMetadataList(md_list)
         
-        self.setStatusDetail(u"Monitor: finished scanning metadata in {0} of {1} files".format(self.read_count,len(filelist)), logging.INFO)
+        self.setStatusDetail(u"Metadata {0}/{1} Files".format(self.read_count,len(filelist)), logging.INFO)
 
  
         
-        self.status = "IDLE"
+        self.status = u"IDLE"
         self.statusdetail = ""
         self.scancomplete_ts = int(time.mktime(datetime.utcnow().timetuple()) * 1000)
         
-        logging.info("Monitor: Added {0} comics".format(self.add_count))
-        logging.info("Monitor: Removed {0} comics".format(self.remove_count))
+        logging.info(u"Monitor: Added {0} Files".format(self.add_count))
+        logging.info(u"Monitor: Removed {0} Files".format(self.remove_count))
             
         if self.quit_when_done:
             self.quit = True
@@ -306,7 +361,7 @@ class Monitor():
 if __name__ == '__main__':
     
     if len(sys.argv) < 2:
-        print >> sys.stderr, "usage:  {0} comic_folder ".format(sys.argv[0])
+        print >> sys.stderr, u"usage:  {0} comic_folder ".format(sys.argv[0])
         sys.exit(-1)    
 
     

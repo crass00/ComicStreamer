@@ -30,7 +30,7 @@ from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
 
 
 
-SCHEMA_VERSION=3
+SCHEMA_VERSION=4
 
 Base = declarative_base()
 Session = sessionmaker()
@@ -228,7 +228,7 @@ class Comic(Base):
                 viewonly=True               
                 )
 
-    #credits = association_proxy('credits_raw', 'person_role_dict'
+    #credits = association_proxy('credits_raw', 'person_role_dict')
     alternateseries = association_proxy('alternateseries_raw', 'name')
     characters = association_proxy('characters_raw', 'name')
     teams = association_proxy('teams_raw', 'name')
@@ -437,8 +437,11 @@ class DataManager():
     def create(self):
 
         # if we don't have a UUID for this DB, add it.
-        Base.metadata.create_all(self.engine)
-
+        try:
+            Base.metadata.create_all(self.engine)
+        except:
+            logging.debug("(BUG) There was an error loaded the database (file corrupted?)")
+            self.engine = create_engine('sqlite:///'+ self.dbfile, echo=False)
         session = self.Session()
  
         results = session.query(SchemaInfo).first()

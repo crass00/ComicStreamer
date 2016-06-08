@@ -40,12 +40,12 @@ class WinGui(object):
         
         self.apiServer = apiServer
         
-        self.icon = AppFolders.imagePath("trout.ico")
+        self.icon = AppFolders.imagePath("logo.ico")
         self.hover_text = "ComicStreamer"
         self.on_quit = self.bye    
             
         menu_options = (
-                        ('Show ComicStreamer UI', None, self.show),
+                        ('Show Interface', None, self.show),
                        )
         
         menu_options = menu_options + (('Quit', None, self.QUIT),)

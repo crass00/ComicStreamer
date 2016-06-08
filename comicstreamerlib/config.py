@@ -1,23 +1,3 @@
-"""
-Config class for comicstreamer app
-"""
-
-"""
-Copyright 2014  Anthony Beville
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-"""
-
 import os
 import sys
 import platform
@@ -26,6 +6,7 @@ import uuid
 import base64
 import logging
 import io
+import utils
 
 from configobj import ConfigObj
 from validate import Validator
@@ -38,19 +19,34 @@ class ComicStreamerConfig(ConfigObj):
 
     configspec = u"""
             [general]
-            port=integer(default=32500)
             install_id=string(default="")
             folder_list=string_list(default=list())
-            launch_browser=boolean(default="True")
+            launch_client=boolean(default="True")
             first_run=boolean(default="True")    
-            webroot=string(default="")        
+            [server]
+            use_https=boolean(default="False")
+            certificate_file=string(default="")
+            key_file=string(default="")
+            port=integer(default=32500)
+            webroot=string(default="")
             [security]
             use_authentication=boolean(default="False")
             username=string(default="")
             password_digest=string(default="1f81ba3766c2287a452d98a28a33892528383ddf3ce570c6b2911b0435e71940")
-            api_key=string(default="")
             use_api_key=boolean(default="False")
+            api_key=string(default="")
             cookie_secret=string(default="")
+            [database]
+            use_mysql=boolean(default="False")
+            mysql_database=string(default="comicdb")
+            mysql_username=string(default="comic")
+            mysql_password=string(default="")
+            mysql_host=string(default="localhost")
+            mysql_port=integer(default=3306)
+            [cache]
+            use_cache=boolean(default="True")
+            size=integer(default=0)
+            free=integer(default=3000)
            """
     
 
@@ -84,6 +80,7 @@ class ComicStreamerConfig(ConfigObj):
 
         # normalize the folder list
         tmp['general']['folder_list'] = [os.path.abspath(os.path.normpath(unicode(a))) for a in tmp['general']['folder_list']]
+        tmp['database']['mysql_password'] = utils.encode(tmp['general']['install_id'],'comic')
 
         self.merge(tmp)
         if not os.path.exists( self.filename ):
@@ -91,23 +88,23 @@ class ComicStreamerConfig(ConfigObj):
             
         # not sure if this belongs here:
         # if mac app, and no unrar in path, add the one from the app bundle
-        if getattr(sys, 'frozen', None) and  platform.system() == "Darwin":
-            if which("unrar") is None:
-                addtopath(AppFolders.appBase())
+        #if getattr(sys, 'frozen', None) and  platform.system() == "Darwin":
+        #    if which("unrar") is None:
+        #        addtopath(AppFolders.appBase())
         
     def applyOptions( self, opts ):
 
         modified = False
         
         if opts.port is not None:
-            self['general']['port'] = opts.port
+            self['server']['port'] = opts.port
             modified = True
 
         if opts.folder_list is not None:
             self['general']['folder_list'] = [os.path.abspath(os.path.normpath(unicode(a))) for a in opts.folder_list]
             modified = True
         if opts.webroot is not None:
-            self['general']['webroot'] = opts.webroot
+            self['server']['webroot'] = opts.webroot
             modified = True
             
         if modified:

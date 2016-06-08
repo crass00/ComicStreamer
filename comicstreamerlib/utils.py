@@ -1,24 +1,5 @@
 # coding=utf-8
 
-"""
-Some generic utilities
-"""
-
-"""
-Copyright 2012-2014  Anthony Beville
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-	http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-"""
 import sys
 import os
 import re
@@ -28,6 +9,7 @@ import codecs
 import calendar
 import hashlib
 import time
+import base64
 from PIL import Image
 try:
     from PIL import WebPImagePlugin
@@ -59,39 +41,6 @@ def fix_output_encoding( ):
 		sys.stdout = codecs.getwriter(preferred_encoding)(sys.stdout)
 		sys.stderr = codecs.getwriter(preferred_encoding)(sys.stderr)
 		UtilsVars.already_fixed_encoding = True
-
-def get_recursive_filelist( pathlist ):
-	"""
-	Get a recursive list of of all files under all path items in the list
-	"""
-	filename_encoding = sys.getfilesystemencoding()	
-	filelist = []
-	for p in pathlist:
-		# if path is a folder, walk it recursivly, and all files underneath
-		if type(p) == str:
-			#make sure string is unicode
-			p = p.decode(filename_encoding) #, 'replace')
-		elif type(p) != unicode:
-			#it's probably a QString
-			p = unicode(p)
-		
-		if os.path.isdir( p ):
-			for root,dirs,files in os.walk( p ):
-				# issue #26: try to exclude hidden files and dirs
-				files = [f for f in files if not f[0] == '.']
-				dirs[:] = [d for d in dirs if not d[0] == '.']
-				for f in files:
-					if type(f) == str:
-						#make sure string is unicode
-						f = f.decode(filename_encoding, 'replace')
-					elif type(f) != unicode:
-						#it's probably a QString
-						f = unicode(f)
-					filelist.append(os.path.join(root,f))
-		else:
-			filelist.append(p)
-	
-	return filelist
 	
 def touch(fname, times=None):
     with open(fname, 'a'):
@@ -103,6 +52,24 @@ def getDigest(password):
         digest = hashlib.sha256(digest).hexdigest()
     time.sleep(.5)
     return digest
+
+
+def encode(key, clear):
+    enc = []
+    for i in range(len(clear)):
+        key_c = key[i % len(key)]
+        enc_c = chr((ord(clear[i]) + ord(key_c)) % 256)
+        enc.append(enc_c)
+    return base64.urlsafe_b64encode("".join(enc))
+
+def decode(key, enc):
+    dec = []
+    enc = base64.urlsafe_b64decode(enc)
+    for i in range(len(enc)):
+        key_c = key[i % len(key)]
+        dec_c = chr((256 + ord(enc[i]) - ord(key_c)) % 256)
+        dec.append(dec_c)
+    return "".join(dec)
 
 def utc_to_local(utc_dt):
     # get integer timestamp to avoid precision lost
@@ -131,7 +98,7 @@ def resizeImage(max, image_data):
     # disable WebP for now, due a memory leak in python library
     imtype = imghdr.what(StringIO.StringIO(image_data))
     if imtype == "webp":
-        with open(AppFolders.imagePath("notfound.png"), 'rb') as fd:
+        with open(AppFolders.imagePath("missing.png"), 'rb') as fd:
             image_data = fd.read()
 
     im = Image.open(StringIO.StringIO(image_data)).convert('RGB')

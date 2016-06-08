@@ -1,26 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""
-ComicStreamer main server classes
-"""
-
-"""
-Copyright 2012-2014  Anthony Beville
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-	http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-"""
-
 from datetime import date
 import tornado.escape
 import tornado.ioloop
@@ -28,6 +8,7 @@ import tornado.web
 import urllib
 import mimetypes
 import re
+import shutil
 
 from urllib2 import quote
 
@@ -68,7 +49,6 @@ from comicstreamerlib.folders import AppFolders
 from options import Options
 from bonjour import BonjourThread
 from bookmarker import Bookmarker
-
 from library import Library
 
 # add webp test to imghdr in case it isn't there already
@@ -80,7 +60,7 @@ imghdr.tests.append(my_test_webp)
 
 # to allow a blank username
 def fix_username(username):
-    return  username + "XX"
+    return  username + "ComicStreamer"
 
 def custom_get_current_user(handler):
     user = handler.get_secure_cookie("user")
@@ -88,15 +68,16 @@ def custom_get_current_user(handler):
         user = fix_username(user)
     return  user
 
+# you can change default root here :-)
 def deviceroot(s):
     if(re.search('(iPhone|iPod).*', s.request.headers["User-Agent"])):
-        return "mobile/"
+        return "default/"
     elif(re.search('(Android).*', s.request.headers["User-Agent"])):
-        return "mobile/"
+        return "default/"
     elif(re.search('(iPad).*', s.request.headers["User-Agent"])):
-        return "mobile/"
+        return "default/"
     else:
-        return ""
+        return "default/"
 
 class BaseHandler(tornado.web.RequestHandler):
 
@@ -183,7 +164,7 @@ class JSONResultAPIHandler(GenericAPIHandler):
 
         if folder_filter != "":
             folder_filter = os.path.normcase(os.path.normpath(folder_filter))
-            print folder_filter
+            #print folder_filter
         
         person = None
         role = None
@@ -366,7 +347,7 @@ class ZippableAPIHandler(JSONResultAPIHandler):
         else:
             self.write(json_data)       
 
-class CommandAPIHandler(GenericAPIHandler):
+class ServerAPIHandler(GenericAPIHandler):
     def get(self):
         self.validateAPIKey()
         cmd = self.get_argument(u"cmd", default=None)
@@ -464,13 +445,12 @@ class ComicListBrowserHandler(BaseHandler):
         if entity_src is not None:
             src=entity_src
         else:
-            default_src=self.webroot + "/comiclist"
+            default_src=self.webroot + "/comics"
             arg_string = ""
             ##if '?' in self.request.uri:
             #    arg_string = '?'+self.request.uri.split('?',1)[1]
             src = default_src + arg_string
-        
-        self.render(deviceroot(self)+"comic_results2.html",
+        self.render(deviceroot(self)+"browser.html",
                     src=src,
                     api_key=self.application.config['security']['api_key']
                 )
@@ -478,12 +458,22 @@ class ComicListBrowserHandler(BaseHandler):
 class FoldersBrowserHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self,args):
+        entity_src = self.get_argument(u"entity_src", default=None)
+        if entity_src is not None:
+                src=entity_src
+        else:
+            default_src=self.webroot + "/comics"
+            arg_string = ""
+            ##if '?' in self.request.uri:
+            #    arg_string = '?'+self.request.uri.split('?',1)[1]
+            src = default_src + arg_string
+
         if args is None:
             args = "/"
-        args = utils.collapseRepeats(args, "/")    
+        args = utils.collapseRepeats(args, "/")
             
         self.render(deviceroot(self)+"folders.html",
-                    args=args,
+                    args=args,src=src,
                     api_key = self.application.config['security']['api_key'])
 
 class EntitiesBrowserHandler(BaseHandler):
@@ -534,7 +524,7 @@ class ComicPageAPIHandler(ImageAPIHandler):
         self.setContentType(image_data)
         self.write(image_data)
 
-class ThumbnailAPIHandler(ImageAPIHandler):
+class ThumbnailLargeAPIHandler(ImageAPIHandler):
     def get(self, comic_id):
         self.validateAPIKey()
         thumbnail = self.library.getComicThumbnail(comic_id)
@@ -543,7 +533,41 @@ class ThumbnailAPIHandler(ImageAPIHandler):
             self.setContentType('image/jpg')
             self.write(thumbnail)
         else:
-            default_img_file = AppFolders.imagePath("notfound.png")
+            default_img_file = AppFolders.imagePath("missing.png")
+            with open(default_img_file, 'rb') as fd:
+                image_data = fd.read()
+            self.setContentType('image/jpg')
+            self.write(image_data)
+
+class ThumbnailSmallAPIHandler(ImageAPIHandler):
+    def get(self, comic_id):
+        self.validateAPIKey()
+        thumbnail = self.library.getComicThumbnail(comic_id)
+        
+        if thumbnail != None:
+            self.setContentType('image/jpg')
+            thumb = StringIO.StringIO()
+            utils.resize(thumbnail, (100, 100), thumb)
+            self.write(thumb.getvalue())
+        else:
+            default_img_file = AppFolders.imagePath("missing.png")
+            with open(default_img_file, 'rb') as fd:
+                image_data = fd.read()
+            self.setContentType('image/jpg')
+            self.write(image_data)
+
+class ThumbnailAPIHandler(ImageAPIHandler):
+    def get(self, comic_id):
+        self.validateAPIKey()
+        thumbnail = self.library.getComicThumbnail(comic_id)
+        
+        if thumbnail != None:
+            self.setContentType('image/jpg')
+            thumb = StringIO.StringIO()
+            utils.resize(thumbnail, (200, 200), thumb)
+            self.write(thumb.getvalue())
+        else:
+            default_img_file = AppFolders.imagePath("missing.png")
             with open(default_img_file, 'rb') as fd:
                 image_data = fd.read()
             self.setContentType('image/jpg')
@@ -634,7 +658,7 @@ class FolderAPIHandler(JSONResultAPIHandler):
                 # see if there are any comics here
                 (ignore, total_results) = self.library.list({'folder': path}, {'per_page': 0, 'offset': 0})
                 response['comics']['count'] = total_results
-                comic_path = self.webroot + u"/comiclist?folder=" + urllib.quote(u"{0}".format(path).encode('utf-8'))
+                comic_path = self.webroot + u"/comics?folder=" + urllib.quote(u"{0}".format(path).encode('utf-8'))
                 response['comics']['url_path'] = comic_path
 
             except FloatingPointError as e:
@@ -837,7 +861,7 @@ class ReaderHandler(BaseHandler):
             else:
                 target_page=obj.lastread_page   
                 
-            self.render(deviceroot(self)+"cbreader.html",
+            self.render(deviceroot(self)+"comic.html",
                         title=title,
                         id=comic_id,
                         count=obj.page_count,
@@ -853,7 +877,7 @@ class ReaderHandler(BaseHandler):
 class UnknownHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self):
-        self.render(deviceroot(self)+"notfound.html", version=self.application.version)
+        self.render(deviceroot(self)+"missing.html", version=self.application.version)
 
 class MainHandler(BaseHandler):
     @tornado.web.authenticated
@@ -868,25 +892,28 @@ class MainHandler(BaseHandler):
         random_comic = self.library.randomComic()
 
         if random_comic is None:
-            random_comic = type('fakecomic', (object,), 
-             {'id':0, 'series':'No Comics', 'issue':0})()
+            random_comic = type('fakecomic', (object,),{'id':0, '':'No Comics', 'issue':'', 'series':'','title':''})()
+        
+        caption = u""
+        if random_comic.issue is not None:
+            caption = random_comic.issue
+        if random_comic.title is not None:
+            if random_comic.issue is not None:
+                caption = caption + u" " + random_comic.title
+            caption = random_comic.title
 
-        self.render(deviceroot(self)+"index.html", stats=stats,
-                    random_comic=random_comic,
-                    recently_added = list(recently_added_comics),
-                    recently_read = list(recently_read_comics),
-                    roles = roles_list,
-                    server_time =  int(time.mktime(datetime.utcnow().timetuple()) * 1000),
+        self.render(deviceroot(self)+"index.html",
+                    random_comic=random_comic,random_caption=caption,
                     api_key = self.application.config['security']['api_key']
                 )
 
-class StatsPageHandler(BaseHandler):
+class ServerPageHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self):
         stats = self.library.getStats()
         stats['last_updated'] = utils.utc_to_local(stats['last_updated']).strftime("%Y-%m-%d %H:%M:%S")
         stats['created'] = utils.utc_to_local(stats['created']).strftime("%Y-%m-%d %H:%M:%S")
-        self.render(deviceroot(self)+"stats.html", stats=stats,
+        self.render(deviceroot(self)+"server.html", stats=stats,
                     server_time =  int(time.mktime(datetime.utcnow().timetuple()) * 1000),
                     api_key = self.application.config['security']['api_key']
                     )
@@ -920,20 +947,25 @@ class SearchPageHandler(BaseHandler):
 class GenericPageHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self,page):
-        if os.path.isfile(AppFolders.appBase()+"/"+"templates"+"/"+deviceroot(self)+page+".html"):
+        if os.path.isfile(AppFolders.appBase()+"/"+"gui"+"/"+deviceroot(self)+page+".html"):
             self.render(deviceroot(self)+page+".html")
         else:
-            self.render(deviceroot(self)+"notfound.html", version=self.application.version)
+            self.render(deviceroot(self)+"missing.html", version=self.application.version)
 
 class AboutPageHandler(BaseHandler):
-    @tornado.web.authenticated
+    #@tornado.web.authenticated
     def get(self):
         self.render(deviceroot(self)+"about.html", version=self.application.version)
 
-class ControlPageHandler(BaseHandler):
-    @tornado.web.authenticated
+class APIPageHandler(BaseHandler):
+    #@tornado.web.authenticated
     def get(self):
-        self.render(deviceroot(self)+"control.html", api_key=self.application.config['security']['api_key'])
+        self.render(deviceroot(self)+"api.html", api_key=self.application.config['security']['api_key'])
+
+class HelpPageHandler(BaseHandler):
+    #@tornado.web.authenticated
+    def get(self):
+        self.render(deviceroot(self)+"help.html", api_key=self.application.config['security']['api_key'])
 
 class LogPageHandler(BaseHandler):
     
@@ -950,9 +982,8 @@ class LogPageHandler(BaseHandler):
                     logtxt=logtxt)
      
 class ConfigPageHandler(BaseHandler):
-    
-    fakepass = "N0TRYL@P@SSWRD"
-    
+    fakepass = "T01let$tRe@meR"
+
     def is_port_available(self,port):    
         host = '127.0.0.1'
     
@@ -967,10 +998,12 @@ class ConfigPageHandler(BaseHandler):
 
     def render_config(self, formdata, success="", failure=""):
         #convert boolean to "checked" or ""
+        formdata['use_https'] = "checked" if formdata['use_https'] else ""
+        formdata['use_mysql'] = "checked" if formdata['use_mysql'] else ""
         formdata['use_api_key'] = "checked" if formdata['use_api_key'] else ""
+        formdata['use_cache'] = "checked" if formdata['use_cache'] else ""
         formdata['use_authentication'] = "checked" if formdata['use_authentication'] else ""
-        formdata['launch_browser'] = "checked" if formdata['launch_browser'] else ""
-        
+        formdata['launch_client'] = "checked" if formdata['launch_client'] else ""
         if (  self.application.config['security']['use_authentication'] ):
             formdata['password'] = ConfigPageHandler.fakepass
             formdata['password_confirm'] = ConfigPageHandler.fakepass
@@ -978,7 +1011,7 @@ class ConfigPageHandler(BaseHandler):
             formdata['password'] = ""
             formdata['password_confirm'] = ""
             
-        self.render(deviceroot(self)+"configure.html",
+        self.render(deviceroot(self)+"settings.html",
                     formdata=formdata,
                     success=success,
                     failure=failure)
@@ -988,8 +1021,14 @@ class ConfigPageHandler(BaseHandler):
     @tornado.web.authenticated    
     def get(self):
         formdata = dict()
-        formdata['port'] = self.application.config['general']['port']
-        formdata['webroot'] = self.application.config['general']['webroot']
+        formdata['use_cache'] = self.application.config['cache']['use_cache']
+        formdata['cache_size'] = self.application.config['cache']['size']
+        formdata['cache_free'] = self.application.config['cache']['free']
+        formdata['port'] = self.application.config['server']['port']
+        formdata['key_file'] = self.application.config['server']['key_file']
+        formdata['certificate_file'] = self.application.config['server']['certificate_file']
+        formdata['use_https'] = self.application.config['server']['use_https']
+        formdata['webroot'] = self.application.config['server']['webroot']
         formdata['folders'] = "\n".join(self.application.config['general']['folder_list'])
         formdata['use_authentication'] = self.application.config['security']['use_authentication'] 
         formdata['username'] = self.application.config['security']['username']
@@ -997,24 +1036,41 @@ class ConfigPageHandler(BaseHandler):
         formdata['password_confirm'] = ""
         formdata['use_api_key'] = self.application.config['security']['use_api_key'] 
         formdata['api_key'] = self.application.config['security']['api_key']
-        formdata['launch_browser'] = self.application.config['general']['launch_browser']
-        
+        formdata['launch_client'] = self.application.config['general']['launch_client']
+        formdata['use_mysql'] = self.application.config['database']['use_mysql']
+        formdata['mysql_database'] = self.application.config['database']['mysql_database']
+        formdata['mysql_username'] = self.application.config['database']['mysql_username']
+        formdata['mysql_password'] = utils.decode(self.application.config['general']['install_id'],self.application.config['database']['mysql_password'])
+        formdata['mysql_host'] = self.application.config['database']['mysql_host']
+        formdata['mysql_port'] = self.application.config['database']['mysql_port']
         self.render_config(formdata)
          
     @tornado.web.authenticated
     def post(self):
         formdata = dict()
-        formdata['port'] = self.get_argument(u"port", default="")
-        formdata['webroot'] = self.get_argument(u"webroot", default="")
         formdata['folders'] = self.get_argument(u"folders", default="")
+        formdata['webroot'] = self.get_argument(u"webroot", default="")
+        formdata['port'] = self.get_argument(u"port", default="")
+        formdata['key_file'] = self.get_argument(u"key_file", default="")
+        formdata['certificate_file'] = self.get_argument(u"certificate_file", default="")
+        formdata['use_https'] = (len(self.get_arguments("use_https"))!=0)
+        formdata['cache_size'] = self.get_argument(u"cache_size", default="")
+        formdata['cache_free'] = self.get_argument(u"cache_free", default="")
+        formdata['use_cache'] = (len(self.get_arguments("use_cache"))!=0)
         formdata['use_authentication'] = (len(self.get_arguments("use_authentication"))!=0)
         formdata['username'] = self.get_argument(u"username", default="")
         formdata['password'] = self.get_argument(u"password", default="")
         formdata['password_confirm'] = self.get_argument(u"password_confirm", default="")
         formdata['use_api_key'] = (len(self.get_arguments("use_api_key"))!=0)
         formdata['api_key'] = self.get_argument(u"api_key", default="")
-        formdata['launch_browser'] = (len(self.get_arguments("launch_browser"))!=0)
-        
+        formdata['launch_client'] = (len(self.get_arguments("launch_client"))!=0)
+        formdata['use_mysql'] = (len(self.get_arguments("use_mysql"))!=0)
+        formdata['mysql_username'] = self.get_argument(u"mysql_username", default="")
+        formdata['mysql_database'] = self.get_argument(u"mysql_database", default="")
+        formdata['mysql_host'] = self.get_argument(u"mysql_host", default="")
+        formdata['mysql_port'] = self.get_argument(u"mysql_port", default="")
+        formdata['mysql_password'] = self.get_argument(u"mysql_password", default="")
+       
         failure_str = ""
         success_str = ""
         failure_strs = list()
@@ -1044,7 +1100,7 @@ class ConfigPageHandler(BaseHandler):
             
 
         port_failed = False
-        old_port = self.application.config['general']['port']
+        old_port = self.application.config['server']['port']
 
         #validate numeric port
         if not formdata['port'].isdigit():
@@ -1077,7 +1133,7 @@ class ConfigPageHandler(BaseHandler):
 
         if len(failure_strs) == 0:
             validated = True
-            
+    
         if validated:
             # was the password changed?
             password_changed = True
@@ -1088,21 +1144,27 @@ class ConfigPageHandler(BaseHandler):
                     password_changed = False
             else:
                 password_changed = False
-                
-            # find out if we need to save:
+        
+            # find out if we need to save: (BUG NEED TO ADD MORE)
             if (new_port != old_port or
-                formdata['webroot'] != self.application.config['general']['webroot'] or
+                formdata['webroot'] != self.application.config['server']['webroot'] or
                 new_folder_list != old_folder_list or
                 formdata['username'] != self.application.config['security']['username'] or
                 password_changed or
                 formdata['use_api_key'] != self.application.config['security']['use_api_key'] or
                 formdata['api_key'] != self.application.config['security']['api_key'] or
-                formdata['launch_browser'] != self.application.config['general']['launch_browser'] 
+                formdata['use_mysql'] != self.application.config['database']['use_mysql'] or
+                formdata['mysql_database'] != self.application.config['database']['mysql_database'] or
+                utils.encode(self.application.config['general']['install_id'],formdata['mysql_password']) != self.application.config['database']['mysql_password'] or
+                formdata['mysql_username'] != self.application.config['database']['mysql_username'] or
+                formdata['mysql_port'] != self.application.config['database']['mysql_port'] or
+                formdata['mysql_host'] != self.application.config['database']['mysql_host'] or
+                formdata['launch_client'] != self.application.config['general']['launch_client']
                ): 
                 # apply everything from the form
                 self.application.config['general']['folder_list'] = new_folder_list
-                self.application.config['general']['port'] = new_port
-                self.application.config['general']['webroot'] = formdata['webroot']
+                self.application.config['server']['port'] = new_port
+                self.application.config['server']['webroot'] = formdata['webroot']
                 self.application.config['security']['use_authentication'] = formdata['use_authentication']
                 self.application.config['security']['username'] = formdata['username']
                 if formdata['password'] != ConfigPageHandler.fakepass:
@@ -1113,8 +1175,18 @@ class ConfigPageHandler(BaseHandler):
                 else:
                     self.application.config['security']['api_key'] = ""
                     formdata['api_key'] = ""
-                self.application.config['general']['launch_browser'] = formdata['launch_browser']
-                    
+                self.application.config['general']['launch_client'] = formdata['launch_client']
+                
+                self.application.config['database']['use_mysql'] = formdata['use_mysql']
+                
+                # lame password hide should be better...
+                self.application.config['database']['mysql_password'] = utils.encode(self.application.config['general']['install_id'],formdata['mysql_password'])
+                self.application.config['database']['mysql_username'] = formdata['mysql_username']
+                self.application.config['database']['mysql_database'] = formdata['mysql_database']
+                self.application.config['database']['mysql_host'] = formdata['mysql_host']
+                self.application.config['database']['mysql_port'] = formdata['mysql_port']
+                
+                
                 success_str = "Saved. Server restart needed"                
                 self.application.config.write()
         else:
@@ -1130,14 +1202,14 @@ class LoginHandler(BaseHandler):
             next=self.get_argument("next")
         else:
             next=self.webroot + "/"
-            
+        
         #if password and user are blank, just skip to the "next"
         if (  self.application.config['security']['password_digest'] == utils.getDigest("")  and
               self.application.config['security']['username'] == ""
             ):
             self.set_secure_cookie("user", fix_username(self.application.config['security']['username']))
             self.redirect(next)
-        else:    
+        else:
             self.render(deviceroot(self)+'login.html', next=next)
 
     def post(self):
@@ -1160,8 +1232,8 @@ class APIServer(tornado.web.Application):
         self.config = config
         self.opts = opts
         
-        self.port = self.config['general']['port']
-        self.webroot = self.config['general']['webroot']
+        self.port = self.config['server']['port']
+        self.webroot = self.config['server']['webroot']
         
         self.comicArchiveList = []
         
@@ -1170,8 +1242,9 @@ class APIServer(tornado.web.Application):
         #    sys.exit(-1)
         
         self.dm = DataManager()
+        #self.dm = DataManager(config)
         self.library = Library(self.dm.Session)
-        
+
         if opts.reset or opts.reset_and_run:
             logging.info( "Deleting any existing database!")
             self.dm.delete()
@@ -1179,7 +1252,7 @@ class APIServer(tornado.web.Application):
         # quit on a standard reset
         if opts.reset:
             sys.exit(0)
-            
+        
         try:
             self.dm.create()
         except SchemaVersionException as e:
@@ -1187,7 +1260,21 @@ class APIServer(tornado.web.Application):
             logging.error(msg)
             utils.alert("Schema change", msg)
             sys.exit(-1)
-            
+        except sqlalchemy.exc.OperationalError as e:
+            msg = e.orig.args[1]
+            self.config['database']['use_mysql'] = False;
+            logging.error("MySQL: " + msg)
+            utils.alert("MySQL Error", msg)
+            self.dm = DataManager(self.config)
+            self.library = Library(self.dm.Session)
+            try:
+                self.dm.create()
+            except SchemaVersionException as e:
+                msg = "Couldn't open database.  Probably the schema has changed."
+                logging.error(msg)
+                utils.alert("Schema change", msg)
+                sys.exit(-1)
+        
         
         try:
             self.listen(self.port, no_keep_alive = True)
@@ -1213,12 +1300,14 @@ class APIServer(tornado.web.Application):
             (self.webroot + r"/", MainHandler),
             (self.webroot + r"/(.*)\.html", GenericPageHandler),
             (self.webroot + r"/about", AboutPageHandler),
-            (self.webroot + r"/control", ControlPageHandler),
-            (self.webroot + r"/configure", ConfigPageHandler),
+            (self.webroot + r"/api", APIPageHandler),
+            (self.webroot + r"/help", HelpPageHandler),
+            (self.webroot + r"/settings", ConfigPageHandler),
             (self.webroot + r"/search", SearchPageHandler),
-            (self.webroot + r"/stats", StatsPageHandler),
+            (self.webroot + r"/server", ServerPageHandler),
             (self.webroot + r"/recently", RecentlyPageHandler),
             (self.webroot + r"/log", LogPageHandler),
+            (self.webroot + r"/comics/browse", ComicListBrowserHandler),
             (self.webroot + r"/comiclist/browse", ComicListBrowserHandler),
             (self.webroot + r"/folders/browse(/.*)*", FoldersBrowserHandler),
             (self.webroot + r"/entities/browse(/.*)*", EntitiesBrowserHandler),
@@ -1229,14 +1318,18 @@ class APIServer(tornado.web.Application):
             (self.webroot + r"/version", VersionAPIHandler),
             (self.webroot + r"/deleted", DeletedAPIHandler),
             (self.webroot + r"/comic/([0-9]+)", ComicAPIHandler),
+            (self.webroot + r"/comics", ComicListAPIHandler),
             (self.webroot + r"/comiclist", ComicListAPIHandler),
             (self.webroot + r"/comic/([0-9]+)/page/([0-9]+|clear)/bookmark", ComicBookmarkAPIHandler ),
             (self.webroot + r"/comic/([0-9]+)/page/([0-9]+)", ComicPageAPIHandler ),
             (self.webroot + r"/comic/([0-9]+)/thumbnail", ThumbnailAPIHandler),
+            (self.webroot + r"/comic/([0-9]+)/thumbnail/small", ThumbnailSmallAPIHandler),
+            (self.webroot + r"/comic/([0-9]+)/thumbnail/large", ThumbnailLargeAPIHandler),
             (self.webroot + r"/comic/([0-9]+)/file", FileAPIHandler),
             (self.webroot + r"/entities(/.*)*", EntityAPIHandler),
             (self.webroot + r"/folders(/.*)*", FolderAPIHandler),
-            (self.webroot + r"/command", CommandAPIHandler),
+            (self.webroot + r"/command", ServerAPIHandler),
+            (self.webroot + r"/server", ServerAPIHandler),
             (self.webroot + r"/scanstatus", ScanStatusAPIHandler),
             #(r'/favicon.ico', tornado.web.StaticFileHandler, {'path': os.path.join(AppFolders.appBase(), "static","images")}),
             (self.webroot + r'/.*', UnknownHandler),
@@ -1245,7 +1338,7 @@ class APIServer(tornado.web.Application):
 
 
         settings = dict(
-            template_path=os.path.join(AppFolders.appBase(), "templates"),
+            template_path=os.path.join(AppFolders.appBase(), "gui"),
             static_path=os.path.join(AppFolders.appBase(), "static"),
             static_url_prefix=self.webroot + "/static/",
             debug=True,
@@ -1269,11 +1362,13 @@ class APIServer(tornado.web.Application):
         self.bookmarker = Bookmarker(self.dm)
         self.bookmarker.start()
 
-        if opts.launch_browser and self.config['general']['launch_browser']:
+        if opts.launch_client and self.config['general']['launch_client']:
             if ((platform.system() == "Linux" and os.environ.has_key('DISPLAY')) or
-                    (platform.system() == "Darwin" and not os.environ.has_key('SSH_TTY')) or
-                    platform.system() == "Windows"):
-                webbrowser.open("http://localhost:{0}".format(self.port), new=0)
+                (platform.system() == "Darwin" and not os.environ.has_key('SSH_TTY')) or
+                platform.system() == "Windows"):
+               webbrowser.open("http://localhost:{0}".format(self.port), new=0)
+        bonjour = BonjourThread(self.port)
+        bonjour.start()
 
     def rebuild(self):
         # after restart, purge the DB
@@ -1305,7 +1400,8 @@ class APIServer(tornado.web.Application):
         MAX_WAIT_SECONDS_BEFORE_SHUTDOWN = 3
 
         logging.info('Initiating shutdown...')
-        self.monitor.stop()
+        if not self.opts.no_monitor:
+            self.monitor.stop()
         self.bookmarker.stop()
      
         logging.info('Will shutdown ComicStreamer in maximum %s seconds ...', MAX_WAIT_SECONDS_BEFORE_SHUTDOWN)
@@ -1319,7 +1415,7 @@ class APIServer(tornado.web.Application):
                 io_loop.add_timeout(now + 1, stop_loop)
             else:
                 io_loop.stop()
-                logging.info('Shutdown complete.')
+                logging.info('Bye!')
         stop_loop()
         
     def log_request(self, handler):

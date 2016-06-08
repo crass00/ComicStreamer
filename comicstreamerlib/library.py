@@ -2,6 +2,7 @@
 from datetime import datetime
 import dateutil
 import os
+import random
 
 from sqlalchemy import func, distinct
 from sqlalchemy.orm import subqueryload
@@ -11,19 +12,22 @@ from database import Comic, DatabaseInfo, Person, Role, Credit, Character, Gener
     StoryArc, Genre, DeletedComic,AlternateSeries
 from folders import AppFolders
 from comicapi.comicarchive import ComicArchive
+
 from comicapi.issuestring import IssueString
 
 
 class Library:
 
-    def __init__(self, session_getter):
+    def __init__(self, session_getter, cache=None):
         self.getSession = session_getter
+        self.cache = cache
         self.comicArchiveList = []
         self.namedEntities = {}
 
     def getSession(self):
         """SQLAlchemy session"""
-        pass
+        #pass
+        return self.getSession
 
     def getComicThumbnail(self, comic_id):
         """Fast access to a comic thumbnail"""
@@ -38,11 +42,11 @@ class Library:
                                  .filter(Comic.id == int(comic_id)).first()
 
         image_data = None
-        default_img_file = AppFolders.imagePath("notfound.png")
+        default_img_file = AppFolders.imagePath("missing.png")
 
         if path is not None:
             if int(page_number) < page_count:
-                ca = self.getComicArchive(path)
+                ca = self.getComicArchive(comic_id,path)
                 image_data = ca.getPage(int(page_number))
 
         if image_data is None:
@@ -94,8 +98,8 @@ class Library:
     def randomComic(self):
         # SQLite specific random call
         return self.getSession().query(Comic)\
-                   .order_by(func.random()).limit(1).first()
-
+            .order_by(func.random()).limit(1).first()
+        
     def getDeletedComics(self, since=None):
         # get all deleted comics first
         session = self.getSession()
@@ -204,7 +208,6 @@ class Library:
                 role = self.getNamedEntity(Role, credit['role'].lower().strip())
                 person = self.getNamedEntity(Person, credit['person'].strip())
                 comic.credits_raw.append(Credit(person, role))
-
         return comic
 
     def getNamedEntity(self, cls, name):
@@ -225,6 +228,8 @@ class Library:
         if len(comic_list) > 0:
             self._dbUpdated()
         self.getSession().commit()
+        self.getSession().expire_all()
+
 
     def deleteComics(self, comic_id_list):
         s = self.getSession()
@@ -462,7 +467,7 @@ class Library:
 
         return query
 
-    def getComicArchive(self, path):
+    def getComicArchive(self, id, path):
         # should also look at modified time of file
         for ca in self.comicArchiveList:
             if ca.path == path:
@@ -471,8 +476,10 @@ class Library:
                 self.comicArchiveList.append(ca)
                 return ca
         else:
-            ca = ComicArchive(path, default_image_path=AppFolders.imagePath("notfound.png"))
+            ca = ComicArchive(id, path, default_image_path=AppFolders.imagePath("missing.png"))
             self.comicArchiveList.append(ca)
             if len(self.comicArchiveList) > 10:
                 self.comicArchiveList.pop(0)
             return ca
+
+

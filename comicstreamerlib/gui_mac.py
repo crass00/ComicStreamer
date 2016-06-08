@@ -6,16 +6,16 @@ import os
 
 from comicstreamerlib.folders import AppFolders
 
-rumps.debug_mode(True)  # turn on command line logging information for development - default is off
+rumps.debug_mode(False)  # turn on command line logging information for development - default is off
 
 class MacGui(rumps.App):
     def __init__(self, apiServer):
-        super(MacGui, self).__init__("ComicStreamer", icon=AppFolders.imagePath("trout.png"))
+        super(MacGui, self).__init__("ComicStreamer", icon=AppFolders.imagePath("logo.png"))
         self.apiServer =  apiServer
         
         self.menu = [
             #rumps.MenuItem('About'), 
-            'Show ComicStreamer UI',
+            'Show Interface',
             #None,  # None functions as a separator in your menu
             #{'Arbitrary':
             #    {"Depth": ["Menus", "It's pretty easy"],
@@ -28,7 +28,7 @@ class MacGui(rumps.App):
     #    #sender.title = 'NOM' if sender.title == 'About' else 'About'  # can adjust titles of menu items dynamically
     #    rumps.alert("ComicStreamer")
 
-    @rumps.clicked("Show ComicStreamer UI")
+    @rumps.clicked("Show Interface")
     def about(self, sender):
         webbrowser.open("http://localhost:{0}".format(self.apiServer.port), new=0)
         
@@ -37,7 +37,7 @@ class MacGui(rumps.App):
         #rumps.alert("My quit message")
         self.apiServer.shutdown()
         AppHelper.stopEventLoop()
-        print "after stop"
+        #print "after stop"
         
     
     #@rumps.clicked("Arbitrary", "Depth", "It's pretty easy")  # very simple to access nested menu items

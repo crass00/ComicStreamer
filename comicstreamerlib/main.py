@@ -1,25 +1,5 @@
 #!/usr/bin/env python
 
-"""
-ComicStreamer main server classes
-"""
-
-"""
-Copyright 2012-2014  Anthony Beville
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-	http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-"""
-
 import os
 import sys
 import time
@@ -33,7 +13,6 @@ from config import ComicStreamerConfig
 from comicstreamerlib.folders import AppFolders
 from options import Options
 from server import APIServer
-from bonjour import BonjourThread
 #from gui import GUIThread    
 
  
@@ -48,7 +27,10 @@ class Launcher():
     def go(self):
         utils.fix_output_encoding()
         self.apiServer = None
-        
+
+        opts = Options()
+        opts.parseCmdLineArgs()
+ 
         #Configure logging
         # root level        
         logger = logging.getLogger()    
@@ -69,10 +51,6 @@ class Launcher():
         sh.setFormatter(formatter)
         logger.addHandler(sh)
     
-        config = ComicStreamerConfig()
-        opts = Options()
-        opts.parseCmdLineArgs()
-    
         # set file logging according to config file
         #fh.setLevel(config['general']['loglevel'])
             
@@ -81,9 +59,9 @@ class Launcher():
             sh.setLevel(logging.DEBUG)
         elif opts.quiet:
             sh.setLevel(logging.CRITICAL)
-    
+        config = ComicStreamerConfig()
         config.applyOptions(opts)
-        
+
         self.apiServer = APIServer(config, opts)
     
         self.apiServer.logFileHandler = fh
@@ -91,15 +69,11 @@ class Launcher():
         
         signal.signal(signal.SIGINT, self.signal_handler)
     
-    
-        bonjour = BonjourThread(self.apiServer.port)
-        bonjour.start()
-    
         if getattr(sys, 'frozen', None):
             # A frozen app will run a GUI
             self.apiServer.runInThread()
        
-            logging.info("starting GUI loop")    
+            logging.info("UI Started")
             if platform.system() == "Darwin":
                 from gui_mac import MacGui
                 MacGui(self.apiServer).run()
@@ -115,7 +89,7 @@ class Launcher():
             #self.apiServer.shutdown()
             self.apiServer.run()
             
-        logging.info("gui shoudld be done now")
+        logging.info("Sit you later!")
 
 def main():
     Launcher().go()
