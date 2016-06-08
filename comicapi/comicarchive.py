@@ -739,9 +739,9 @@ class ComicArchive:
                         self.archive_type = self.ArchiveType.Pdf
                         self.archiver = PdfArchiver(self.path)
 
-                elif os.path.basename(self.path)[-4:] == 'epub':
-                    self.archive_type = self.ArchiveType.Epub
-                    self.archiver = EpubArchiver(self.path)
+                #elif os.path.basename(self.path)[-4:] == 'epub':
+                #self.archive_type = self.ArchiveType.Epub
+                #self.archiver = EpubArchiver(self.path)
 
                 elif self.zipTest():
                     self.archive_type =  self.ArchiveType.Zip
