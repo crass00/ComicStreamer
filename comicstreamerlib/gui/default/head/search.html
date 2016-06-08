@@ -1,0 +1,21 @@
+{% include base/head.html %}
+<script type="text/javascript" language="javascript">
+    function searchSubmit()
+    {
+        var role = $('#roles_select').val();
+        var person = $('#person_input').val();
+        
+        if (person != "")
+        {
+            if (role != "")
+            {
+                person = person+":"+role
+            }
+        }
+        $('#credit_input').val(person);
+    }
+</script>
+    </head>
+    <body>
+{% include menu/browser.html %}
+        <div id=content>

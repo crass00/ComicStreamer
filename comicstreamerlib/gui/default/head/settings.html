@@ -1,0 +1,103 @@
+{% include base/head.html %}
+<script type="text/javascript" charset="utf-8">
+    
+    $(document).ready(
+                      function()
+                      {
+                      //target_port=0;
+                      //if (location.port != target_port)
+                      //{
+                      //    location.port = target_port;
+                      //}
+                      use_api_key_toggle();
+                      use_auth_toggle();
+                      use_mysql_toggle();
+                      use_cache_toggle();
+                      use_https_toggle();                      }
+                      );
+                      function create_key()
+                      {
+                          
+                          function s4() {
+                              return Math.floor((1 + Math.random()) * 0x10000)
+                              .toString(16)
+                              .substring(1);
+                          }
+                          var key = s4() + s4() + s4() + s4() +
+                          s4() + s4() + s4() + s4();
+                          $("#api_key").val(key);
+                      }
+
+
+
+ 
+function use_api_key_toggle()
+{
+/*  $("#api_key").prop('disabled', !($("#use_key").is(':checked')));
+    $("#key_btn").prop('disabled', !($("#use_key").is(':checked')));
+  */
+    if (!($("#use_key").is(':checked'))) {
+      document.getElementById("settings_api").style.display = "none";
+    }
+    else {
+       document.getElementById("settings_api").style.display = "inline";
+    }
+}
+
+function use_auth_toggle()
+{
+/*    $("#username").prop('disabled', !($("#use_auth").is(':checked')));
+    $("#password").prop('disabled', !($("#use_auth").is(':checked')));
+    $("#password_confirm").prop('disabled', !($("#use_auth").is(':checked')));
+ */
+    if (!($("#use_auth").is(':checked'))) {
+        document.getElementById("settings_auth").style.display = "none";
+    }
+    else {
+        document.getElementById("settings_auth").style.display = "inline";
+    }
+
+}
+function use_cache_toggle()
+{
+   /* $("#cache_size").prop('disabled', !($("#use_cache").is(':checked')));
+    $("#cache_free").prop('disabled', !($("#use_cache").is(':checked')));
+    */
+   if (!($("#use_cache").is(':checked'))) {
+        document.getElementById("settings_cache").style.display = "none";
+    }
+    else {
+        document.getElementById("settings_cache").style.display = "inline";
+    }
+}
+function use_https_toggle()
+{/*
+    $("#https_port").prop('disabled', !($("#use_https").is(':checked')));
+  */
+    if (!($("#use_https").is(':checked'))) {
+        document.getElementById("settings_https").style.display = "none";
+    }
+    else {
+        document.getElementById("settings_https").style.display = "inline";
+    }
+}
+function use_mysql_toggle()
+{
+/*  $("#mysql_username").prop('disabled', !($("#use_mysql").is(':checked')));
+    $("#mysql_password").prop('disabled', !($("#use_mysql").is(':checked')));
+    $("#mysql_database").prop('disabled', !($("#use_mysql").is(':checked')));
+    $("#mysql_host").prop('disabled', !($("#use_mysql").is(':checked')));
+    $("#mysql_port").prop('disabled', !($("#use_mysql").is(':checked')));
+ */
+    if (!($("#use_mysql").is(':checked'))) {
+        document.getElementById("settings_mysql").style.display = "none";
+    }
+    else {
+        document.getElementById("settings_mysql").style.display = "inline";
+    }
+}
+</script>
+    </head>
+    <body>
+    {% include menu/one.html %}
+        <div id=content>

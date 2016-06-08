@@ -1,0 +1,78 @@
+{% autoescape None %}
+{% set title = "Settings" %}
+{% include head/settings.html %}
+<form class="entry_form" action="settings" method="post">
+	{% module xsrf_form_html() %}
+    <div>
+        <h1>GENERAL</h1>
+        <br>
+        <span>Comic Folders</span> <span class="help">one folder per line</span><textarea id="folders" name="folders" >{{formdata['folders']}}</textarea>
+        <br>
+        <span>Launch Client At Startup</span><input type="checkbox" name="launch_client" class="formcheck" id="launch_client" value="{{formdata['launch_client']}}">
+    </div>
+    <br>
+    <div>
+        <h1>SERVER</h1>
+        <br>
+        <span id="statusbad">{{failure}}</span><span id="statusgood">{{success}}</span>
+        <span>Port</span><input id="port" type="text" name="port" value="{{formdata['port']}}" />
+        <br>
+        <div style="display:none">
+            <span>HTTPS</span><input type="checkbox" name="use_https" class="formcheck" id="use_https" onclick="use_https_toggle()" value="use" {{formdata['use_https']}}>
+        <div id="settings_https">
+        <span>Key File</span><input id="key_file" type="text" name="key_file" value="{{formdata['key_file']}}" />
+        <span>Certificate File</span><input id="certificate_file" type="text" name="certificate_file" value="{{formdata['certificate_file']}}" />
+        </div> </div>
+        <br>
+        <span>Webroot</span><input id="webroot" type="text" name="webroot" value="{{formdata['webroot']}}" />
+    </div>
+    <br>
+    <div>
+        <h1>Security</h1>
+        <br>
+        <span>Use Authenication</span><input type="checkbox" name="use_authentication" class="formcheck" id="use_auth" value="use" onclick="use_auth_toggle()" {{formdata['use_authentication']}}>
+        <div id="settings_auth">
+        <span>Username</span><input id="username" type="text" name="username" value="{{formdata['username']}}" />
+        <span>Password</span><input id="password" type="password" name="password" value="{{formdata['password']}}" />
+        <span>Password</span> <span class="help">re-enter</span><input id="password_confirm" type="password" name="password_confirm" value="{{formdata['password']}}" />
+        </div>
+        <br>
+        <span>Use API Key</span><input type="checkbox" name="use_api_key" class="formcheck" id="use_key" value="use" onclick="use_api_key_toggle()" {{formdata['use_api_key']}}>
+        <div id="settings_api">
+        <input id="api_key" type="text" name="api_key" value="{{formdata['api_key']}}" />
+        <button type="button" class="formbutton" id="key_btn" onclick="create_key()">Generate</button>
+        </div>
+    </div>
+    <br>
+    <div  style="display:none">
+        <h1>DATABASE</h1>
+        <br>
+        <span>Use MySQL</span><input type="checkbox" name="use_mysql" class="formcheck" id="use_mysql" value="use" onclick="use_mysql_toggle()" {{formdata['use_mysql']}} />
+        <div id="settings_mysql">
+            <span>Database</span><input id="mysql_database" type="text" name="mysql_database" value="{{formdata['mysql_database']}}" />
+            <br>
+            <span>Username</span><input id="mysql_username" type="text" name="mysql_username" value="{{formdata['mysql_username']}}" />
+            <span>Password</span> <span class="help">default: comic</span><input id="mysql_password" type="password" name="mysql_password" value="{{formdata['mysql_password']}}" />
+            <br>
+            <span>Host</span><input id="mysql_host" type="text" name="mysql_host" value="{{formdata['mysql_host']}}" />
+            <span>Port</span><input id="mysql_port" type="text" name="mysql_port" value="{{formdata['mysql_port']}}" />
+        </div>
+    </div>
+    <br>
+    <div  style="display:none">
+        <h1>CACHE</h1>
+        <br>
+        <span>Use Cache</span><input type="checkbox" name="use_cache" class="formcheck" id="use_cache" value="use" onclick="use_cache_toggle()" {{formdata['use_cache']}} />
+        <div id="settings_cache">
+        <span>Size</span> <span class="help">megabytes</span><input id="cache_size" type="text" name="cache_size" value="{{formdata['cache_size']}}" />
+        <span>Free Space</span> <span class="help">megabytes</span><input id="cache_free" type="text" name="cache_free" value="{{formdata['cache_free']}}" />
+        </div>
+    </div>
+    <br>
+    <input type="submit" id="submit_btn" class="formbutton" value="Save" />
+    <br>
+    <br>
+    <br>
+    <br>
+</form>
+{% include foot/foot.html %}

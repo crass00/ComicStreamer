@@ -1,0 +1,76 @@
+{% set title = "Search" %}
+{% include head/search.html %}
+<div id="main_search">
+    <h3>Search Comics</h3>
+    <div>
+        <div id="main_search_form" onsubmit="searchSubmit()">
+            <form action="{{handler.webroot}}/comiclist/browse" method="get">
+                <span class="param"><label>Title</label><input type="text" name="title"></span>
+				            <span class="param"><label>Language</label><input type="text" name="language"></span>
+                            <span class="param"><label>Path</label><input type="text" name="path"></span>
+                            <span class="param"><label>Series</label><input type="text" name="series"></span>
+                            <span class="param"><label>Publisher</label><input type="text" name="publisher"></span>
+                            <span class="param"><label>Filename</label><input type="text" name="path"></span>
+                            <span class="param"><label>Character</label><input type="text" name="character"></span>
+                            <span class="param"><label>Team</label><input type="text" name="team"></span>
+                            <span class="param"><label>Location</label><input type="text" name="location"></span>
+                            <span class="param"><label>Story Arc</label><input type="text" name="storyarc"></span>
+                            <span class="param"><label>Genre</label><input type="text" name="genre"></span>
+                            <span class="param"><label>Tag</label><input type="text" name="tag"></span>
+                            <span class="param"><label>Volume</label><input type="text" name="volume"></span>
+                            <span class="param"><label>Creator/Contributor</label><input type="text" id="person_input"></span>
+                            
+                            <span class="param"><label>Role</label>
+                                <select  id="roles_select">
+                                    <option value="">---</option>
+                                    {% for role in roles %}
+                                    {% block role %}
+                                    <option value="{{role}}">{{role}}</option>
+                                    {% end %}
+                                    {% end %}
+                                </select>
+                            </span>
+                            
+                            <br>
+                            <span class="param"><label>Publication Start Date</label><input type="text" name="start_date"></span>
+                            <span class="param"><label>Publication End Date</label><input type="text" name="end_date"></span>
+                            <span class="param"><label>Added Since</label><input type="text" name="added_since"></span>
+                            
+                            <span class="param"><label>Order By</label>
+                                <select name="order">
+                                    <option value="">---</option>
+                                    <option value="series">Series</option>
+                                    <option value="added">Date Added</option>
+                                    <option value="volume">Volume</option>
+                                    <option value="issue">Issue</option>
+                                    <option value="date">Publication Date</option>
+                                </select>
+                            </span>
+                            <span class="param"><label>Order descending</label><input type="checkbox" name="order_desc"></span>
+                            
+                            <span class="param"><label>Max Results</label><input type="text" name="per_page"></span>
+                            
+                            <input type="hidden" name="credit" id="credit_input">
+                                <span class="param"><label>.  </label><input type="submit" value="Search"/></span>
+                                </form>
+        </div>
+        <div id="main_search_help">
+            <span>
+                Most text fields will accept a "*" as a wildcard.  For example:<br>
+                <br>
+                *Walking*<br>
+                Brian*Vaughn<br>
+                Image*<br>
+                <br>
+                <br>
+                Date fields expect format "YYYY-MM-DD hh:mm:ss".  You may omit the any right-most portion.  For example:<br>
+                <br>
+                2014<br>
+                2014-03<br>
+                2014-03-12<br>
+            </span>
+        </div>
+    </div>
+</div>
+{% include foot/foot.html %}
+

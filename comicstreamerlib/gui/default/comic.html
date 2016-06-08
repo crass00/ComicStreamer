@@ -1,0 +1,33 @@
+{% include head/comic.html %}
+    <canvas id="comic"></canvas>
+
+    <script>
+        var pages,book,i;
+        pages = [];
+        for( i=0; i<{{count}}; i++ )
+        {
+           pages.push('page/'+i+'?api_key={{api_key}}');
+        }
+
+        target_page = {{page}};
+        if (target_page != 0 && location.hash=='')
+        {
+            location.hash = (target_page+1).toString()
+        }
+        //set the bookmark
+        $.getJSON( 'page/' + target_page  +'/bookmark?api_key={{api_key}}')
+
+        book=new ComicBook('comic',pages ,
+            {
+                libPath: "{{ static_url('comicbook/js/') }}",
+                displayMode: 'single',
+                keyboard: { next: 39, previous: 37 },
+                pageTurnCallback: function(page){$.getJSON( 'page/'+(page-1)+'/bookmark?api_key={{api_key}}')}
+            }
+        );
+        book.draw();
+        $(window).on('resize',function(event){book.draw();});
+    </script>
+    </body>
+</html>
+

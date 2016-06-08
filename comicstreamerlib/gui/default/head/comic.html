@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf8">
+            <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+            <meta name="apple-mobile-web-app-capable" content="yes">
+                <meta name="apple-mobile-web-app-status-bar-style" content="black">
+                    <link rel="icon" href="{{handler.webroot}}/favicon.ico" />
+                    {% include ../head/base/links.html %}
+                    <title>ToiletStreamer {{title}}</title>
+                    <script src="{{ static_url('js/jquery-2.0.2.min.js') }}"></script>
+                    <link rel="shortcut icon" sizes="196x196" href="{{ static_url('icons/logo.png')}}">
+                        <link rel="apple-touch-icon" sizes="128x128" href="{{ static_url('icons/logo.png')}}">
+                            <link rel="apple-touch-icon-precomposed" sizes="128x128" href="{{ static_url('icons/logo.png')}}">
+                                
+
+<script src="{{ static_url('comicbook/js/comicbook.js') }}"></script>
+<link rel="stylesheet" href="{{ static_url('comicbook/comicbook.css') }}">
+<style>.toolbar li:first-child, .toolbar li:nth-child(2) {display:none}</style>
+    </head>
+    <body>
+
+        <div id=content>

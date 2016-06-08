@@ -1,0 +1,11 @@
+{% set title = "ToiletStreamer" %}
+{% include head/main.html %}
+<div id="random">
+    <a href="{{handler.webroot}}/comic/{{random_comic.id}}/reader"> <!-- target="_blank" -->
+        <span class="comic_caption">{{random_comic.series}}</span>
+        <img src="{{handler.webroot}}/comic/{{random_comic.id}}/thumbnail/large?api_key={{api_key}}">
+        <span class="comic_caption">{{random_caption}}</span>
+    </a>
+</div>
+{% include foot/foot.html %}
+

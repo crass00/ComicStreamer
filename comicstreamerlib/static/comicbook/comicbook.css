@@ -9,6 +9,8 @@
 	font-style: normal;
 }
 
+
+
 /* Use the following CSS code if you want to use data attributes for inserting your icons */
 [data-icon]:before {
 	font-family: 'toolbar';
@@ -27,7 +29,7 @@ Instead of a list of all class selectors,
 you can use the generic selector below, but it's slower:
 [class*="icon-"] {
 */
-.icon-file, .icon-image, .icon-zoom-out, .icon-zoom-in, .icon-expand, .icon-expand-2, .icon-folder-open, .icon-folder, .icon-cog, .icon-menu, .icon-wrench, .icon-settings, .icon-loop, .icon-pin, .icon-first, .icon-last, .icon-arrow-left, .icon-arrow-right, .icon-arrow-left-2, .icon-arrow-right-2, .icon-arrow-left-3, .icon-arrow-right-3, .icon-previous, .icon-next, .icon-droplet, .icon-adjust, .icon-sun, .icon-remove-sign, .icon-remove, .icon-copy {
+.icon-file, .icon-image, .icon-zoom-out, .icon-zoom-in, .icon-expand, .icon-expand-2, .icon-folder-open, .icon-folder, .icon-cog, .icon-menu, .icon-wrench, .icon-settings, .icon-loop, .icon-pin, .icon-first, .icon-last, /*.icon-arrow-left,*/ .icon-arrow-right, .icon-arrow-left-2, .icon-arrow-right-2, .icon-arrow-left-3, .icon-arrow-right-3, .icon-previous, .icon-next, .icon-droplet, .icon-adjust, .icon-sun, .icon-remove-sign, .icon-remove, .icon-copy {
 	font-family: 'toolbar';
 	speak: none;
 	font-style: normal;
@@ -85,9 +87,14 @@ you can use the generic selector below, but it's slower:
 .icon-last:before {
 	content: "\e00f";
 }
-.icon-arrow-left:before {
+/*.icon-arrow-left:before {
 	content: "\e011";
+}*/
+
+.icon-arrow-left {
+    image: url('back.png');
 }
+
 .icon-arrow-right:before {
 	content: "\e010";
 }
@@ -233,6 +240,7 @@ body:not(.mobile) .navigate:hover {
 }
 
 #cb-status {
+    #f6b946
 	z-index: 101;
 	font-size: 12px;
 	right: 0;
@@ -252,7 +260,7 @@ body:not(.mobile) .navigate:hover {
 
 #cb-progress-bar .progressbar-value {
 	width: 0;
-	background: #86C441;
+	background: #f6b946;
 	border-color: #3E7600;
 }
 
@@ -283,12 +291,13 @@ button, input, label {
 
 .toolbar {
 	color: white;
-	background-color: black;
-	background-image: linear-gradient(to bottom, rgb(80, 80, 80), rgb(17, 17, 17));
+	background-color: #f6b946;
+    #background-image: linear-gradient(to bottom, #f6b946, rgb(17, 17, 17));
 	overflow: visible;
 	padding: 0.75em;
 	position: fixed;
-	left: 0;
+    top: 0px;
+    left: 0;
 	right: 0;
 	z-index: 99;
 	margin-bottom: 0;

@@ -1,0 +1,61 @@
+{% set title = "Techno Overview" %}
+{% include head/about.html %}
+        <style type="text/css">
+    .grow img {
+    height: 200px;
+    width: 200px;
+    
+    -webkit-transition: all 1s ease;
+    -moz-transition: all 1s ease;
+    -o-transition: all 1s ease;
+    -ms-transition: all 1s ease;
+    transition: all 1s ease;
+    }
+    
+    .grow img:hover {
+    width: 220px;
+    height: 220px;
+    }
+    </style>
+<center>
+    <span id="bigtitle">Help</span>
+    <div>
+        Introduction Here
+    </div>
+
+    <span id="bigtitle">MySQL</span>
+    <div>
+        <pre>
+        CREATE DATABASE comicdb;
+        CREATE USER 'comic'@'%' IDENTIFIED BY 'comic';
+        GRANT ALL PRIVILEGES ON *.* TO 'comic'@'%' WITH GRANT OPTION;
+        CREATE USER 'comic'@'%' IDENTIFIED BY comic;
+        GRANT ALL ON *.* TO 'comic'@'localhost';
+        FLUSH PRIVILEDGES;
+        </pre>
+    </div>
+<span id="bigtitle">Supported Formats</span>
+<div>
+    Comic Books:
+    PDF, CBR, RAR, CBZ, ZIP, CB7, 7Z, PDF, BMP
+    Pages:
+    JPG, PNG, BMP, WEBP
+</div>
+
+    <span id="bigtitle">Technology</span>
+    <div class="grow pic">
+        <img src="{{ static_url('icons/technology/pythonv2.png') }}">
+        <img src="{{ static_url('icons/technology/tornado.png') }}">
+        <img src="{{ static_url('icons/technology/html.png') }}">
+        <img src="{{ static_url('icons/technology/css.png') }}">
+        <img src="{{ static_url('icons/technology/mysql.png') }}">
+        <img src="{{ static_url('icons/technology/sqlite.png') }}">
+        <img src="{{ static_url('icons/technology/comicstreamer.png') }}">
+        <img src="{{ static_url('icons/technology/bonjour.png') }}">
+    </div>
+
+
+<br><br><br>
+<center>
+{% include foot/foot.html %}
+

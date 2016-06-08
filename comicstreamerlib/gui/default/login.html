@@ -1,0 +1,10 @@
+{% set title = "Login" %}
+{% include head/none.html %}
+<form class="entry_form" action="{{handler.webroot}}/login" method="post">
+    {% module xsrf_form_html() %}
+    <input  type="hidden" name="next" value="{{next}}" />
+    <span>Username</span><div><input type="text" name="username" size="15"/></div>
+    <span>Password</span><div><input  type="password" name="password" size="15"/></div>
+    <input type="submit" id="submit_btn" class="formbutton" value="Login" alt="Login">
+</form>
+{% include foot/foot.html %}
