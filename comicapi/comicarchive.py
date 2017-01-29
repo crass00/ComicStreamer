@@ -7,6 +7,7 @@ import subprocess
 import platform
 import locale
 import shutil
+import tarfile
 
 from natsort import natsorted
 from unrar import rarfile
@@ -315,6 +316,46 @@ class SevenZipArchiver:
             print >> sys.stderr, u"Unable to get 7zipfile list [{0}]: {1}".format(e, self.path)
             return []
 
+class TarArchiver:
+
+    def __init__( self, path ):
+        self.path = path
+
+    def getArchiveComment( self ):
+        return ""
+
+    def setArchiveComment( self, comment ):
+        return False
+    
+    def readArchiveFile( self, archive_file ):
+        data = ""
+        zf = tarfile.TarFile( self.path, 'r' )
+
+        try:
+            data = zf.extractfile(archive_file).read()
+        except Exception as e:
+            zf.close()
+            print >> sys.stderr, u"bad tarfile [{0}]: {1} :: {2}".format(e, self.path, archive_file)
+            raise IOError
+        finally:
+            zf.close()
+        return data
+
+    def removeArchiveFile( self, archive_file ):
+        return False
+    
+    def writeArchiveFile( self, archive_file, data ):
+        return False
+
+    def getArchiveFilenameList( self ):
+        try:
+            zf = tarfile.TarFile( self.path, 'r' )
+            namelist = zf.getnames()
+            zf.close()
+            return namelist
+        except Exception as e:
+            print >> sys.stderr, u"Unable to get tarfile list [{0}]: {1}".format(e, self.path)
+            return []
 
 #------------------------------------------
 # RAR implementation
@@ -688,7 +729,7 @@ class ComicArchive:
     logo_data = None
 
     class ArchiveType:
-        Zip, SevenZip, Rar, Folder, Pdf, Epub, Unknown = range(7)
+        Zip, SevenZip, Rar, Folder, Pdf, Epub, Tar, Unknown = range(8)
     
     def __init__( self, path, rar_exe_path=None, default_image_path=None ):
         self.path = path
@@ -720,41 +761,69 @@ class ComicArchive:
                 self.archive_type = self.ArchiveType.SevenZip
                 self.archiver = SevenZipArchiver( self.path )
 
+            elif self.tarTest():
+                self.archive_type = self.ArchiveType.Tar
+                self.archiver = TarArchiver( self.path )
+
+        elif ext == ".cb7" or ext == ".7z":
+            if self.sevenZipTest():
+                self.archive_type = self.ArchiveType.SevenZip
+                self.archiver = SevenZipArchiver( self.path )
+
+            elif self.zipTest():
+                self.archive_type =  self.ArchiveType.Zip
+                self.archiver = ZipArchiver( self.path )
+
+            elif self.rarTest():
+                self.archive_type =  self.ArchiveType.Rar
+                self.archiver = RarArchiver( self.path, rar_exe_path=self.rar_exe_path )
+
+            elif self.tarTest():
+                self.archive_type = self.ArchiveType.Tar
+                self.archiver = TarArchiver( self.path )
+        elif ext == ".cbt" or ext == ".tar":
+            
+            if self.tarTest():
+                self.archive_type = self.ArchiveType.Tar
+                self.archiver = TarArchiver( self.path )
+
+            elif self.sevenZipTest():
+                self.archive_type = self.ArchiveType.SevenZip
+                self.archiver = SevenZipArchiver( self.path )
+
+            elif self.zipTest():
+                self.archive_type =  self.ArchiveType.Zip
+                self.archiver = ZipArchiver( self.path )
+
+            elif self.rarTest():
+                self.archive_type =  self.ArchiveType.Rar
+                self.archiver = RarArchiver( self.path, rar_exe_path=self.rar_exe_path )
+
         else:
-            if ext == ".cb7" or ext == ".7z":
-                if self.sevenZipTest():
-                    self.archive_type = self.ArchiveType.SevenZip
-                    self.archiver = SevenZipArchiver( self.path )
+            if os.path.basename(self.path)[-3:] == 'pdf':
+                if os.path.basename(self.path)[-8:] != '.tmp.pdf':
+                    self.archive_type = self.ArchiveType.Pdf
+                    self.archiver = PdfArchiver(self.path)
 
-                elif self.zipTest():
-                    self.archive_type =  self.ArchiveType.Zip
-                    self.archiver = ZipArchiver( self.path )
+            #elif os.path.basename(self.path)[-4:] == 'epub':
+            #self.archive_type = self.ArchiveType.Epub
+            #self.archiver = EpubArchiver(self.path)
 
-                elif self.rarTest():
-                    self.archive_type =  self.ArchiveType.Rar
-                    self.archiver = RarArchiver( self.path, rar_exe_path=self.rar_exe_path )
-            else:
-                if os.path.basename(self.path)[-3:] == 'pdf':
-                    if os.path.basename(self.path)[-8:] != '.tmp.pdf':
-                        self.archive_type = self.ArchiveType.Pdf
-                        self.archiver = PdfArchiver(self.path)
+            elif self.zipTest():
+                self.archive_type =  self.ArchiveType.Zip
+                self.archiver = ZipArchiver( self.path )
 
-                #elif os.path.basename(self.path)[-4:] == 'epub':
-                #self.archive_type = self.ArchiveType.Epub
-                #self.archiver = EpubArchiver(self.path)
+            elif self.rarTest():
+                self.archive_type =  self.ArchiveType.Rar
+                self.archiver = RarArchiver( self.path, rar_exe_path=self.rar_exe_path )
 
-                elif self.zipTest():
-                    self.archive_type =  self.ArchiveType.Zip
-                    self.archiver = ZipArchiver( self.path )
+            elif self.sevenZipTest():
+                self.archive_type = self.ArchiveType.SevenZip
+                self.archiver = SevenZipArchiver( self.path )
 
-                elif self.rarTest():
-                    self.archive_type =  self.ArchiveType.Rar
-                    self.archiver = RarArchiver( self.path, rar_exe_path=self.rar_exe_path )
-
-                elif self.sevenZipTest():
-                    self.archive_type = self.ArchiveType.SevenZip
-                    self.archiver = SevenZipArchiver( self.path )
-
+            elif self.tarTest():
+                self.archive_type = self.ArchiveType.Tar
+                self.archiver = TarArchiver( self.path )
         if ComicArchive.logo_data is None:
             #fname = ComicTaggerSettings.getGraphic('nocover.png')
             fname = self.default_image_path
@@ -781,9 +850,11 @@ class ComicArchive:
         self.path = path
         self.archiver.path = path
 
+
     def zipTest( self ):
         return zipfile.is_zipfile( self.path )
-    
+
+
     def sevenZipTest( self ):
 	try: 
 	    Archive7z(open(self.path)).getnames()
@@ -791,6 +862,16 @@ class ComicArchive:
 	    return False
 	else: 
 	    return True
+
+
+    def tarTest( self ):
+	try: 
+	    return tarfile.is_tarfile( self.path )
+	except:
+	    return False
+	else: 
+	    return True
+
 
     def rarTest( self ):
         try:
@@ -811,6 +892,8 @@ class ComicArchive:
         return self.archive_type ==  self.ArchiveType.Pdf
     def isEpub(self):
         return self.archive_type ==  self.ArchiveType.Epub
+    def isTar(self):
+        return self.archive_type ==  self.ArchiveType.Tar
     def isFolder( self ):
         return self.archive_type ==  self.ArchiveType.Folder
 
@@ -821,8 +904,17 @@ class ComicArchive:
         elif check_rar_status and self.isRar() and self.rar_exe_path is None:
             return False
 
-	elif self.isSevenZip():
-	    return False
+        elif self.isSevenZip():
+            return False
+
+        elif self.isPdf():
+            return False
+
+        elif self.isEpub():
+            return False
+
+        elif self.isTar():
+            return False
 
         elif not os.access(self.path, os.W_OK):
             return False
@@ -846,7 +938,7 @@ class ComicArchive:
         ext = os.path.splitext(self.path)[1].lower()
 
         if (
-              ( self.isZip() or  self.isRar() or self.isPdf() or self.isEpub() or self.isSevenZip() ) #or self.isFolder() )
+              ( self.isZip() or self.isTar() or  self.isRar() or self.isPdf() or self.isEpub() or self.isSevenZip() ) #or self.isFolder() )
               and
               ( self.getNumberOfPages() > 0)
 

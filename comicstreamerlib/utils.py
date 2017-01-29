@@ -96,10 +96,11 @@ def collapseRepeats(string, ch):
 
 def resizeImage(max, image_data):
     # disable WebP for now, due a memory leak in python library
-    imtype = imghdr.what(StringIO.StringIO(image_data))
-    if imtype == "webp":
-        with open(AppFolders.imagePath("missing.png"), 'rb') as fd:
-            image_data = fd.read()
+    
+    #imtype = imghdr.what(StringIO.StringIO(image_data))
+    #if imtype == "webp":
+    #    with open(AppFolders.imagePath("missing.png"), 'rb') as fd:
+    #        image_data = fd.read()
 
     im = Image.open(StringIO.StringIO(image_data)).convert('RGB')
     w,h = im.size
