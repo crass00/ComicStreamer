@@ -40,7 +40,7 @@ class WinGui(object):
         
         self.apiServer = apiServer
         
-        self.icon = AppFolders.imagePath("logo.ico")
+        self.icon = AppFolders.iconsPath("logo.ico")
         self.hover_text = "ComicStreamer"
         self.on_quit = self.bye    
             
