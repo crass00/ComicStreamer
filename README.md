@@ -2,6 +2,8 @@
 
 For now no mac or windows package! 
 
+ComicStreamer ToiletStreamer Edition Windows Alplha (https://dl.dropboxusercontent.com/u/12474226/32/ComicStreamer%200.9.5.exe) with broken web settings so edit the settings manually!
+
 ## Help wanted
 - front-end html/css could use some help
 - webp support in webcomicbook reader used in the web reader
