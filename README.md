@@ -1,13 +1,26 @@
+# ComicStream: ToiletStreamer Edition
+
 For now no mac or windows package! 
 
-Help wanted: front-end html/css & webp support in webcomicbook reader used
+## Help wanted
+- front-end html/css could use some help
+- webp support in webcomicbook reader used in the web reader
 
-Settings: Keep clicking on "tha brain" :-)
+## Settings
+Keep clicking on "tha brain" :-) Did I mention the fron-end help wanted :-)
 
-Todo: MySQL support
-      Find a good epub page to jpg converter for ebook support (pdf works great! better then any ebook reader)
-      Fix some gui stuff...
-      
+## ToDo!
+
+- MySQL support (I created a test data set and it chokes at more then 30.000 files with sqlite :-/)
+- Find a good epub page to jpg converter for ebook support (pdf works great! better then any ebook reader)
+- Fix some gui stuff...
+- Create Windows & Mac packages
+
+![screw](https://raw.githubusercontent.com/Tristan79/ComicStreamer/master/ad.png)
+
+   
+## Work done
+
 Tristan79 Work on this fork (januari 28 2017)
 
 - Fixed bug (appartently source didn't work for months)
@@ -23,12 +36,6 @@ Tristan79 Work on this fork (may 15 2016)
 - Added option to have alternative mobile site for android/ipad/etc...
 
 If you have web development or graphic design skills, and would like to help out, please contact me at tristan@monkeycat.nl.
-
-
-
-
-
-
 
 
 
