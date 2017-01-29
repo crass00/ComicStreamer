@@ -1,3 +1,11 @@
+Tristan79 Work on this fork (januaru 28 2017)
+
+- Fixed bug (appartently source didn't work for months)
+- Added cbt/tar support
+- Patched webp (it does not load in web comic book, haven't tested chunky so converted to jpeg :/)
+- Experimental Cache System (since remote storage could be slow, even usb2 vs ssd :-)
+
+
 Tristan79 Work on this fork (may 15 2016)
 
 - Lot of bug fixes, 
