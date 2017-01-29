@@ -94,6 +94,11 @@ class AppFolders():
         else:
             folder = os.path.join(AppFolders.userFolder())
         return folder
+
+
+    @staticmethod
+    def appCache():
+        return os.path.join(AppFolders.appData(), "cache")
     
     @staticmethod
     def imagePath(filename):

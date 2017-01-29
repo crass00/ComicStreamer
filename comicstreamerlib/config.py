@@ -44,7 +44,7 @@ class ComicStreamerConfig(ConfigObj):
             mysql_host=string(default="localhost")
             mysql_port=integer(default=3306)
             [cache]
-            use_cache=boolean(default="True")
+            active=boolean(default="False")
             size=integer(default=0)
             free=integer(default=3000)
            """

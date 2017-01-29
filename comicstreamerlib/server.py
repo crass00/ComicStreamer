@@ -1022,7 +1022,7 @@ class ConfigPageHandler(BaseHandler):
     @tornado.web.authenticated    
     def get(self):
         formdata = dict()
-        formdata['use_cache'] = self.application.config['cache']['use_cache']
+        formdata['use_cache'] = self.application.config['cache']['active']
         formdata['cache_size'] = self.application.config['cache']['size']
         formdata['cache_free'] = self.application.config['cache']['free']
         formdata['port'] = self.application.config['server']['port']
@@ -1241,14 +1241,18 @@ class APIServer(tornado.web.Application):
         #if len(self.config['general']['folder_list']) == 0:
         #    logging.error("No folders on either command-line or config file.  Quitting.")
         #    sys.exit(-1)
-        
+
         self.dm = DataManager()
         #self.dm = DataManager(config)
         self.library = Library(self.dm.Session)
+        self.library.cache(AppFolders.appCache(),self.config['cache']['active'],self.config['cache']['size'],self.config['cache']['free'])
 
         if opts.reset or opts.reset_and_run:
             logging.info( "Deleting any existing database!")
             self.dm.delete()
+            logging.info( "Deleting any existing cache!")
+            if os.path.exists(AppFolders.appCache()) and os.path.isdir(AppFolders.appCache()):
+                shutil.rmtree(AppFolders.appCache())
             
         # quit on a standard reset
         if opts.reset:

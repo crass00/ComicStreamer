@@ -723,6 +723,8 @@ class EpubArchiver:
         return out
 
 #------------------------------------------------------------------
+
+
 class ComicArchive:
 
     logo_data = None
@@ -1395,4 +1397,3 @@ class ComicArchive:
 
         zip_archiver = ZipArchiver( zipfilename )
         return zip_archiver.copyFromArchive( self.archiver )
-

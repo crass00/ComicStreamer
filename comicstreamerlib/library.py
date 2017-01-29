@@ -18,11 +18,126 @@ from comicapi.issuestring import IssueString
 
 class Library:
 
-    def __init__(self, session_getter, cache=None):
+    def __init__(self, session_getter):
         self.getSession = session_getter
-        self.cache = cache
         self.comicArchiveList = []
         self.namedEntities = {}
+        self.cache_active = False
+
+    def cache(self,path,active,size,free):
+        self.cache_active = active
+        self.cache_size = size
+        self.cache_free = free
+        self.cache_path = path
+        self.cache_filled = 0
+        self.cache_list = []
+        
+        try:
+            if not os.path.exists(path):
+                os.makedirs(path)
+        except:
+            self.cache_active = False;
+        
+        for subdir, dirs, files in os.walk(self.cache_path):
+            if os.path.split(subdir)[-1] == 'cache': continue
+            for file in files:
+                cachefile = os.path.join(subdir, file)
+                cache_file_size = utils.file_size_bytes(cachefile)
+                #print (os.path.split(subdir)[-1])
+                #print file
+                self.cache_list += [(os.path.split(subdir)[-1],file,cache_file_size,os.path.getmtime(cachefile))]
+                self.cache_filled += cache_file_size
+
+        self.cache_list = sorted(self.cache_list, key = lambda x: int(x[3]))
+        
+        x = utils.get_free_space(self.cache_path) - self.cache_free*1048576 - self.cache_filled
+        if x < 0:
+            self.cache_delete(abs(x))
+        
+        """
+        print "Cache: " + str(self.cache_active)
+        if self.cache_size == 0:
+            print "Size: Fill"
+        else:
+            print "Size: " + str(self.cache_size) + "mb"
+        print "Free: " + str(self.cache_free) + "mb"
+        print "Free FS: " + str(utils.get_free_space(self.cache_path)/1024/1024) + "mb"
+        print "Filled: " + str(self.cache_filled/1024/1024) + "mb"
+        print "Files: " + str(len(self.cache_list))
+        print "Remaining: " + str(x/1024/1024)
+        """
+
+    def cache_delete(self, size):
+        #print "delete: " + str(size)
+        deleted = 0
+        while size - deleted > 0:
+            if self.cache_list == []:
+                return deleted
+            x = self.cache_list[0]
+            #print "remove:" + os.path.join(self.cache_path,x[0],x[1])
+            os.remove(os.path.join(self.cache_path,x[0],x[1]))
+            self.cache_filled -= x[2]
+            deleted += x[2]
+            self.cache_list.pop(0)
+        return deleted
+
+    def cache_hit(self, comic_id, page_number, path):
+        if self.cache_active:
+            cachepath = self.cache_path + "/" + comic_id + "/"
+            cachefile = cachepath + str(page_number)
+            if not os.path.exists(cachepath):
+                os.makedirs(cachepath)
+            if not os.path.isfile(cachefile):
+                ca = self.getComicArchive(comic_id,path)
+                image = ca.getPage(int(page_number))
+                
+                # auto convert webp (disable for chunky or fix web book reader)
+                image = utils.webp_patch_convert(image)
+
+                cache_file_size = len(image)
+                
+                cache_free_size = utils.get_free_space(self.cache_path)
+                x = cache_free_size - self.cache_free*1048576 - self.cache_filled
+                if x < 0:
+                    self.cache_delete(abs(x))
+                
+                deleted = 0
+                if self.cache_size > 0 and self.cache_filled + cache_file_size > self.cache_size*1048576:
+                    deleted = self.cache_delete(cache_file_size)
+                else:
+                    deleted = cache_file_size
+                
+                if cache_file_size <= deleted:
+                    file = open(cachefile, "w")
+                    file.write(image)
+                    file.close()
+                    self.cache_filled += cache_file_size
+                    self.cache_list += [(comic_id,page_number,cache_file_size,os.path.getmtime(cachefile))]
+
+                # DEBUG
+                """
+                if self.cache_size == 0:
+                    print "Size: Fill"
+                else:
+                    print "Size: " + str(self.cache_size) + "mb"
+                print "Free: " + str(self.cache_free) + "mb"
+                print "Free FS: " + str(utils.get_free_space(self.cache_path)/1024/1024) + "mb"
+                print "Filled: " + str(self.cache_filled/1024/1024) + "mb"
+                print "Files: " + str(len(self.cache_list))
+                print "Remaining: " + str(x/1024/1024)
+                """
+
+            else:
+                file = open(cachefile, "r")
+                image = file.read()
+                # DEBUG
+                #print "Hit"
+        else:
+            ca = self.getComicArchive(comic_id,path)
+            # auto convert webp (disable for chunky or fix web book reader)
+            image = utils.webp_patch_convert(ca.getPage(int(page_number)))
+
+        return image
 
     def getSession(self):
         """SQLAlchemy session"""
@@ -36,7 +151,7 @@ class Library:
 
     def getComic(self, comic_id):
         return self.getSession().query(Comic).get(int(comic_id))
-
+    
     def getComicPage(self, comic_id, page_number, max_height = None):
         (path, page_count) = self.getSession().query(Comic.path, Comic.page_count) \
                                  .filter(Comic.id == int(comic_id)).first()
@@ -46,8 +161,7 @@ class Library:
         
         if path is not None:
             if int(page_number) < page_count:
-                ca = self.getComicArchive(comic_id,path)
-                image_data = ca.getPage(int(page_number))
+                image_data = self.cache_hit(comic_id,page_number,path)
         
         if image_data is None:
             with open(default_img_file, 'rb') as fd:
@@ -62,7 +176,6 @@ class Library:
                 #logging.error(e)
                 pass
                 
-        image_data = utils.webp_patch_convert(image_data)
         return image_data
 
     def getStats(self):
@@ -468,6 +581,8 @@ class Library:
             query = query.order_by(order_key)
 
         return query
+
+
 
     def getComicArchive(self, id, path):
         # should also look at modified time of file

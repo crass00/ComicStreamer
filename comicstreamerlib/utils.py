@@ -10,6 +10,8 @@ import calendar
 import hashlib
 import time
 import base64
+import ctypes
+
 from PIL import Image
 try:
     from PIL import WebPImagePlugin
@@ -166,7 +168,6 @@ def resize(img, box, out, fit=False):
     # somebody should patch the book reader... for now convert to jpg
 def webp_patch_convert(img):
     imtype = imghdr.what(StringIO.StringIO(img))
-    print  imtype
     if imtype == "webp":
         if type(img) != Image and type(img) == str:
             img = Image.open(StringIO.StringIO(img))
@@ -176,4 +177,37 @@ def webp_patch_convert(img):
         return out.getvalue()
     else:
         return img
+
+def get_free_space(folder):
+    """Return folder/drive free space (in megabytes)."""
+    if platform.system() == 'Windows':
+        free_bytes = ctypes.c_ulonglong(0)
+        ctypes.windll.kernel32.GetDiskFreeSpaceExW(ctypes.c_wchar_p(folder), None, None, ctypes.pointer(free_bytes))
+        return free_bytes.value
+    else:
+        st = os.statvfs(folder)
+        return st.f_bavail * st.f_frsize
+
+def convert_bytes(num):
+    """
+    this function will convert bytes to MB.... GB... etc
+    """
+    for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
+        if num < 1024.0:
+            return "%3.1f %s" % (num, x)
+        num /= 1024.0
+
+def file_size(file_path):
+    """
+    this function will return the file size
+    """
+    return convert_bytes(file_size_bytes(file_path))
+
+def file_size_bytes(file_path):
+    """
+    this function will return the file size in bytes
+    """
+    if os.path.isfile(file_path):
+        file_info = os.stat(file_path)
+        return file_info.st_size
 
