@@ -97,7 +97,7 @@
 Section "Install Section" SecInstall
 
 	SetOutPath "$INSTDIR"
-	File /r ..\dist\*
+	File /r ..\dist\comicstreamer\*
 	;File ..\..\release_notes.txt
 
 	;Store installation folder
