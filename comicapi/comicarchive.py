@@ -764,14 +764,31 @@ class ComicArchive:
             elif self.tarTest():
                 self.archive_type = self.ArchiveType.Tar
                 self.archiver = TarArchiver( self.path )
+    
+        elif ext == ".cbz" or ext == ".zip":
+            if self.zipTest():
+                self.archive_type = self.ArchiveType.Zip
+                self.archiver = ZipArchiver( self.path )
+            
+            elif self.sevenZipTest():
+                self.archive_type = self.ArchiveType.SevenZip
+                self.archiver = SevenZipArchiver( self.path )
 
+            elif self.rarTest():
+                self.archive_type =  self.ArchiveType.Rar
+                self.archiver = RarArchiver( self.path, rar_exe_path=self.rar_exe_path )
+
+            elif self.tarTest():
+                self.archive_type = self.ArchiveType.Tar
+                self.archiver = TarArchiver( self.path )
+                
         elif ext == ".cb7" or ext == ".7z":
             if self.sevenZipTest():
                 self.archive_type = self.ArchiveType.SevenZip
                 self.archiver = SevenZipArchiver( self.path )
 
             elif self.zipTest():
-                self.archive_type =  self.ArchiveType.Zip
+                self.archive_type = self.ArchiveType.Zip
                 self.archiver = ZipArchiver( self.path )
 
             elif self.rarTest():
@@ -824,6 +841,7 @@ class ComicArchive:
             elif self.tarTest():
                 self.archive_type = self.ArchiveType.Tar
                 self.archiver = TarArchiver( self.path )
+
         if ComicArchive.logo_data is None:
             #fname = ComicTaggerSettings.getGraphic('nocover.png')
             fname = self.default_image_path
@@ -996,9 +1014,10 @@ class ComicArchive:
         image_data = None
 
         filename = self.getPageName( index )
-        
+       
         if filename is not None:
             try:
+
                 image_data = self.archiver.readArchiveFile( filename )
             except IOError:
                 print >> sys.stderr, u"Error reading in page.  Substituting logo page."

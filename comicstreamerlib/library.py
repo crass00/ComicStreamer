@@ -43,12 +43,12 @@ class Library:
 
         image_data = None
         default_img_file = AppFolders.imagePath("missing.png")
-
+        
         if path is not None:
             if int(page_number) < page_count:
                 ca = self.getComicArchive(comic_id,path)
                 image_data = ca.getPage(int(page_number))
-
+        
         if image_data is None:
             with open(default_img_file, 'rb') as fd:
                 image_data = fd.read()
@@ -476,7 +476,7 @@ class Library:
                 self.comicArchiveList.append(ca)
                 return ca
         else:
-            ca = ComicArchive(id, path, default_image_path=AppFolders.imagePath("missing.png"))
+            ca = ComicArchive(path, default_image_path=AppFolders.imagePath("missing.png"))
             self.comicArchiveList.append(ca)
             if len(self.comicArchiveList) > 10:
                 self.comicArchiveList.pop(0)
