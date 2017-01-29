@@ -4,12 +4,12 @@ import urllib
 import os
 
 setup(
-    name="TestProject",
+    name="ComicStreamer",
     packages=[],
     version="1.0",
-    url="http://example.com/",
-    author="Davide Romanini",
-    author_email="davide.romanini@gmail.com"
+    url="https://github.com/Tristan79/ComicStreamer",
+    author="Beville/Davide Romanini/Tristan Crispijn",
+    author_email="tristan@monkeycat.nl"
 )
 
 @task

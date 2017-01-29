@@ -1,10 +1,19 @@
-Tristan79 Work on this fork (januaru 28 2017)
+For now no mac or windows package! 
+
+Help wanted: front-end html/css & webp support in webcomicbook reader used
+
+Settings: Keep clicking on "tha brain" :-)
+
+Todo: MySQL support
+      Find a good epub page to jpg converter for ebook support (pdf works great! better then any ebook reader)
+      Fix some gui stuff...
+      
+Tristan79 Work on this fork (januari 28 2017)
 
 - Fixed bug (appartently source didn't work for months)
 - Added cbt/tar support
 - Patched webp (it does not load in web comic book, haven't tested chunky so converted to jpeg :/)
 - Experimental Cache System (since remote storage could be slow, even usb2 vs ssd :-)
-
 
 Tristan79 Work on this fork (may 15 2016)
 
@@ -13,37 +22,18 @@ Tristan79 Work on this fork (may 15 2016)
 - Fixes for jpg, bmp, 7z, pdf & other bugfull stuff
 - Added option to have alternative mobile site for android/ipad/etc...
 
-Broken Mac Download (requires brew already installed )
-
-https://cloud.catmonkey.nl/s/mws5KVMs8xaMM5y
-
-Remeber new version of database, please backup your old one and delete it before running...
-
-So open location with the Terminal:
-
-open ~/Application\ Support\ComicStreamer\
-
-Needs Brew Stuff. So after installing brew type on the Terminal:
-
-brew install mupdf-tools
-
-brew unlink mupdf-tools
-
-brew install homebrew/x11/mupdf
-
-(stupid thing needs x11 so install XQuartz :/ or download package and place lib & commandline tool yourself)
+If you have web development or graphic design skills, and would like to help out, please contact me at tristan@monkeycat.nl.
 
 
-Open DMG copy app to application folder. Start the package in the terminal with: 
 
-cd /Applications/ComicStreamer.app/Contents/MacOS/
 
-./ComicStreamer
 
-CTRL-C to quit
 
-It's broken because I can not get it to start with a simple double click...
 
+
+
+
+# OLD README.md
 
 #### Work on this fork (september 5 2015)
  - added webroot option to configuration, useful for proxy pass configurations (issue #24)
@@ -80,18 +70,9 @@ It's best used on libraries that have been tagged internally with tools like [Co
 ComicStreamer is very early ALPHA stages, and may be very flakey, eating up memory and CPU cycles. In particular, with very large datasets,
 filters on the sub-lists (characters, credits, etc. ) can be slow.
 
-If you have web development or graphic design skills, and would like to help out, please contact me at comictagger@gmail.com.
-In particular, ComicStreamer needs a new logo!
-
 [Chunky Comic Reader](http://chunkyreader.com/) for iPad has added experimental ComicStreamer support. Pro upgrade required, but it's well
 worth it for the other features you get.  Check it out!  If you are comic reader developer (any platform), and would like to add CS support,
 please contact me if you need any special support or features.
-
-----------
-
-#### Compiled Package Downloads
-
-**[Windows and Mac OS X](https://googledrive.com/host/0Bw4IursaqWhhbDFzUENfSTAwckE/)**
 
 ----------
 

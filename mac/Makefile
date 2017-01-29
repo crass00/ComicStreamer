@@ -1,4 +1,4 @@
-PYINSTALLER_CMD := python ../../pyinstaller-develop/pyinstaller.py
+PYINSTALLER_CMD := pyinstaller
 STREAMER_BASE ?= ..
 STREAMER_SRC := $(STREAMER_BASE)/comicstreamerlib
 
