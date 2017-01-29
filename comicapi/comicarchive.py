@@ -330,7 +330,6 @@ class TarArchiver:
     def readArchiveFile( self, archive_file ):
         data = ""
         zf = tarfile.TarFile( self.path, 'r' )
-
         try:
             data = zf.extractfile(archive_file).read()
         except Exception as e:

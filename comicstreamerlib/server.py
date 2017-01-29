@@ -521,6 +521,7 @@ class ComicPageAPIHandler(ImageAPIHandler):
 
         image_data = self.library.getComicPage(comic_id, pagenum, max_height)
 
+
         self.setContentType(image_data)
         self.write(image_data)
 

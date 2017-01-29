@@ -161,4 +161,19 @@ def resize(img, box, out, fit=False):
     img = img.convert('RGB')
 
     #save it into a file-like object
-    img.save(out, "JPEG", quality=65)
+    img.save(out, "JPEG", quality=100)
+
+    # somebody should patch the book reader... for now convert to jpg
+def webp_patch_convert(img):
+    imtype = imghdr.what(StringIO.StringIO(img))
+    print  imtype
+    if imtype == "webp":
+        if type(img) != Image and type(img) == str:
+            img = Image.open(StringIO.StringIO(img))
+        out = StringIO.StringIO()
+        img = img.convert('RGB')
+        img.save(out, "JPEG", quality=100)
+        return out.getvalue()
+    else:
+        return img
+

@@ -61,6 +61,8 @@ class Library:
             except Exception as e:
                 #logging.error(e)
                 pass
+                
+        image_data = utils.webp_patch_convert(image_data)
         return image_data
 
     def getStats(self):
