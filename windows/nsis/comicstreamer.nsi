@@ -60,7 +60,7 @@
 
     !define MUI_FINISHPAGE_SHOWREADME ""
     !define MUI_FINISHPAGE_SHOWREADME_CHECKED
-    !define MUI_FINISHPAGE_SHOWREADME_TEXT "ComicStreamer-TEA-Full Desktop Icon"
+    !define MUI_FINISHPAGE_SHOWREADME_TEXT "ComicStreamer Desktop Icon"
     !define MUI_FINISHPAGE_SHOWREADME_FUNCTION finishpageaction
 
 	!define MUI_FINISHPAGE_TITLE $(app_FinishPageTitle)

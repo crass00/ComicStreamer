@@ -7,7 +7,7 @@ LangString app_AppName ${LANG_ENGLISH} "ComicStreamer"
 LangString app_WelcomePageTitle ${LANG_ENGLISH} \
 		"ComicStreamer"
 LangString app_WelcomePageText ${LANG_ENGLISH} \
-        "If tea is the drink of love, then ComicStreamer on!"
+        "ComicStreamer: ToiletStreamer: Pampers Edition"
 LangString app_LicensePageTextTop ${LANG_ENGLISH} "ComicStreamer License Agreement"
 LangString app_FinishPageTitle ${LANG_ENGLISH} \
 		"ComicStreamer"
