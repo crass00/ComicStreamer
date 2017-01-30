@@ -29,9 +29,9 @@
         CREATE DATABASE comicdb;
         CREATE USER 'comic'@'%' IDENTIFIED BY 'comic';
         GRANT ALL PRIVILEGES ON *.* TO 'comic'@'%' WITH GRANT OPTION;
-        CREATE USER 'comic'@'%' IDENTIFIED BY comic;
+        CREATE USER 'comic'@'localhost' IDENTIFIED BY 'comic';
         GRANT ALL ON *.* TO 'comic'@'localhost';
-        FLUSH PRIVILEDGES;
+        FLUSH PRIVILEGES;
         </pre>
     </div>
 <span id="bigtitle">Supported Formats</span>
