@@ -1142,6 +1142,15 @@ class ConfigPageHandler(BaseHandler):
             failure_strs.append(u"API Key must have a value if the box is checked")
 
         # check cache input... ok?
+        try:
+            int(formdata['cache_size'])
+        except:
+            failure_strs.append(u"Cache size not a number")
+
+        try:
+            int(formdata['cache_free'])
+        except:
+            failure_strs.append(u"Cache free size not a number")
         
         if len(failure_strs) == 0:
             validated = True
