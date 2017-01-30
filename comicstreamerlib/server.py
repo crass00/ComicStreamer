@@ -1141,6 +1141,8 @@ class ConfigPageHandler(BaseHandler):
         if formdata['use_api_key'] and formdata['api_key']=="":
             failure_strs.append(u"API Key must have a value if the box is checked")
 
+        # check cache input... ok?
+        
         if len(failure_strs) == 0:
             validated = True
     
@@ -1170,7 +1172,17 @@ class ConfigPageHandler(BaseHandler):
                 formdata['mysql_port'] != self.application.config['database']['mysql_port'] or
                 formdata['mysql_host'] != self.application.config['database']['mysql_host'] or
                 formdata['launch_client'] != self.application.config['general']['launch_client']
-               ): 
+
+                formdata['mysql_host'] != self.application.config['database']['mysql_host'] or
+                formdata['mysql_host'] != self.application.config['database']['mysql_host'] or
+                formdata['mysql_host'] != self.application.config['database']['mysql_host'] or
+                formdata['mysql_host'] != self.application.config['database']['mysql_host'] or
+                self.application.config['cache']['active'] != formdata['use_cache'] or
+                self.application.config['cache']['size'] != formdata['cache_size'] or
+                self.application.config['cache']['free'] != formdata['cache_free']
+               ):
+
+
                 # apply everything from the form
                 self.application.config['general']['folder_list'] = new_folder_list
                 self.application.config['server']['port'] = new_port
@@ -1187,7 +1199,10 @@ class ConfigPageHandler(BaseHandler):
                     formdata['api_key'] = ""
                 self.application.config['general']['launch_client'] = formdata['launch_client']
                 
-                
+                self.application.config['cache']['active'] = formdata['use_cache']
+                self.application.config['cache']['size'] = formdata['cache_size']
+                self.application.config['cache']['free'] = formdata['cache_free']
+
                 self.application.config['database']['use_mysql'] = formdata['use_mysql']
                 
                 # lame password hide should be better...
