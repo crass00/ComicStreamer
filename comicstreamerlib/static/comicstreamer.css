@@ -167,7 +167,7 @@ ul.nav
 {  border-radius: 25px;
     color:#000; background-color:#f6b946;
     padding:4px;
-    width:150px;
+    width:300px;
 	display: block;
 
     box-shadow: 0 1px 10px rgba(0, 0, 0, 0.4);
@@ -393,14 +393,14 @@ ui-tooltip .ui-tooltip-content,
 
 /*----------------------------------------------*/
 .entry_form    {
-	
+	/*
 	background: -webkit-gradient(linear, bottom, left 175px, from(#CCCCCC), to(#EEEEEE));
 	background: -moz-linear-gradient(bottom, #CCCCCC, #EEEEEE 175px);
-	
+	*/
 	/*margin:auto;*/
 	position:relative;
 	width:550px;
-	height:450px;
+	/*height:450px;*/
 	/*font-family: Tahoma, Geneva, sans-serif;*/
 	font-size: 14px;
 	font-style: italic;

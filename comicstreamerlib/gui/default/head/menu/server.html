@@ -1,0 +1,45 @@
+<div id="menu">
+        &nbsp;
+        <a href="{{handler.webroot}}/"><img src="{{ static_url('icons/navigation/back.png') }}"></a>
+        <a href="{{handler.webroot}}/settings">
+            <img id="ctrl_button" src="{{ static_url('icons/server/server.png') }}">
+        </a>
+        <a href="{{handler.webroot}}/about"><img src="{{ static_url('icons/about/about.png') }}"></a>
+        <a href="#dialogReset" >
+            <img src="{{ static_url('icons/server/reset.png') }}">
+        </a>
+        
+                      <!--
+                <a href="#dialogStop"><img id="ctrl_button" src="{{ static_url('icons/server/stop.png') }}"></a> -->
+        <a href="{{handler.webroot}}/log"><img src="{{ static_url('icons/server/log.png') }}"></a>
+</div>
+
+    <div id="dialogReset">
+        <img class="dialog_balloon" src="{{ static_url('images/smallballoon.png') }}">
+            <div class="dialog_question">Reset Server?</div>
+            <a href="#"><img class="dialog_cancel" src="{{ static_url('icons/dialog/think.png') }}"></a>
+            <a href="javascript:sendCmd('reset')"><img class="dialog_ok" src="{{ static_url('icons/dialog/ok.png') }}"></a>
+            <img class="dialog_avatar" src="{{ static_url('icons/server/server.png') }}">
+    </div>
+    <div id="coverReset" >
+    </div>
+    
+    <!--
+    <div id="dialogStop">
+        <img class="dialog_balloon" src="{{ static_url('images/smallballoon.png') }}">
+            <div class="dialog_question">Stop Server?</div>
+            <a href="#"><img class="dialog_cancel" src="{{ static_url('icons/dialog/think.png') }}"></a>
+            <a href="javascript:sendCmd('stop')"><img class="dialog_ok" src="{{ static_url('icons/dialog/ok.png') }}"></a>
+            <img class="dialog_avatar" src="{{ static_url('icons/server/server.png') }}">
+    </div>
+    <div id="coverStop" >
+    </div>
+
+    <div id="dialogStopped">
+        <img class="dialog_balloon" src="{{ static_url('images/smallballoon.png') }}">
+            <div class="dialog_question">Stopped</div>
+            <a href="{{handler.webroot}}/"><img class="dialog_avatar" src="{{ static_url('icons/dialog/stopped.png') }}"></a>
+                </div>
+    <div id="coverStopped" >
+    </div>
+    -->

@@ -16,9 +16,10 @@ Keep clicking on "tha brain" :-) Did I mention the fron-end help wanted :-)
 
 - MySQL support (I created a test data set and it chokes at more then 30.000 files with sqlite :-/)
 - Find a good epub page to jpg converter for ebook support (pdf works great! better then any ebook reader)
-- Fix some gui stuff...
+- Fix some gui stuff (didirect with restarting & resetting)
 - Added new db features...
 - Create Windows & Mac packages
+- Test Test Test!
 
 ![screw](https://raw.githubusercontent.com/Tristan79/ComicStreamer/master/ad.png)
 

@@ -3,6 +3,7 @@
 {% include head/settings.html %}
 <form class="entry_form" action="settings" method="post">
 	{% module xsrf_form_html() %}
+    <span id="statusbad">{{failure}}</span><span id="statusgood">{{success}}</span>
     <div>
         <h1>GENERAL</h1>
         <br>
@@ -14,15 +15,16 @@
     <div>
         <h1>SERVER</h1>
         <br>
-        <span id="statusbad">{{failure}}</span><span id="statusgood">{{success}}</span>
         <span>Port</span><input id="port" type="text" name="port" value="{{formdata['port']}}" />
         <br>
         <div style="display:none">
             <span>HTTPS</span><input type="checkbox" name="use_https" class="formcheck" id="use_https" onclick="use_https_toggle()" value="use" {{formdata['use_https']}}>
+        
         <div id="settings_https">
         <span>Key File</span><input id="key_file" type="text" name="key_file" value="{{formdata['key_file']}}" />
         <span>Certificate File</span><input id="certificate_file" type="text" name="certificate_file" value="{{formdata['certificate_file']}}" />
-        </div> </div>
+        </div>
+        </div>
         <br>
         <span>Webroot</span><input id="webroot" type="text" name="webroot" value="{{formdata['webroot']}}" />
     </div>
@@ -44,7 +46,7 @@
         </div>
     </div>
     <br>
-    <div  style="display:none">
+    <div>
         <h1>DATABASE</h1>
         <br>
         <span>Use MySQL</span><input type="checkbox" name="use_mysql" class="formcheck" id="use_mysql" value="use" onclick="use_mysql_toggle()" {{formdata['use_mysql']}} />

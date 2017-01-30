@@ -89,6 +89,11 @@ class BaseHandler(tornado.web.RequestHandler):
     def library(self):
         return self.application.library
 
+    @property
+    def port(self):
+        return self.application.port
+
+
     def get_current_user(self):
         return custom_get_current_user(self)
     
@@ -1011,9 +1016,10 @@ class ConfigPageHandler(BaseHandler):
         else:
             formdata['password'] = ""
             formdata['password_confirm'] = ""
-            
+        
         self.render(deviceroot(self)+"settings.html",
                     formdata=formdata,
+                    api_key = self.application.config['security']['api_key'],
                     success=success,
                     failure=failure)
         
@@ -1021,6 +1027,7 @@ class ConfigPageHandler(BaseHandler):
     
     @tornado.web.authenticated    
     def get(self):
+        
         formdata = dict()
         formdata['use_cache'] = self.application.config['cache']['active']
         formdata['cache_size'] = self.application.config['cache']['size']
@@ -1045,7 +1052,7 @@ class ConfigPageHandler(BaseHandler):
         formdata['mysql_host'] = self.application.config['database']['mysql_host']
         formdata['mysql_port'] = self.application.config['database']['mysql_port']
         self.render_config(formdata)
-         
+
     @tornado.web.authenticated
     def post(self):
         formdata = dict()
@@ -1112,14 +1119,16 @@ class ConfigPageHandler(BaseHandler):
         if not port_failed:  
             new_port = int(formdata['port'])
             if new_port > 49151 or new_port < 1024:
-                failure_strs.append(u"Port value out of range (1024-4151): {0}".format(new_port))
+                failure_strs.append(u"Port value out of range (1024-49151): {0}".format(new_port))
                 port_failed = True
 
         #validate port availability
-        if not port_failed:  
-            if new_port != old_port and not self.is_port_available(new_port):
-                failure_strs.append(u"Port not available: {0}".format(new_port))
-                port_failed = True
+        
+        if self.port != new_port:
+            if not port_failed:  
+                if new_port != old_port and not self.is_port_available(new_port):
+                    failure_strs.append(u"Port not available: {0}".format(new_port))
+                    port_failed = True
           
         #validate password and username are set
         if formdata['use_authentication'] and (formdata['username']=="" or formdata['password']==""):
@@ -1178,6 +1187,7 @@ class ConfigPageHandler(BaseHandler):
                     formdata['api_key'] = ""
                 self.application.config['general']['launch_client'] = formdata['launch_client']
                 
+                
                 self.application.config['database']['use_mysql'] = formdata['use_mysql']
                 
                 # lame password hide should be better...
@@ -1195,7 +1205,7 @@ class ConfigPageHandler(BaseHandler):
         formdata['password'] = ""
         formdata['password_confirm'] = ""
         logging.info("Config: " + str(self.application.config))
-        self.render_config(deviceroot(self)+formdata, success=success_str, failure=failure_str)
+        self.render_config(formdata, success=success_str, failure=failure_str)
         
 class LoginHandler(BaseHandler):
     def get(self):
@@ -1334,7 +1344,7 @@ class APIServer(tornado.web.Application):
             (self.webroot + r"/entities(/.*)*", EntityAPIHandler),
             (self.webroot + r"/folders(/.*)*", FolderAPIHandler),
             (self.webroot + r"/command", ServerAPIHandler),
-            (self.webroot + r"/server", ServerAPIHandler),
+           # (self.webroot + r"/server", ServerAPIHandler),
             (self.webroot + r"/scanstatus", ScanStatusAPIHandler),
             #(r'/favicon.ico', tornado.web.StaticFileHandler, {'path': os.path.join(AppFolders.appBase(), "static","images")}),
             (self.webroot + r'/.*', UnknownHandler),

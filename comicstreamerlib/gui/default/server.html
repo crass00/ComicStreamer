@@ -1,11 +1,11 @@
 {% set title = "Stats" %}
 {% include head/server.html %}
 <center>
-    <table border="0" cellpadding="5" style="text-align: center">
+    <table border="0" cellpadding="3" style="text-align: center">
         <tr><th>
+
+               <a href="{{handler.webroot}}/"><img src="{{ static_url('icons/logo.png') }}"></a>
             <div id="main_stats">
-                <br>
-                <a href="{{handler.webroot}}/settings"><img id="big_ctrl_button" src="{{ static_url('icons/server/server.png') }}"></a>
                 <br>
                 {{ stats['total'] }} comics
                 <br>
@@ -13,55 +13,17 @@
                 <br>
                 {{ stats['persons'] }} artists
                 <br>
-                <a href="#dialogReset" ><img id="ctrl_button" src="{{ static_url('icons/server/reset.png') }}"></a>
                 <br>
-                <a href="{{handler.webroot}}/log"><img id="big_ctrl_button" src="{{ static_url('icons/server/activity.png') }}"></a>
-                  <a href="#dialogRestart"><img id="ctrl_button" src="{{ static_url('icons/server/restart.png') }}"></a>
-                <a href="#dialogStop"><img id="ctrl_button" src="{{ static_url('icons/server/stop.png') }}"></a>
                 <section id="scan_status">
                 </section>
                 <div id="scan_status_detail">
                 </div>
+                <br>
             </div>
         </th>
         </tr>
     </table>
 <center>
-    
-    <div id="dialogRestart">
-            <img class="dialog_balloon" src="{{ static_url('images/smallballoon.png') }}">
-                <div class="dialog_question">Restart Server?</div>
-                <a href="#"><img class="dialog_cancel" src="{{ static_url('icons/dialog/think.png') }}"></a>
-                <a href="javascript:sendCmd('restart')"><img class="dialog_ok" src="{{ static_url('icons/dialog/ok.png') }}"></a>
-                <img class="dialog_avatar" src="{{ static_url('icons/server/server.png') }}">
-    </div>
-    <div id="coverRestart" >
-    </div>
-    <div id="dialogStop">
-        <img class="dialog_balloon" src="{{ static_url('images/smallballoon.png') }}">
-            <div class="dialog_question">Stop Server?</div>
-            <a href="#"><img class="dialog_cancel" src="{{ static_url('icons/dialog/think.png') }}"></a>
-            <a href="javascript:sendCmd('stop')"><img class="dialog_ok" src="{{ static_url('icons/dialog/ok.png') }}"></a>
-            <img class="dialog_avatar" src="{{ static_url('icons/server/server.png') }}">
-    </div>
-    <div id="coverStop" >
-    </div>
-    <div id="dialogReset">
-        <img class="dialog_balloon" src="{{ static_url('images/smallballoon.png') }}">
-            <div class="dialog_question">Reset Server?</div>
-            <a href="#"><img class="dialog_cancel" src="{{ static_url('icons/dialog/think.png') }}"></a>
-            <a href="javascript:sendCmd('reset')"><img class="dialog_ok" src="{{ static_url('icons/dialog/ok.png') }}"></a>
-            <img class="dialog_avatar" src="{{ static_url('icons/server/server.png') }}">
-    </div>
-    <div id="coverReset" >
-    </div>
-    <div id="dialogStopped">
-        <img class="dialog_balloon" src="{{ static_url('images/smallballoon.png') }}">
-            <div class="dialog_question">Stopped</div>
-            <a href="{{handler.webroot}}/"><img class="dialog_avatar" src="{{ static_url('icons/dialog/stopped.png') }}"></a>
-                </div>
-    <div id="coverStopped" >
-    </div>
 {% include foot/foot.html %}
 
 
