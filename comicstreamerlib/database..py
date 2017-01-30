@@ -190,15 +190,14 @@ class Comic(Base):
     lastread_ts = Column(DateTime)
     lastread_page = Column(Integer)
     #thumbnail = deferred(Column(LargeBinary(1024*1024*10*10)))
-    thumbnail = Column(LargeBinary(1024*1024*10*10))
+    thumbnail = Column(LargeBinary(1024*1024*3))
     alternateIssue = Column(String(1000))
     alternateNumber = Column(Float)
     #hash = Column(String)
     added_ts = Column(DateTime, default=datetime.utcnow)  # when the comic was added to the DB
     mod_ts = Column(DateTime)  # the last modified date of the file
     
-    """
-	alternateseries_raw = relationship('AlternateSeries', secondary=comics_alternateseries_table,
+    alternateseries_raw = relationship('AlternateSeries', secondary=comics_alternateseries_table,
                                 cascade="save-update,delete") #, backref='comics')
 
     credits_raw = relationship('Credit', #secondary=credits_,
@@ -215,6 +214,7 @@ class Comic(Base):
                                 cascade="save-update,delete") #, backref='comics')
     genres_raw = relationship('Genre', secondary=comics_genres_table,
                                 cascade="save-update,delete") #, backref='comics')
+  
     """
     # chanhef to all instead of save-update
     alternateseries_raw = relationship('AlternateSeries', secondary=comics_alternateseries_table, cascade="save-update,delete", backref='comics')
@@ -225,6 +225,7 @@ class Comic(Base):
     storyarcs_raw = relationship('StoryArc', secondary=comics_storyarcs_table,cascade="save-update ,delete", backref='comics')
     generictags_raw = relationship('GenericTag', secondary=comics_generictags_table,cascade="save-update, delete", backref='comics')
     genres_raw = relationship('Genre', secondary=comics_genres_table,cascade="save-update, delete", backref='comics')
+    """
 
     persons_raw = relationship("Person",
                 secondary="join(Credit, Person, Credit.person_id == Person.id)",
