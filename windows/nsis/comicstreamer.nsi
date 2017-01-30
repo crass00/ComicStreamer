@@ -13,6 +13,9 @@
 ;General
 	;file name
 	OutFile "ComicStreamer ${RELEASE_STR}.exe"
+	;OutFile "ComicStreamer.exe"
+
+    Caption "ComicStreamer: ToiletStreamer Edition! ${RELEASE_STR} Installer"
 
 	;Default installation folder
 	InstallDir "$PROGRAMFILES\ComicStreamer"
@@ -34,41 +37,52 @@
 ;Interface Configuration
 
 	!define MUI_ICON "installer.ico"
-	!define MUI_WELCOMEFINISHPAGE_BITMAP "side_graphic.bmp"  ;shoukd be 164x314
+	!define MUI_WELCOMEFINISHPAGE_BITMAP "side.bmp"  ;shoukd be 164x314
 	!define MUI_HEADERIMAGE
-	!define MUI_HEADERIMAGE_BITMAP "top_graphic.bmp" ; ;should be 150x57
+	!define MUI_HEADERIMAGE_BITMAP "top.bmp" ; ;should be 150x57
 	;!define MUI_ABORTWARNING
 	!define MUI_WELCOMEPAGE_TITLE $(app_WelcomePageTitle)
 	!define MUI_WELCOMEPAGE_TEXT $(app_WelcomePageText) 
 
 	!define  MUI_LICENSEPAGE_TEXT_TOP $(app_LicensePageTextTop)
 	;!define  MUI_LICENSEPAGE_TEXT_BOTTOM  $(app_LicensePageTextBottom)
-	;!define  MUI_LICENSEPAGE_CHECKBOX	
+	!define  MUI_LICENSEPAGE_CHECKBOX
 	
-	!define MUI_FINISHPAGE_NOAUTOCLOSE	
+	;!define MUI_FINISHPAGE_NOAUTOCLOSE
 
 	;!define MUI_FINISHPAGE_SHOWREADME "release_notes.txt"
 	;!define MUI_FINISHPAGE_SHOWREADME_TEXT "Show Release Notes"
 	;!define MUI_FINISHPAGE_SHOWREADME_NOTCHECKED
-	
+
+    Function finishpageaction
+    CreateShortCut "$DESKTOP\ComicStreamer.lnk" "$INSTDIR\ComicStreamer.exe" ""
+    FunctionEnd
+
+    !define MUI_FINISHPAGE_SHOWREADME ""
+    !define MUI_FINISHPAGE_SHOWREADME_CHECKED
+    !define MUI_FINISHPAGE_SHOWREADME_TEXT "ComicStreamer-TEA-Full Desktop Icon"
+    !define MUI_FINISHPAGE_SHOWREADME_FUNCTION finishpageaction
+
 	!define MUI_FINISHPAGE_TITLE $(app_FinishPageTitle)
 	!define MUI_FINISHPAGE_TEXT $(app_FinishPageText)
 
 	!define MUI_FINISHPAGE_LINK $(app_FinishPageLink)
-	!define MUI_FINISHPAGE_LINK_LOCATION  "https://github.com/beville/ComicStreamer"
+	!define MUI_FINISHPAGE_LINK_LOCATION  "https://github.com/Tristan79/ComicStreamer/"
 
 	;Start Menu Folder Page Configuration
 	!define MUI_STARTMENUPAGE_REGISTRY_ROOT "HKLM" 
-	!define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\ComicStreamer" 
+	!define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\ComicStreamer"
 	!define MUI_STARTMENUPAGE_REGISTRY_VALUENAME "Start Menu Folder"
 	!define MUI_STARTMENUPAGE_DEFAULTFOLDER "ComicStreamer"
+
+
     
 	;--------------------------------
 ;Pages
 
 	!insertmacro MUI_PAGE_WELCOME
 	
-    !insertmacro MUI_PAGE_LICENSE "license.txt"
+    !insertmacro MUI_PAGE_LICENSE "LICENSE"
 
 	!insertmacro MUI_PAGE_DIRECTORY
 	!insertmacro MUI_PAGE_STARTMENU Application $StartMenuFolder
@@ -97,7 +111,7 @@
 Section "Install Section" SecInstall
 
 	SetOutPath "$INSTDIR"
-	File /r ..\dist\comicstreamer\*
+	File /r ..\dist\ComicStreamer\*
 	;File ..\..\release_notes.txt
 
 	;Store installation folder
@@ -116,18 +130,18 @@ Section "Install Section" SecInstall
                  "Publisher" "ComicStreamer"
 				 
 	;Create uninstaller
-	WriteUninstaller "$INSTDIR\Uninstall.exe"
+	WriteUninstaller "$INSTDIR\uninstall.exe"
 
 	!insertmacro MUI_STARTMENU_WRITE_BEGIN Application
 
 		;Create shortcuts
 		CreateDirectory "$SMPROGRAMS\$StartMenuFolder"
-		CreateShortCut "$SMPROGRAMS\$StartMenuFolder\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
-		CreateShortCut "$SMPROGRAMS\$StartMenuFolder\ComicStreamer.lnk" "$INSTDIR\comicstreamer.exe"
+		CreateShortCut "$SMPROGRAMS\$StartMenuFolder\Uninstall.lnk" "$INSTDIR\uninstall.exe"
+		CreateShortCut "$SMPROGRAMS\$StartMenuFolder\ComicStreamer.lnk" "$INSTDIR\ComicStreamer.exe"
 
 	!insertmacro MUI_STARTMENU_WRITE_END
 
-	CreateShortCut "$DESKTOP\ComicStreamer.lnk" "$INSTDIR\comicstreamer.exe" ""
+	;CreateShortCut "$DESKTOP\ComicStreamer.lnk" "$INSTDIR\ComicStreamer.exe" ""
 
 	
 SectionEnd
@@ -148,12 +162,10 @@ FunctionEnd
 Section "Uninstall"
 
 	Delete "$INSTDIR\*"
-	RMDir /r "$INSTDIR\imageformats"
-	RMDir /r "$INSTDIR\PyQt4.uic.widget-plugins"
-	
-	Delete "$INSTDIR\Uninstall.exe"
 
-	RMDir "$INSTDIR"
+	Delete "$INSTDIR\uninstall.exe"
+
+	RMDir /r "$INSTDIR"
 
     Delete "$DESKTOP\ComicStreamer.lnk"
 
