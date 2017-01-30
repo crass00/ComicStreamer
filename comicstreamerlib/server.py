@@ -1152,6 +1152,9 @@ class ConfigPageHandler(BaseHandler):
         except:
             failure_strs.append(u"Cache free size not a number")
         
+        # need more validation here on mysql!!!!
+        # FIX: RELEASE1
+        
         if len(failure_strs) == 0:
             validated = True
     
@@ -1166,7 +1169,6 @@ class ConfigPageHandler(BaseHandler):
             else:
                 password_changed = False
         
-            # find out if we need to save: (BUG NEED TO ADD MORE)
             if (new_port != old_port or
                 formdata['webroot'] != self.application.config['server']['webroot'] or
                 new_folder_list != old_folder_list or
