@@ -651,8 +651,13 @@ class PdfArchiver:
         return False
     def readArchiveFile( self, page_num ):
         resolution = 300
+        
         #return subprocess.check_output(['pdftopng', '-r', str(resolution), '-f', str(int(os.path.basename(page_num)[:-4])), '-l', str(int(os.path.basename(page_num)[:-4])), self.path,  '-'])
-        return subprocess.check_output(['mudraw', '-r', str(resolution), '-o','-', self.path, str(int(os.path.basename(page_num)[:-4]))])
+        
+        if platform.system() == "Windows":
+            return subprocess.check_output(['.\mutool.exe', 'draw','-r', str(resolution), '-o','-', self.path, str(int(os.path.basename(page_num)[:-4]))])
+        else:
+            return subprocess.check_output(['./mudraw', '-r', str(resolution), '-o','-', self.path, str(int(os.path.basename(page_num)[:-4]))])
 
     def writeArchiveFile( self, archive_file, data ):
         return False

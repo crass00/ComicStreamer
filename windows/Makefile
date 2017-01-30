@@ -16,6 +16,7 @@ dist:
 	cp "$(STREAMER_BASE)\comicapi\UnRAR2\UnRARDLL\unrar.dll" $(DIST_DIR)\comicstreamer
 	cp -r "$(STREAMER_SRC)\gui" $(DIST_DIR)\comicstreamer
 	cp -r "$(STREAMER_SRC)\static" $(DIST_DIR)\comicstreamer
+	cp mutool.exe $(DIST_DIR)\comicstreamer
 	
 package:
 	echo !define RELEASE_STR $(VERSION) > $(STREAMER_BASE)\windows\nsis\release.nsh
