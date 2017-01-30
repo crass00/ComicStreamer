@@ -14,5 +14,5 @@ LangString app_FinishPageTitle ${LANG_ENGLISH} \
 LangString app_FinishPageText ${LANG_ENGLISH} \
 		""
 LangString app_FinishPageLink ${LANG_ENGLISH} "ComicStreamer development site"
-LangString LicenseFile ${LANG_ENGLISH} 		 "LICENSE"  ;;these two should be the same
-LicenseLangString LicenseRTF ${LANG_ENGLISH} "LICENSE"
+LangString LicenseFile ${LANG_ENGLISH} 		 "license.txt"  ;;these two should be the same
+LicenseLangString LicenseRTF ${LANG_ENGLISH} "license.txt"
