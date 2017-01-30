@@ -9,14 +9,14 @@ import logging
 import os
 
 import utils
-from config import ComicStreamerConfig
+#from config import ComicStreamerConfig
 from comicstreamerlib.folders import AppFolders
 
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import deferred
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, Float, String, DateTime, LargeBinary, Table, ForeignKey
+from sqlalchemy import Column, Integer, Float, String, DateTime, BigInteger, Text, LargeBinary, Table, ForeignKey
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy import create_engine, func
 from sqlalchemy.ext.declarative import DeclarativeMeta
@@ -27,6 +27,8 @@ from sqlalchemy.orm.properties import \
                         CompositeProperty,\
                         RelationshipProperty
 from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
+from sqlalchemy.types import String
+from sqlalchemy.dialects import mysql
 
 
 
@@ -124,11 +126,6 @@ comics_storyarcs_table = Table('comics_storyarcs', Base.metadata,
 )
 
 # Junction table
-comics_alternateseries_table = Table('comics_alternateseries', Base.metadata,
-    Column('comic_id', Integer, ForeignKey('comics.id')),
-    Column('alternateseries_id', Integer, ForeignKey('alternateseries.id'))
-)
-# Junction table
 comics_generictags_table = Table('comics_generictags', Base.metadata,
      Column('comic_id', Integer, ForeignKey('comics.id')),
      Column('generictags_id', Integer, ForeignKey('generictags.id'))
@@ -162,15 +159,21 @@ class MyComparator(ColumnProperty.Comparator):
 
 class Comic(Base):
     __tablename__ = 'comics'
-    __table_args__ = {'sqlite_autoincrement': True}
-
+    __table_args__ = {'sqlite_autoincrement': True, 'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8'}
+    path = Column(String(1000), unique=True)
+    folder = Column(String(1000))
+    file = Column(String(1000))
+    series = Column(String(1000))
+    issue = Column(String(100))
+    comments = Column(Text)
+    publisher = Column(String(1000))
+    title = Column(String(1000))
+    imprint = Column(String(1000))
+    weblink = Column(String(1000))
+    hash = Column(String(1000))
+    language = Column(String(100))
+    filesize = Column(BigInteger)
     id = Column(Integer, primary_key=True)
-    path = Column(String, unique=True)
-    folder = Column(String)
-    file = Column(String)
-    series = Column(String)
-
-    issue = Column(String)
     issue_num = Column(Float)
     date = Column(DateTime)  # will be a composite of month,year,day for sorting/filtering
     day = Column(Integer)
@@ -178,42 +181,24 @@ class Comic(Base):
     year = Column(Integer)
     volume = Column(Integer)
     page_count = Column(Integer)
-    comments = Column(String)
-    publisher = Column(String)
-    title = Column(String)
-    imprint = Column(String)
-    weblink = Column(String)
-    filesize = Column(Integer)
-    hash = Column(String)
     deleted_ts = Column(DateTime)
     lastread_ts = Column(DateTime)
     lastread_page = Column(Integer)
     thumbnail = deferred(Column(LargeBinary))
-    language = Column(String)
-    alternateIssue = Column(String)
-    alternateNumber = Column(Float)
+
+    
     #hash = Column(String)
     added_ts = Column(DateTime, default=datetime.utcnow)  # when the comic was added to the DB
     mod_ts = Column(DateTime)  # the last modified date of the file
-
-
-    alternateseries_raw = relationship('AlternateSeries', secondary=comics_alternateseries_table,
-                                cascade="save-update,delete") #, backref='comics')
-
-    credits_raw = relationship('Credit', #secondary=credits_,
-                                cascade="all, delete", )#, backref='comics')
-    characters_raw = relationship('Character', secondary=comics_characters_table,
-                                cascade="save-update,delete")#, backref='comics')
-    teams_raw = relationship('Team', secondary=comics_teams_table,
-                                cascade="save-update,delete") #)#, backref='comics')
-    locations_raw = relationship('Location', secondary=comics_locations_table,
-                                cascade="save-update,delete") #, backref='comics')
-    storyarcs_raw = relationship('StoryArc', secondary=comics_storyarcs_table,
-                                cascade="save-update,delete") #, backref='comics')
-    generictags_raw = relationship('GenericTag', secondary=comics_generictags_table,
-                                cascade="save-update,delete") #, backref='comics')
-    genres_raw = relationship('Genre', secondary=comics_genres_table,
-                                cascade="save-update,delete") #, backref='comics')
+    
+    # chanhef to all instead of save-update
+    credits_raw = relationship('Credit',secondary=credits,cascade="save-update, delete", backref='comics')
+    characters_raw = relationship('Character', secondary=comics_characters_table,cascade="save-update ,delete", backref='comics')
+    teams_raw = relationship('Team', secondary=comics_teams_table,cascade="save-update ,delete", backref='comics')
+    locations_raw = relationship('Location', secondary=comics_locations_table,cascade="save-update ,delete", backref='comics')
+    storyarcs_raw = relationship('StoryArc', secondary=comics_storyarcs_table,cascade="save-update ,delete", backref='comics')
+    generictags_raw = relationship('GenericTag', secondary=comics_generictags_table,cascade="save-update, delete", backref='comics')
+    genres_raw = relationship('Genre', secondary=comics_genres_table,cascade="save-update, delete", backref='comics')
 
     persons_raw = relationship("Person",
                 secondary="join(Credit, Person, Credit.person_id == Person.id)",
@@ -228,8 +213,7 @@ class Comic(Base):
                 viewonly=True               
                 )
 
-    #credits = association_proxy('credits_raw', 'person_role_dict')
-    alternateseries = association_proxy('alternateseries_raw', 'name')
+#credits = association_proxy('credits_raw', 'person_role_dict')
     characters = association_proxy('characters_raw', 'name')
     teams = association_proxy('teams_raw', 'name')
     locations = association_proxy('locations_raw', 'name')
@@ -262,6 +246,8 @@ class Comic(Base):
 
 class Credit(Base):
     __tablename__ = 'credits'
+    __table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8'}
+
     #__table_args__ = {'extend_existing': True}
     comic_id = Column(Integer, ForeignKey('comics.id'), primary_key=True)
     role_id = Column(Integer, ForeignKey('roles.id'), primary_key=True)
@@ -273,8 +259,8 @@ class Credit(Base):
     #                            #cascade="all, delete-orphan")
     #        )
 
-    person = relationship("Person", cascade="all, delete") #, backref='credits')
-    role = relationship("Role" , cascade="all, delete") #, backref='credits')
+    person = relationship("Person",passive_deletes=True) # cascade="save-update, delete")
+    role = relationship("Role" ,passive_deletes=True) # cascade="save-update, delete")
 
     def __init__(self, person=None, role=None):
         self.person = person
@@ -293,25 +279,27 @@ class Credit(Base):
         
 class Role(Base):
     __tablename__ = "roles"
+    __table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8'}
     id = Column(Integer, primary_key=True)
     name = ColumnProperty(
-                    Column('name', String, unique = True),
+                    Column('name', String(1000), unique = True),
                     comparator_factory=MyComparator)
 
 class Person(Base):
     __tablename__ = "persons"
+    __table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8'}
     id = Column(Integer, primary_key=True)
     name = ColumnProperty(
-                    Column('name', String, unique = True),
+                    Column('name', String(1000), unique = True),
                     comparator_factory=MyComparator)
 
     
 class Character(Base):
     __tablename__ = "characters"
+    __table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8'}
     id = Column(Integer, primary_key=True)
-    #name = Column(String, unique=True)
     name = ColumnProperty(
-                    Column('name', String, unique = True),
+                    Column('name', String(1000), unique = True),
                     #comparator_factory=MyComparator
                 )   
     
@@ -321,48 +309,47 @@ class Character(Base):
 
 class Team(Base):
     __tablename__ = "teams"
+    __table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8'}
     id = Column(Integer, primary_key=True)
     name = ColumnProperty(
-                    Column('name', String, unique = True),
+                    Column('name', String(1000), unique = True),
                     comparator_factory=MyComparator)
         
 class Location(Base):
     __tablename__ = "locations"
+    __table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8'}
     id = Column(Integer, primary_key=True)
     name = ColumnProperty(
-                    Column('name', String, unique = True),
+                    Column('name', String(1000), unique = True),
                     comparator_factory=MyComparator)
 
 class StoryArc(Base):
     __tablename__ = "storyarcs"
+    __table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8'}
     id = Column(Integer, primary_key=True)
     name = ColumnProperty(
-                    Column('name', String, unique = True),
-                    comparator_factory=MyComparator)
-
-class AlternateSeries(Base):
-    __tablename__ = "alternateseries"
-    id = Column(Integer, primary_key=True)
-    name = ColumnProperty(
-                    Column('name', String, unique = True),
+                    Column('name', String(1000), unique = True),
                     comparator_factory=MyComparator)
 
 class GenericTag(Base):
     __tablename__ = "generictags"
+    __table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8'}
     id = Column(Integer, primary_key=True)
     name = ColumnProperty(
-                    Column('name', String, unique = True),
+                    Column('name', String(1000), unique = True),
                     comparator_factory=MyComparator)
 
 class Genre(Base):
     __tablename__ = "genres"
+    __table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8'}
     id = Column(Integer, primary_key=True)
     name = ColumnProperty(
-                    Column('name', String, unique = True),
+                    Column('name', String(1000), unique = True),
                     comparator_factory=MyComparator)
 
 class DeletedComic(Base):
     __tablename__ = "deletedcomics"
+    __table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8'}
     id = Column(Integer, primary_key=True)
     comic_id = Column(Integer)
     ts = Column(DateTime, default=datetime.utcnow)  
@@ -405,13 +392,15 @@ class ReadingList(Base):
 
 class SchemaInfo(Base):
     __tablename__ = "schemainfo"
+    __table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8'}
     id = Column(Integer, primary_key=True)
     schema_version = Column(Integer)
 
 class DatabaseInfo(Base):
     __tablename__ = "dbid"
+    __table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8'}
     id = Column(Integer, primary_key=True)
-    uuid = Column(String)
+    uuid = Column(String(1000))
     created = Column(DateTime, default=datetime.utcnow)
     last_updated = Column(DateTime)
     
@@ -423,38 +412,67 @@ class SchemaVersionException(Exception):
     pass
 
 class DataManager():
-    def __init__(self):
-        self.dbfile = os.path.join(AppFolders.appData(), "comicdb.sqlite")
-        self.engine = create_engine('sqlite:///'+ self.dbfile, echo=False)
-
-        session_factory = sessionmaker(bind=self.engine)
+    def __init__(self, config):
+        self.config = config
+        self.init()
+        
+    def init(self):
+        if self.config['database']['use_mysql']:
+            logging.info("Database: MySQL Engine")
+            try:
+                 self.engine = create_engine("mysql://"+self.config['database']['mysql_username']+":"+utils.decode(self.config['general']['install_id'],self.config['database']['mysql_password'])+"@"+self.config['database']['mysql_host']+":"+str(self.config['database']['mysql_port'])+"/"+self.config['database']['mysql_database']+"?charset=utf8", pool_recycle=3600,  echo=False, isolation_level="READ COMMITTED")
+            except:
+                self.dbfile = os.path.join(AppFolders.appData(), "comicdb.sqlite")
+                self.engine = create_engine('sqlite:///'+ self.dbfile, echo=False)
+                logging.warning("Database: Switching to SQLite Engine")
+                self.config['database']['use_mysql'] = False;
+        else:
+            self.dbfile = os.path.join(AppFolders.appData(), "comicdb.sqlite")
+            self.engine = create_engine('sqlite:///'+ self.dbfile, echo=False)
+            logging.info("Database: SQLite Engine")
+        session_factory = sessionmaker(bind=self.engine, expire_on_commit=True) #, autoflush=False, autocommit=True, expire_on_commit=True) #,autocommit=True)
         self.Session = scoped_session(session_factory)
 
     def delete(self):
-        if os.path.exists( self.dbfile ):
-            os.unlink( self.dbfile )
+        logging.info("Database: Delete Database")
+        if self.config['database']['use_mysql']:
+            print "HIER"
+            
+            Base.metadata.drop_all(self.engine)
+            self.engine.dispose()
+            self.init()
+            print "DAAR"
+        else:
+            if os.path.exists( self.dbfile ):
+                os.unlink( self.dbfile )
             
     def create(self):
 
         # if we don't have a UUID for this DB, add it.
-        try:
+        if self.config['database']['use_mysql']:
             Base.metadata.create_all(self.engine)
-        except:
-            logging.debug("(BUG) There was an error loaded the database (file corrupted?)")
-            self.engine = create_engine('sqlite:///'+ self.dbfile, echo=False)
-        session = self.Session()
- 
+            session = self.Session()
+        else:
+            try:
+                Base.metadata.create_all(self.engine)
+            except:
+                logging.error("Database: (BUG) There was an error loaded the database (file corrupted?)")
+                self.engine = create_engine('sqlite:///'+ self.dbfile, echo=False)
+            session = self.Session()
+
+
         results = session.query(SchemaInfo).first()
         if results is None:
-           schemainfo = SchemaInfo()
-           schemainfo.schema_version = SCHEMA_VERSION
-           session.add(schemainfo)
-           logging.debug("Setting scheme version".format(schemainfo.schema_version))
-           session.commit()
+        #SQLADD
+            
+            schemainfo = SchemaInfo()
+            schemainfo.schema_version = SCHEMA_VERSION
+            session.add(schemainfo)
+            logging.debug("Database: Setting scheme version".format(schemainfo.schema_version))
+            session.commit()
         else:
             if results.schema_version != SCHEMA_VERSION:
                 raise SchemaVersionException
-        
         results = session.query(DatabaseInfo).first()
         if results is None:
            dbinfo = DatabaseInfo()
@@ -462,7 +480,7 @@ class DataManager():
            dbinfo.last_updated = datetime.utcnow()
            session.add(dbinfo)
            session.commit()
-           logging.debug("Added new uuid".format(dbinfo.uuid))
+           logging.debug("Database: Added new uuid".format(dbinfo.uuid))
 
         """
         # Eventually, there will be multi-user support, but for now,
