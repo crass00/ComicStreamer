@@ -423,7 +423,7 @@ class SchemaVersionException(Exception):
     pass
 
 class DataManager():
-    def __init__(self):
+    def __init__(self,config):
         self.dbfile = os.path.join(AppFolders.appData(), "comicdb.sqlite")
         self.engine = create_engine('sqlite:///'+ self.dbfile, echo=False)
 

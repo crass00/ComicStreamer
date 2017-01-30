@@ -1273,8 +1273,8 @@ class APIServer(tornado.web.Application):
         #    logging.error("No folders on either command-line or config file.  Quitting.")
         #    sys.exit(-1)
 
-        self.dm = DataManager()
-        #self.dm = DataManager(config)
+        #self.dm = DataManager()
+        self.dm = DataManager(config)
         self.library = Library(self.dm.Session)
         self.library.cache(AppFolders.appCache(),self.config['cache']['active'],self.config['cache']['size'],self.config['cache']['free'])
 

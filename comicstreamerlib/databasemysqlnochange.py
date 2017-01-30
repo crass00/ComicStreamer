@@ -126,6 +126,11 @@ comics_storyarcs_table = Table('comics_storyarcs', Base.metadata,
 )
 
 # Junction table
+comics_alternateseries_table = Table('comics_alternateseries', Base.metadata,
+    Column('comic_id', Integer, ForeignKey('comics.id')),
+    Column('alternateseries_id', Integer, ForeignKey('alternateseries.id'))
+)
+# Junction table
 comics_generictags_table = Table('comics_generictags', Base.metadata,
      Column('comic_id', Integer, ForeignKey('comics.id')),
      Column('generictags_id', Integer, ForeignKey('generictags.id'))
@@ -184,14 +189,35 @@ class Comic(Base):
     deleted_ts = Column(DateTime)
     lastread_ts = Column(DateTime)
     lastread_page = Column(Integer)
-    thumbnail = deferred(Column(LargeBinary))
-
-    
+    #thumbnail = deferred(Column(LargeBinary(1024*1024*10*10)))
+    thumbnail = Column(LargeBinary(1024*1024*10*10))
+    alternateIssue = Column(String(1000))
+    alternateNumber = Column(Float)
     #hash = Column(String)
     added_ts = Column(DateTime, default=datetime.utcnow)  # when the comic was added to the DB
     mod_ts = Column(DateTime)  # the last modified date of the file
     
+    """
+	alternateseries_raw = relationship('AlternateSeries', secondary=comics_alternateseries_table,
+                                cascade="save-update,delete") #, backref='comics')
+
+    credits_raw = relationship('Credit', #secondary=credits_,
+                                cascade="all, delete", )#, backref='comics')
+    characters_raw = relationship('Character', secondary=comics_characters_table,
+                                cascade="save-update,delete")#, backref='comics')
+    teams_raw = relationship('Team', secondary=comics_teams_table,
+                                cascade="save-update,delete") #)#, backref='comics')
+    locations_raw = relationship('Location', secondary=comics_locations_table,
+                                cascade="save-update,delete") #, backref='comics')
+    storyarcs_raw = relationship('StoryArc', secondary=comics_storyarcs_table,
+                                cascade="save-update,delete") #, backref='comics')
+    generictags_raw = relationship('GenericTag', secondary=comics_generictags_table,
+                                cascade="save-update,delete") #, backref='comics')
+    genres_raw = relationship('Genre', secondary=comics_genres_table,
+                                cascade="save-update,delete") #, backref='comics')
+    """
     # chanhef to all instead of save-update
+    alternateseries_raw = relationship('AlternateSeries', secondary=comics_alternateseries_table, cascade="save-update,delete", backref='comics')
     credits_raw = relationship('Credit',secondary=credits,cascade="save-update, delete", backref='comics')
     characters_raw = relationship('Character', secondary=comics_characters_table,cascade="save-update ,delete", backref='comics')
     teams_raw = relationship('Team', secondary=comics_teams_table,cascade="save-update ,delete", backref='comics')
@@ -213,7 +239,8 @@ class Comic(Base):
                 viewonly=True               
                 )
 
-#credits = association_proxy('credits_raw', 'person_role_dict')
+    #credits = association_proxy('credits_raw', 'person_role_dict')
+    alternateseries = association_proxy('alternateseries_raw', 'name')
     characters = association_proxy('characters_raw', 'name')
     teams = association_proxy('teams_raw', 'name')
     locations = association_proxy('locations_raw', 'name')
@@ -258,7 +285,10 @@ class Credit(Base):
     #            backref=backref("credits_backref_raw"),
     #                            #cascade="all, delete-orphan")
     #        )
-
+    """
+    person = relationship("Person", cascade="all, delete") #, backref='credits')
+    role = relationship("Role" , cascade="all, delete") #, backref='credits')
+    """
     person = relationship("Person",passive_deletes=True) # cascade="save-update, delete")
     role = relationship("Role" ,passive_deletes=True) # cascade="save-update, delete")
 
@@ -325,6 +355,14 @@ class Location(Base):
 
 class StoryArc(Base):
     __tablename__ = "storyarcs"
+    __table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8'}
+    id = Column(Integer, primary_key=True)
+    name = ColumnProperty(
+                    Column('name', String(1000), unique = True),
+                    comparator_factory=MyComparator)
+
+class AlternateSeries(Base):
+    __tablename__ = "alternateseries"
     __table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8'}
     id = Column(Integer, primary_key=True)
     name = ColumnProperty(
