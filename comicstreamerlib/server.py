@@ -1125,7 +1125,7 @@ class ConfigPageHandler(BaseHandler):
         #validate port availability
         
         if self.port != new_port:
-            if not port_failed:  
+            if not port_failed:
                 if new_port != old_port and not self.is_port_available(new_port):
                     failure_strs.append(u"Port not available: {0}".format(new_port))
                     port_failed = True
