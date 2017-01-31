@@ -11,6 +11,9 @@ import utils
 from database import Comic, DatabaseInfo, Person, Role, Credit, Character, GenericTag, Team, Location, \
     StoryArc, Genre, DeletedComic,AlternateSeries
 from folders import AppFolders
+from sqlalchemy.orm import load_only
+
+
 from comicapi.comicarchive import ComicArchive
 
 from comicapi.issuestring import IssueString
@@ -211,10 +214,20 @@ class Library:
         return self.getSession().query(Role).all()
 
     def randomComic(self):
-        # SQLite specific random call
-        return self.getSession().query(Comic)\
-            .order_by(func.random()).limit(1).first()
         
+        rowCount = int(self.getSession().query(Comic).count())
+        randomRow = self.getSession().query(Comic).options(load_only(Comic.id)).offset(int(rowCount*random.random())).limit(1).first()
+        return randomRow
+
+        # probably wrong with deleted ids...
+        #rand = random.randrange(0, self.getSession().query(Comic).count())
+        #row = self.getSession().query(Comic)[rand]
+        #return row
+        
+        # SQLite specific random call
+        #return self.getSession().query(Comic)\
+        #    .order_by(func.random()).limit(1).first()
+
     def getDeletedComics(self, since=None):
         # get all deleted comics first
         session = self.getSession()
