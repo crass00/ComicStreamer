@@ -87,8 +87,12 @@ body {
                       use_api_key_toggle();
                       use_auth_toggle();
                       use_mysql_toggle();
+                      use_https_toggle();
                       use_cache_toggle();
-                      use_https_toggle();                      }
+                      use_cache_toggle();
+                      use_pdf_toggle();
+                      use_epub_toggle();
+                      }
                       );
                       function create_key()
                       {
@@ -171,6 +175,32 @@ function use_mysql_toggle()
         document.getElementById("settings_mysql").style.display = "inline";
     }
 }
+
+
+function use_pdf_toggle()
+{
+    if (!($("#use_epub").is(':checked')) && !($("#use_pdf").is(':checked'))) {
+            document.getElementById("settings_pdf").style.display = "none";
+    }
+    else {
+        document.getElementById("settings_pdf").style.display = "inline";
+    }
+}
+
+function use_epub_toggle()
+{
+    if (!($("#use_epub").is(':checked'))) {
+        document.getElementById("settings_epub").style.display = "none";
+        if (!($("#use_pdf").is(':checked'))) {
+            document.getElementById("settings_pdf").style.display = "none";
+        }
+    }
+    else {
+        document.getElementById("settings_pdf").style.display = "inline";
+        document.getElementById("settings_epub").style.display = "inline";
+    }
+}
+
 
     function doCmd(cmd)
     {

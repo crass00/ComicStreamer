@@ -1004,6 +1004,11 @@ class ConfigPageHandler(BaseHandler):
 
     def render_config(self, formdata, success="", failure=""):
         #convert boolean to "checked" or ""
+
+        formdata['use_pdf'] = "checked" if formdata['use_pdf'] else ""
+        formdata['use_epub'] = "checked" if formdata['use_epub'] else ""
+
+
         formdata['use_https'] = "checked" if formdata['use_https'] else ""
         formdata['use_mysql'] = "checked" if formdata['use_mysql'] else ""
         formdata['use_api_key'] = "checked" if formdata['use_api_key'] else ""
@@ -1045,12 +1050,17 @@ class ConfigPageHandler(BaseHandler):
         formdata['use_api_key'] = self.application.config['security']['use_api_key'] 
         formdata['api_key'] = self.application.config['security']['api_key']
         formdata['launch_client'] = self.application.config['general']['launch_client']
-        formdata['use_mysql'] = self.application.config['database']['use_mysql']
-        formdata['mysql_database'] = self.application.config['database']['mysql_database']
-        formdata['mysql_username'] = self.application.config['database']['mysql_username']
-        formdata['mysql_password'] = utils.decode(self.application.config['general']['install_id'],self.application.config['database']['mysql_password'])
-        formdata['mysql_host'] = self.application.config['database']['mysql_host']
-        formdata['mysql_port'] = self.application.config['database']['mysql_port']
+        formdata['use_mysql'] = self.application.config['mysql']['active']
+        formdata['mysql_database'] = self.application.config['mysql']['database']
+        formdata['mysql_username'] = self.application.config['mysql']['username']
+        formdata['mysql_password'] = utils.decode(self.application.config['general']['install_id'],self.application.config['mysql']['password'])
+        formdata['mysql_host'] = self.application.config['mysql']['host']
+        formdata['mysql_port'] = self.application.config['mysql']['port']
+        
+        formdata['use_pdf'] = self.application.config['formats']['pdf']
+        formdata['use_epub'] = self.application.config['formats']['epub']
+        formdata['epub2pdf'] = self.application.config['convert']['epub2pdf']
+        formdata['pdf2jpg'] = self.application.config['convert']['pdf2jpg']
         self.render_config(formdata)
 
     @tornado.web.authenticated
@@ -1078,6 +1088,11 @@ class ConfigPageHandler(BaseHandler):
         formdata['mysql_host'] = self.get_argument(u"mysql_host", default="")
         formdata['mysql_port'] = self.get_argument(u"mysql_port", default="")
         formdata['mysql_password'] = self.get_argument(u"mysql_password", default="")
+        
+        formdata['use_pdf'] = (len(self.get_arguments("use_pdf"))!=0)
+        formdata['use_epub'] = (len(self.get_arguments("use_epub"))!=0)
+        formdata['epub2pdf'] = self.get_argument(u"epub2pdf", default="")
+        formdata['pdf2jpg'] = self.get_argument(u"pdf2jpg", default="")
        
         failure_str = ""
         success_str = ""
@@ -1176,12 +1191,16 @@ class ConfigPageHandler(BaseHandler):
                 password_changed or
                 formdata['use_api_key'] != self.application.config['security']['use_api_key'] or
                 formdata['api_key'] != self.application.config['security']['api_key'] or
-                formdata['use_mysql'] != self.application.config['database']['use_mysql'] or
-                formdata['mysql_database'] != self.application.config['database']['mysql_database'] or
-                utils.encode(self.application.config['general']['install_id'],formdata['mysql_password']) != self.application.config['database']['mysql_password'] or
-                formdata['mysql_username'] != self.application.config['database']['mysql_username'] or
-                formdata['mysql_port'] != self.application.config['database']['mysql_port'] or
-                formdata['mysql_host'] != self.application.config['database']['mysql_host'] or
+                formdata['use_mysql'] != self.application.config['mysql']['active'] or
+                formdata['mysql_database'] != self.application.config['mysql']['database'] or
+                utils.encode(self.application.config['general']['install_id'],formdata['mysql_password']) != self.application.config['mysql']['password'] or
+                formdata['mysql_username'] != self.application.config['mysql']['username'] or
+                formdata['mysql_port'] != self.application.config['mysql']['port'] or
+                formdata['mysql_host'] != self.application.config['mysql']['host'] or
+                formdata['use_pdf'] != self.application.config['formats']['pdf'] or
+                formdata['use_epub'] != self.application.config['formats']['epub'] or
+                formdata['epub2pdf'] != self.application.config['convert']['epub2pdf'] or
+                formdata['pdf2jpg'] != self.application.config['convert']['pdf2jpg'] or
                 formdata['launch_client'] != self.application.config['general']['launch_client'] or
                 formdata['use_cache'] != self.application.config['cache']['active'] or
                 formdata['cache_size'] != self.application.config['cache']['size'] or
@@ -1209,14 +1228,19 @@ class ConfigPageHandler(BaseHandler):
                 self.application.config['cache']['size'] = formdata['cache_size']
                 self.application.config['cache']['free'] = formdata['cache_free']
 
-                self.application.config['database']['use_mysql'] = formdata['use_mysql']
+                self.application.config['convert']['epub2pdf'] =  formdata['epub2pdf']
+                self.application.config['convert']['pdf2jpg'] =  formdata['pdf2jpg']
+                self.application.config['formats']['pdf'] =  formdata['use_pdf']
+                self.application.config['formats']['epub'] =  formdata['use_epub']
+              
+                self.application.config['mysql']['active'] = formdata['use_mysql']
                 
                 # lame password hide should be better...
-                self.application.config['database']['mysql_password'] = utils.encode(self.application.config['general']['install_id'],formdata['mysql_password'])
-                self.application.config['database']['mysql_username'] = formdata['mysql_username']
-                self.application.config['database']['mysql_database'] = formdata['mysql_database']
-                self.application.config['database']['mysql_host'] = formdata['mysql_host']
-                self.application.config['database']['mysql_port'] = formdata['mysql_port']
+                self.application.config['mysql']['password'] = utils.encode(self.application.config['general']['install_id'],formdata['mysql_password'])
+                self.application.config['mysql']['username'] = formdata['mysql_username']
+                self.application.config['mysql']['database'] = formdata['mysql_database']
+                self.application.config['mysql']['host'] = formdata['mysql_host']
+                self.application.config['mysql']['port'] = formdata['mysql_port']
                 
                 
                 success_str = "Saved. Server restart needed"                
@@ -1298,7 +1322,7 @@ class APIServer(tornado.web.Application):
             sys.exit(-1)
         except sqlalchemy.exc.OperationalError as e:
             msg = e.orig.args[1]
-            self.config['database']['use_mysql'] = False;
+            self.config['mysql']['active'] = False;
             logging.error("MySQL: " + msg)
             utils.alert("MySQL Error", msg)
             self.dm = DataManager(self.config)

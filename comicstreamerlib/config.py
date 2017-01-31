@@ -22,7 +22,14 @@ class ComicStreamerConfig(ConfigObj):
             install_id=string(default="")
             folder_list=string_list(default=list())
             launch_client=boolean(default="True")
-            first_run=boolean(default="True")    
+            first_run=boolean(default="True")
+            [formats]
+            epub=boolean(default="False")
+            pdf=boolean(default="False")
+            [convert]
+            epub2pdf=string(default="/Applications/calibre.app/Contents/MacOS/ebook-convert")
+            pdf2jpg=string(default="./mudraw")
+            resolution=300
             [server]
             use_https=boolean(default="False")
             certificate_file=string(default="")
@@ -36,13 +43,13 @@ class ComicStreamerConfig(ConfigObj):
             use_api_key=boolean(default="False")
             api_key=string(default="")
             cookie_secret=string(default="")
-            [database]
-            use_mysql=boolean(default="False")
-            mysql_database=string(default="comicdb")
-            mysql_username=string(default="comic")
-            mysql_password=string(default="")
-            mysql_host=string(default="localhost")
-            mysql_port=integer(default=3306)
+            [mysql]
+            active=boolean(default="False")
+            database=string(default="comicdb")
+            username=string(default="comic")
+            password=string(default="")
+            host=string(default="localhost")
+            port=integer(default=3306)
             [cache]
             active=boolean(default="False")
             size=integer(default=0)
@@ -80,7 +87,7 @@ class ComicStreamerConfig(ConfigObj):
 
         # normalize the folder list
         tmp['general']['folder_list'] = [os.path.abspath(os.path.normpath(unicode(a))) for a in tmp['general']['folder_list']]
-        tmp['database']['mysql_password'] = utils.encode(tmp['general']['install_id'],'comic')
+        tmp['mysql']['password'] = utils.encode(tmp['general']['install_id'],'comic')
 
         self.merge(tmp)
         if not os.path.exists( self.filename ):

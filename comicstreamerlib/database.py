@@ -31,7 +31,7 @@ from sqlalchemy.types import String
 from sqlalchemy.dialects import mysql
 from config import ComicStreamerConfig
 
-mysql_active = ComicStreamerConfig()['database']['use_mysql']
+mysql_active = ComicStreamerConfig()['mysql']['active']
 
 SCHEMA_VERSION=4
 
@@ -539,13 +539,13 @@ class DataManager():
         if mysql_active:
             logging.info("Database: MySQL Engine")
             try:
-                 self.engine = create_engine("mysql://"+self.config['database']['mysql_username']+":"+utils.decode(self.config['general']['install_id'],self.config['database']['mysql_password'])+"@"+self.config['database']['mysql_host']+":"+str(self.config['database']['mysql_port'])+"/"+self.config['database']['mysql_database']+"?charset=utf8", pool_recycle=3600,  echo=False, isolation_level="READ COMMITTED")
+                 self.engine = create_engine("mysql://"+self.config['mysql']['username']+":"+utils.decode(self.config['general']['install_id'],self.config['mysql']['password'])+"@"+self.config['mysql']['host']+":"+str(self.config['mysql']['port'])+"/"+self.config['mysql']['database']+"?charset=utf8", pool_recycle=3600,  echo=False, isolation_level="READ COMMITTED")
             except:
                 logging.warning("Database: Switching to SQLite Engine")
                 logging.info("Database: SQLite Engine")
                 self.dbfile = os.path.join(AppFolders.appData(), "comicdb.sqlite")
                 self.engine = create_engine('sqlite:///'+ self.dbfile, echo=False)
-                self.config['database']['use_mysql'] = False;
+                self.config['mysql']['active'] = False;
         else:
             logging.info("Database: SQLite Engine")
             self.dbfile = os.path.join(AppFolders.appData(), "comicdb.sqlite")
@@ -555,7 +555,7 @@ class DataManager():
 
     def delete(self):
         logging.info("Database: Delete Database")
-        if self.config['database']['use_mysql']:
+        if self.config['mysql']['active']:
             Base.metadata.drop_all(self.engine)
             self.engine.dispose()
             self.init()
@@ -566,7 +566,7 @@ class DataManager():
     def create(self):
 
         # if we don't have a UUID for this DB, add it.
-        if self.config['database']['use_mysql']:
+        if self.config['mysql']['active']:
             Base.metadata.create_all(self.engine)
             session = self.Session()
         else:

@@ -5,7 +5,7 @@
 	{% module xsrf_form_html() %}
     <span id="statusbad">{{failure}}</span><span id="statusgood">{{success}}</span>
     <div>
-        <h1>GENERAL</h1>
+        <h1>General</h1>
         <br>
         <span>Comic Folders</span> <span class="help">one folder per line</span><textarea id="folders" name="folders" >{{formdata['folders']}}</textarea>
         <br>
@@ -13,11 +13,9 @@
     </div>
     <br>
     <div>
-        <h1>SERVER</h1>
+        <h1>Server</h1>
         <br>
-        <span>Port</span><input id="port" type="text" name="port" value="{{formdata['port']}}" />
-        <br>
-        <div style="display:none">
+        <div>
             <span>HTTPS</span><input type="checkbox" name="use_https" class="formcheck" id="use_https" onclick="use_https_toggle()" value="use" {{formdata['use_https']}}>
         
         <div id="settings_https">
@@ -26,7 +24,28 @@
         </div>
         </div>
         <br>
+        <span>Port</span><input id="port" type="text" name="port" value="{{formdata['port']}}" />
+        <br>
         <span>Webroot</span><input id="webroot" type="text" name="webroot" value="{{formdata['webroot']}}" />
+    </div>
+    <br>
+    <div>
+        <h1>Formats</h1>
+        <br>
+        <span>CBZ</span><input style="display:inline" type="checkbox" disabled name="use_cbz" class="formcheck" id="use_cbz" value="use" checked />
+        <span>CBR</span><input style="display:inline" type="checkbox" disabled name="use_cbr" class="formcheck" id="use_cbr" value="use" checked />
+        <span>CB7</span><input style="display:inline" type="checkbox" disabled name="use_cb7" class="formcheck" id="use_cb7" value="use" checked />
+        <span>CBT</span><input style="display:inline" type="checkbox" disabled name="use_cbt" class="formcheck" id="use_cbt" value="use" checked />
+        <span>PDF</span><input style="display:inline" type="checkbox" name="use_pdf" class="formcheck" id="use_pdf" value="use" onclick="use_pdf_toggle()" {{formdata['use_pdf']}} />
+        <span>EPUB</span><input style="display:inline" type="checkbox" name="use_epub" class="formcheck" id="use_epub" value="use" onclick="use_epub_toggle()" {{formdata['use_epub']}} />
+        <br>
+        <br>
+        <div id="settings_pdf">
+            <span>mudraw</span><input id="pdf2jpg" type="text" name="pdf2jpg" value="{{formdata['pdf2jpg']}}" />
+        </div>
+        <div id="settings_epub">
+            <span>calibre</span><input id="epub2pdf" type="text" name="epub2pdf" value="{{formdata['epub2pdf']}}" />
+        </div>
     </div>
     <br>
     <div>
@@ -47,27 +66,27 @@
     </div>
     <br>
     <div>
-        <h1>DATABASE</h1>
+        <h1>Database</h1>
         <br>
         <span>Use MySQL</span><input type="checkbox" name="use_mysql" class="formcheck" id="use_mysql" value="use" onclick="use_mysql_toggle()" {{formdata['use_mysql']}} />
         <div id="settings_mysql">
             <span>Database</span><input id="mysql_database" type="text" name="mysql_database" value="{{formdata['mysql_database']}}" />
             <br>
-            <span>Username</span><input id="mysql_username" type="text" name="mysql_username" value="{{formdata['mysql_username']}}" />
-            <span>Password</span> <span class="help">default: comic</span><input id="mysql_password" type="password" name="mysql_password" value="{{formdata['mysql_password']}}" />
-            <br>
             <span>Host</span><input id="mysql_host" type="text" name="mysql_host" value="{{formdata['mysql_host']}}" />
             <span>Port</span><input id="mysql_port" type="text" name="mysql_port" value="{{formdata['mysql_port']}}" />
+            <br>
+            <span>Username</span><input id="mysql_username" type="text" name="mysql_username" value="{{formdata['mysql_username']}}" />
+            <span>Password</span> <span class="help">default: comic</span><input id="mysql_password" type="password" name="mysql_password" value="{{formdata['mysql_password']}}" />
         </div>
     </div>
     <br>
     <div>
-        <h1>CACHE</h1>
+        <h1>Cache</h1>
         <br>
         <span>Use Cache</span><input type="checkbox" name="use_cache" class="formcheck" id="use_cache" value="use" onclick="use_cache_toggle()" {{formdata['use_cache']}} />
         <div id="settings_cache">
-        <span>Size</span> <span class="help">megabytes</span><input id="cache_size" type="text" name="cache_size" value="{{formdata['cache_size']}}" />
-        <span>Free Space</span> <span class="help">megabytes</span><input id="cache_free" type="text" name="cache_free" value="{{formdata['cache_free']}}" />
+        <span>Size</span> <span class="help">(megabytes)</span><input id="cache_size" type="text" name="cache_size" value="{{formdata['cache_size']}}" />
+        <span>Free Space</span> <span class="help">(megabytes)</span><input id="cache_free" type="text" name="cache_free" value="{{formdata['cache_free']}}" />
         </div>
     </div>
     <br>
