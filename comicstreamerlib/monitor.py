@@ -141,6 +141,7 @@ class Monitor():
             
         self.mutex.release()
 
+    """
     def checkIfRemovedOrModified(self, comic, pathlist):
         remove = False
         
@@ -171,6 +172,7 @@ class Monitor():
                 remove = True
            
         return remove
+    """
 
     def getComicMetadata(self, path):
 
@@ -354,9 +356,10 @@ class Monitor():
         if self.quit_when_done:
             self.quit = True
 
+    """
     def doEventProcessing(self, eventList):
         logging.debug(u"Monitor: event_list:{0}".format(eventList))
-
+    """
         
 if __name__ == '__main__':
     

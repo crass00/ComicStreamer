@@ -708,7 +708,10 @@ class EpubArchiver:
             corrected_path = self.path
             if os.path.basename(self.path)[-4:] == 'epub':
                 if not os.path.isfile(self.path+ u".tmp.pdf"):
-                    subprocess.check_output(['/Applications/calibre.app/Contents/MacOS/ebook-convert', self.path, self.path + u".tmp.pdf"])
+                    if platform.system() == "Windows":
+                        subprocess.check_output(['%PROGRAMFILES%\calibre\ebook-convert.exe', self.path, self.path + u".tmp.pdf"])
+                    else:
+                        subprocess.check_output(['/Applications/calibre.app/Contents/MacOS/ebook-convert', self.path, self.path + u".tmp.pdf"])
                 #rename file after process is done... tmp cache
                 corrected_path = self.path + u".tmp.pdf"
             pdf = PdfFileReader(open(corrected_path, 'rb'))
@@ -962,7 +965,7 @@ class ComicArchive:
         ext = os.path.splitext(self.path)[1].lower()
 
         if (
-              ( self.isZip() or self.isTar() or  self.isRar() or self.isPdf() or self.isEpub() or self.isSevenZip() ) #or self.isFolder() )
+              ( self.isZip() or self.isTar() or  self.isRar() or self.isPdf() or self.isEpub() or self.isSevenZip() or self.isFolder() )
               and
               ( self.getNumberOfPages() > 0)
 
