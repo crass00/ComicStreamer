@@ -697,7 +697,7 @@ class EpubArchiver:
         if os.path.basename(self.path)[-4:] == 'epub':
             corrected_path = self.path + u".tmp.pdf"
         resolution = 300;
-        return subprocess.check_output(['mudraw', '-r', str(resolution), '-o','-', corrected_path, str(int(os.path.basename(page_num)[:-4]))])
+        return subprocess.check_output(['./mudraw', '-r', str(resolution), '-o','-', corrected_path, str(int(os.path.basename(page_num)[:-4]))])
     def writeArchiveFile( self, archive_file, data ):
         return False
     def removeArchiveFile( self, archive_file ):
@@ -722,7 +722,7 @@ class EpubArchiver:
             else:
                 for page in range(1, pdf.getNumPages() + 1):
                     #out.append("/%04d.jpg" % (page))
-                    out.append(str(page))
+                    out.append(str(page) + ".jpg")
         except Exception as e:
             print >> sys.stderr, u"PDF Unreadable [{0}]: {1}".format(str(e),corrected_path)
         return out
@@ -828,9 +828,9 @@ class ComicArchive:
                     self.archive_type = self.ArchiveType.Pdf
                     self.archiver = PdfArchiver(self.path)
 
-            #elif os.path.basename(self.path)[-4:] == 'epub':
-            #self.archive_type = self.ArchiveType.Epub
-            #self.archiver = EpubArchiver(self.path)
+            elif os.path.basename(self.path)[-4:] == 'epub':
+                self.archive_type = self.ArchiveType.Epub
+                self.archiver = EpubArchiver(self.path)
 
             elif self.zipTest():
                 self.archive_type =  self.ArchiveType.Zip

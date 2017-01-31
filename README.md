@@ -6,21 +6,26 @@ ComicStreamer ToiletStreamer Edition Windows Alplha (https://dl.dropboxuserconte
     (cache is also broken, probably old python package or windows xp)
 
 ## Help wanted
-- front-end html/css could use some help
-- webp support in webcomicbook reader used in the web reader
 
 ## Settings
 Keep clicking on "tha brain" :-) Did I mention the fron-end help wanted :-)
 
-## ToDo!
+## ToDo! / Help Wanted!
 
-- MySQL support (I created a test data set and it chokes at more then 30.000 files with sqlite :-/)
+- front-end html/css could use some help
+- MySQL support (or better database, _sqlalchemy wizard help needed!!!_)
 - Find a good epub page to jpg converter for ebook support (pdf works great! better then any ebook reader)
+- OSX Calibre works... :-) other options/settings/windows?
 - Fix some gui stuff (redirect with restarting & resetting)
 - Added new db features...
 - Create Windows & Mac packages
-- Fix Cache did not work on xp :-/
+- Fix Cache did not work on xp :-/ (missing webp?)
 - Test Test Test!
+- webp support in webcomicbook reader used in the web reader
+- webcomicbook reader back arrow missing...
+- webcomicbook reader go back to before reader (navigation) missing...
+- webcomicbook reader page chooser (slider/page number selection?)
+- folder with images add as comic
 
 ![screw](https://raw.githubusercontent.com/Tristan79/ComicStreamer/master/ad.png)
 
