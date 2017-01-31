@@ -1,7 +1,7 @@
 # ComicStream: ToiletStreamer Edition
 
 ## Help wanted
-There is something missing... yes!
+There is something missing... yes! Not mention the name, which could be better or changed... or the interface design...
 
 Are you a web magician and able to fix the build in html webcomicbooks reader...
 
