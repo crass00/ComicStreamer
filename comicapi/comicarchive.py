@@ -711,12 +711,12 @@ class EpubArchiver(PdfArchiver):
         try:
             data = zf.read( 'cover.jpeg' )
         except zipfile.BadZipfile as e:
-            print >> sys.stderr, u"bad zipfile [{0}]: {1} :: {2}".format(e, self.path, archive_file)
+            print >> sys.stderr, u"bad zipfile [{0}]: {1} :: {2}".format(e, self.path, 'cover.jpeg' )
             zf.close()
             raise IOError
         except Exception as e:
             zf.close()
-            print >> sys.stderr, u"bad zipfile [{0}]: {1} :: {2}".format(e, self.path, archive_file)
+            print >> sys.stderr, u"bad zipfile [{0}]: {1} :: {2}".format(e, self.path, 'cover.jpeg' )
             raise IOError
         finally:
             zf.close()
@@ -732,10 +732,14 @@ class EpubArchiver(PdfArchiver):
         
         if page_num == '0.jpg':
             
-            x = self.getCover()
-            if x:
-                return x
-            
+            try:
+                x = self.getCover()
+                # maybe if is unneeded...
+                if x:
+                    return x
+            except:
+                pass
+
             cover = os.path.join(os.path.dirname(self.path),'cover.jpg')
             if os.path.isfile(cover):
                 data = ""
@@ -747,8 +751,10 @@ class EpubArchiver(PdfArchiver):
                 except IOError as e:
                     print str(e)
                     pass
+                print "cover.jpg"
                 return data
-            
+
+        print page_num
         #return subprocess.check_output(['pdftopng', '-r', str(resolution), '-f', str(int(os.path.basename(page_num)[:-4])), '-l', str(int(os.path.basename(page_num)[:-4])), self.path,  '-'])
         
         if platform.system() == "Windows":
