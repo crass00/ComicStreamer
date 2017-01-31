@@ -669,8 +669,6 @@ class PdfArchiver:
                     print str(e)
                     pass
                 return data
-            else:
-                pass #page_num_corr = str(int(page_num_corr[:-4]) - 1)
         
         #return subprocess.check_output(['pdftopng', '-r', str(resolution), '-f', str(int(os.path.basename(page_num)[:-4])), '-l', str(int(os.path.basename(page_num)[:-4])), self.path,  '-'])
         
@@ -686,7 +684,6 @@ class PdfArchiver:
     def getArchiveFilenameList( self ):
         out = []
         try:
-            print os.path.isfile(os.path.join(os.path.dirname(self.path),'cover.jpg'))
             if os.path.isfile(os.path.join(os.path.dirname(self.path),'cover.jpg')):
                 out.append("0.jpg")
             pdf = PdfFileReader(open(self.path, 'rb'))
@@ -703,30 +700,68 @@ class PdfArchiver:
                     
         except Exception as e:
             print >> sys.stderr, u"PDF Unreadable [{0}]: {1}".format(str(e),self.path)
-        #print out
         return out
 
-class EpubArchiver:
-    def __init__( self, path ):
-        self.path = path
-    
-    def getArchiveComment( self ):
-        return ""
-    def setArchiveComment( self, comment ):
-        return False
+class EpubArchiver(PdfArchiver):
+
+
+    def getCover(self):
+        data = None
+        zf = zipfile.ZipFile( self.path, 'r' )
+        try:
+            data = zf.read( 'cover.jpeg' )
+        except zipfile.BadZipfile as e:
+            print >> sys.stderr, u"bad zipfile [{0}]: {1} :: {2}".format(e, self.path, archive_file)
+            zf.close()
+            raise IOError
+        except Exception as e:
+            zf.close()
+            print >> sys.stderr, u"bad zipfile [{0}]: {1} :: {2}".format(e, self.path, archive_file)
+            raise IOError
+        finally:
+            zf.close()
+        return data
+
+
     def readArchiveFile( self, page_num ):
         corrected_path = self.path
         if os.path.basename(self.path)[-4:] == 'epub':
             corrected_path = self.path + u".tmp.pdf"
-        resolution = 300;
-        return subprocess.check_output(['./mudraw', '-r', str(resolution), '-o','-', corrected_path, str(int(os.path.basename(page_num)[:-4]))])
-    def writeArchiveFile( self, archive_file, data ):
-        return False
-    def removeArchiveFile( self, archive_file ):
-        return False
+        
+        resolution = 300
+        
+        if page_num == '0.jpg':
+            
+            x = self.getCover()
+            if x:
+                return x
+            
+            cover = os.path.join(os.path.dirname(self.path),'cover.jpg')
+            if os.path.isfile(cover):
+                data = ""
+                fname = cover
+                try:
+                    with open( fname, 'rb' ) as f:
+                        data = f.read()
+                        f.close()
+                except IOError as e:
+                    print str(e)
+                    pass
+                return data
+            
+        #return subprocess.check_output(['pdftopng', '-r', str(resolution), '-f', str(int(os.path.basename(page_num)[:-4])), '-l', str(int(os.path.basename(page_num)[:-4])), self.path,  '-'])
+        
+        if platform.system() == "Windows":
+            return subprocess.check_output(['.\mutool.exe', 'draw','-r', str(resolution), '-o','-', corrected_path, str(int(os.path.basename(page_num)[:-4]))])
+        else:
+            return subprocess.check_output(['./mudraw', '-r', str(resolution), '-o','-', corrected_path, str(int(os.path.basename(page_num)[:-4]))])
+
     def getArchiveFilenameList( self ):
         out = []
         try:
+            if os.path.isfile(os.path.join(os.path.dirname(self.path),'cover.jpg')):
+                out.append("0.jpg")
+
             corrected_path = self.path
             if os.path.basename(self.path)[-4:] == 'epub':
                 if not os.path.isfile(self.path+ u".tmp.pdf"):
@@ -736,6 +771,7 @@ class EpubArchiver:
                         subprocess.check_output(['/Applications/calibre.app/Contents/MacOS/ebook-convert', self.path, self.path + u".tmp.pdf"])
                 #rename file after process is done... tmp cache
                 corrected_path = self.path + u".tmp.pdf"
+            
             pdf = PdfFileReader(open(corrected_path, 'rb'))
             if pdf.isEncrypted:
                 try:
@@ -746,7 +782,6 @@ class EpubArchiver:
                     print >> sys.stderr, u"PDF Decrypted Failed [{0}]: {1}".format(str(e),self.path)
             else:
                 for page in range(1, pdf.getNumPages() + 1):
-                    #out.append("/%04d.jpg" % (page))
                     out.append(str(page) + ".jpg")
         except Exception as e:
             print >> sys.stderr, u"PDF Unreadable [{0}]: {1}".format(str(e),corrected_path)
