@@ -32,8 +32,8 @@ class ComicStreamerConfig(ConfigObj):
             resolution=300
             [server]
             use_https=boolean(default="False")
-            certificate_file=string(default="")
-            key_file=string(default="")
+            certificate_file=string(default="server.crt")
+            key_file=string(default="server.key")
             port=integer(default=32500)
             webroot=string(default="")
             [security]

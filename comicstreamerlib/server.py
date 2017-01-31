@@ -388,7 +388,9 @@ class DBInfoAPIHandler(JSONResultAPIHandler):
         response = { 'id': stats['uuid'],
                     'last_updated':  stats['last_updated'].isoformat(),
                     'created':  stats['created'].isoformat(),
-                    'comic_count': stats['total']
+                    'comic_count': stats['total'],
+                    'series_count': stats['series'],
+                    'artists_count': stats['persons']
                     }
         self.setContentType()
         self.write(response)
@@ -407,7 +409,8 @@ class ScanStatusAPIHandler(JSONResultAPIHandler):
                     }
         self.setContentType()
         self.write(response)
-            
+
+
 class ComicListAPIHandler(ZippableAPIHandler):
     def get(self):
         self.validateAPIKey()
@@ -916,13 +919,17 @@ class MainHandler(BaseHandler):
 class ServerPageHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self):
-        stats = self.library.getStats()
-        stats['last_updated'] = utils.utc_to_local(stats['last_updated']).strftime("%Y-%m-%d %H:%M:%S")
-        stats['created'] = utils.utc_to_local(stats['created']).strftime("%Y-%m-%d %H:%M:%S")
-        self.render(deviceroot(self)+"server.html", stats=stats,
+        #stats = self.library.getStats()
+        #stats['last_updated'] = utils.utc_to_local(stats['last_updated']).strftime("%Y-%m-%d %H:%M:%S")
+        #stats['created'] = utils.utc_to_local(stats['created']).strftime("%Y-%m-%d %H:%M:%S")
+        self.render(deviceroot(self)+"server.html",
                     server_time =  int(time.mktime(datetime.utcnow().timetuple()) * 1000),
                     api_key = self.application.config['security']['api_key']
                     )
+        #self.render(deviceroot(self)+"server.html", stats=stats,
+        #            server_time =  int(time.mktime(datetime.utcnow().timetuple()) * 1000),
+        #            api_key = self.application.config['security']['api_key']
+        #            )
 
 class RecentlyPageHandler(BaseHandler):
     @tornado.web.authenticated
@@ -1347,11 +1354,12 @@ class APIServer(tornado.web.Application):
 
         logging.info( "Stream server running on port {0}...".format(self.port))
         
-        #http_server = tornado.httpserver.HTTPServer(self, no_keep_alive = True, ssl_options={
-        #    "certfile": "server.crt",
-        #    "keyfile": "server.key",
-        #})
-        #http_server.listen(port+1)        
+        if self.config['server']['use_https']:
+            http_server = tornado.httpserver.HTTPServer(self, no_keep_alive = True, ssl_options={
+                "certfile": self.config['server']['certificate_file'], # "server.crt",
+                "keyfile": self.config['server']['key_file'] # "server.key",
+            })
+            http_server.listen(port+1)
          
         self.version = csversion.version
 
@@ -1376,6 +1384,8 @@ class APIServer(tornado.web.Application):
             # Data
             (self.webroot + r"/dbinfo", DBInfoAPIHandler),
             (self.webroot + r"/version", VersionAPIHandler),
+            (self.webroot + r"/command", ServerAPIHandler),
+            (self.webroot + r"/scanstatus", ScanStatusAPIHandler),
             (self.webroot + r"/deleted", DeletedAPIHandler),
             (self.webroot + r"/comic/([0-9]+)", ComicAPIHandler),
             (self.webroot + r"/comics", ComicListAPIHandler),
@@ -1388,9 +1398,6 @@ class APIServer(tornado.web.Application):
             (self.webroot + r"/comic/([0-9]+)/file", FileAPIHandler),
             (self.webroot + r"/entities(/.*)*", EntityAPIHandler),
             (self.webroot + r"/folders(/.*)*", FolderAPIHandler),
-            (self.webroot + r"/command", ServerAPIHandler),
-           # (self.webroot + r"/server", ServerAPIHandler),
-            (self.webroot + r"/scanstatus", ScanStatusAPIHandler),
             #(r'/favicon.ico', tornado.web.StaticFileHandler, {'path': os.path.join(AppFolders.appBase(), "static","images")}),
             (self.webroot + r'/.*', UnknownHandler),
             
