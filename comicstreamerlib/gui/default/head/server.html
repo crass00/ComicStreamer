@@ -106,7 +106,7 @@ function processs_dbinfo(dbinfo)
     $('#db_comics').text(dbinfo.comic_count)
     $('#db_series').text(dbinfo.series_count)
     $('#db_artists').text(dbinfo.artists_count)
-    var delay = 5000;
+    var delay = 10000;
     setTimeout(fetch_dbinfo, delay);
 }
 
@@ -127,7 +127,7 @@ var page_load_time = {{ server_time }};
 $(document).ready(function()
                   {
                     setTimeout(fetch_scanstatus, 1000);
-                    setTimeout(fetch_dbinfo, 1000);
+                    setTimeout(fetch_dbinfo, 0);
                   }
                   );
 

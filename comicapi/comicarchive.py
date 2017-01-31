@@ -652,12 +652,32 @@ class PdfArchiver:
     def readArchiveFile( self, page_num ):
         resolution = 300
         
+        print page_num
+        page_num_corr = page_num
+        
+        cover = os.path.join(os.path.dirname(self.path),'cover.jpg')
+        print cover
+        if os.path.isfile(cover):
+            if page_num_corr == '0.jpg':
+                data = ""
+                fname = cover
+                try:
+                    with open( fname, 'rb' ) as f:
+                        data = f.read()
+                        f.close()
+                except IOError as e:
+                    print str(e)
+                    pass
+                return data
+            else:
+                pass #page_num_corr = str(int(page_num_corr[:-4]) - 1)
+        
         #return subprocess.check_output(['pdftopng', '-r', str(resolution), '-f', str(int(os.path.basename(page_num)[:-4])), '-l', str(int(os.path.basename(page_num)[:-4])), self.path,  '-'])
         
         if platform.system() == "Windows":
-            return subprocess.check_output(['.\mutool.exe', 'draw','-r', str(resolution), '-o','-', self.path, str(int(os.path.basename(page_num)[:-4]))])
+            return subprocess.check_output(['.\mutool.exe', 'draw','-r', str(resolution), '-o','-', self.path, str(int(os.path.basename(page_num_corr)[:-4]))])
         else:
-            return subprocess.check_output(['./mudraw', '-r', str(resolution), '-o','-', self.path, str(int(os.path.basename(page_num)[:-4]))])
+            return subprocess.check_output(['./mudraw', '-r', str(resolution), '-o','-', self.path, str(int(os.path.basename(page_num_corr)[:-4]))])
 
     def writeArchiveFile( self, archive_file, data ):
         return False
@@ -666,6 +686,9 @@ class PdfArchiver:
     def getArchiveFilenameList( self ):
         out = []
         try:
+            print os.path.isfile(os.path.join(os.path.dirname(self.path),'cover.jpg'))
+            if os.path.isfile(os.path.join(os.path.dirname(self.path),'cover.jpg')):
+                out.append("0.jpg")
             pdf = PdfFileReader(open(self.path, 'rb'))
             if pdf.isEncrypted:
                 try:
@@ -676,12 +699,11 @@ class PdfArchiver:
                     print >> sys.stderr, u"PDF Decrypted Failed [{0}]: {1}".format(str(e),self.path)
             else:
                 for page in range(1, pdf.getNumPages() + 1):
-                    #out.append("/%04d.jpg" % (page))
-
                     out.append(str(page) + ".jpg")
                     
         except Exception as e:
             print >> sys.stderr, u"PDF Unreadable [{0}]: {1}".format(str(e),self.path)
+        #print out
         return out
 
 class EpubArchiver:
