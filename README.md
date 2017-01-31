@@ -1,39 +1,53 @@
 # ComicStream: ToiletStreamer Edition
 
+## Help wanted
+There is something missing... yes!
+
+Are you a web magician and able to fix the build in html webcomicbooks reader...
+
+- webp support
+- back arrow missing...
+- go back to navigation missing...
+- page chooser (slider and/or page number selection?)
+
+Or you are a database wizard...
+
+- MySQL support
+- Other databases backend support
+- Faster (or better database, __sqlalchemy wizard help needed!!!__)
+- New db features...
+
+Please help!
+
+## Intermission end...
+
 For now no mac or windows package! 
 
 ComicStreamer ToiletStreamer Edition Windows Alplha (https://dl.dropboxusercontent.com/u/12474226/32/ComicStreamer%200.9.5.exe) with broken web settings so edit the settings manually! Will fix soon!
     (cache is also broken, probably old python package or windows xp)
 
-## Help wanted
-
 ## Settings
 Keep clicking on "tha brain" :-) Did I mention the fron-end help wanted :-)
 
-## ToDo! / Help Wanted!
+## Further ToDo! / Help Wanted!
 
-- front-end html/css could use some help
-- MySQL support (or better database, _sqlalchemy wizard help needed!!!_)
-- Find a good epub page to jpg converter for ebook support (pdf works great! better then any ebook reader)
-- OSX Calibre works... :-) other options/settings/windows?
+- Front-end html/css could use some help
+- Find a good epub page to png/jpg converter for ebook support (pdf works great! better then any ebook reader)
+- OSX Calibre works... in remark to previous line :-) so other options/settings/windows?
 - Fix some gui stuff (redirect with restarting & resetting)
-- Added new db features...
+- Folder with images add as comic
 - Create Windows & Mac packages
 - Fix Cache did not work on xp :-/ (missing webp?)
-- Test Test Test!
-- webp support in webcomicbook reader used in the web reader
-- webcomicbook reader back arrow missing...
-- webcomicbook reader go back to before reader (navigation) missing...
-- webcomicbook reader page chooser (slider/page number selection?)
-- folder with images add as comic
-
+x
 ![screw](https://raw.githubusercontent.com/Tristan79/ComicStreamer/master/ad.png)
 
    
 ## Work done
 
-Tristan79 Work on this fork (januari 28 2017)
+Tristan79 Work on this fork (januari 31 2017)
 
+- Much better (faster) random comic query
+- MySQL support (experimental) in database..py -> rename to database.py to check it out!
 - Fixed bug (appartently source didn't work for months)
 - Added cbt/tar support
 - Patched webp (it does not load in web comic book, haven't tested chunky so converted to jpeg :/)
