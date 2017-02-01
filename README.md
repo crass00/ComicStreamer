@@ -10,9 +10,16 @@ Are you a web magician and able to fix the build in html webcomicbooks reader...
 - go back to navigation missing...
 - page chooser (slider and/or page number selection?)
 
+
+Or general web page
+- search result not limited to 10/20../100
+- css (text to big or to small :/
+- publisher with / in name not recognized in entity browser
+- Fix some gui stuff (redirect with restarting & resetting)
+
 Or you are a database wizard...
 
-- MySQL support
+- MySQL support (currently no changing files!)
 - Other databases backend support
 - Faster (or better database, __sqlalchemy wizard help needed!!!__)
 - New db features...
@@ -31,16 +38,13 @@ Keep clicking on "tha brain" :-) Did I mention the fron-end help wanted :-)
 
 ## Further ToDo! / Help Wanted!
 
-- Front-end html/css could use some help
 - Find a good epub page to png/jpg converter for ebook support (pdf works great! better then any ebook reader)
 - OSX Calibre works... in remark to previous line :-) so other options/settings/windows?
-- Fix some gui stuff (redirect with restarting & resetting)
 - Folder with images add as comic
 - Create Windows & Mac packages
 - Fix Cache did not work on xp :-/ (missing webp?)
-x
-![screw](https://raw.githubusercontent.com/Tristan79/ComicStreamer/master/ad.png)
 
+![screw](https://raw.githubusercontent.com/Tristan79/ComicStreamer/master/ad.png)
    
 ## Work done
 
