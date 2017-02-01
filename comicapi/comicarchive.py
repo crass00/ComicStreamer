@@ -1169,7 +1169,6 @@ class ComicArchive:
         if self.page_list is None:
             # get the list file names in the archive, and sort
             files = self.archiver.getArchiveFilenameList()
-
             # seems like some archive creators are on  Windows, and don't know about case-sensitivity!
             if sort_list:
                 def keyfunc(k):
@@ -1178,8 +1177,11 @@ class ComicArchive:
                     #if basename < '0':
                     #	k = os.path.join(os.path.split(k)[0], "z" + basename)
                     return k.lower()
-
-                files = natsorted(files, key=keyfunc,signed=False)
+                try:
+                    files = natsorted(files, key=keyfunc,signed=False)
+                except:
+                    # fix bug with strange encoding... should we check zip/rar/etc files for encoding?
+                    files = natsorted([i.decode('windows-1252') for i in files], key=keyfunc,signed=False)
 
             # make a sub-list of image files
             self.page_list = []
