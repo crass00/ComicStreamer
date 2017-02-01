@@ -175,10 +175,9 @@ class Monitor():
     """
 
     def getComicMetadata(self, path):
-
+        logging.debug(u"Monitor: Scanning File {0} {1}\r".format(self.read_count, path))
         ca = ComicArchive(path,  default_image_path=AppFolders.missingPath("page.png"))
         
-        logging.debug(u"Monitor: Reading File {0} {1}\r".format(self.read_count, path))
         if ca.seemsToBeAComicArchive():
             sys.stdout.flush()
             self.read_count += 1
