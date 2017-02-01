@@ -107,7 +107,7 @@ function processs_dbinfo(dbinfo)
     $('#db_series').text('Series ' + dbinfo.series_count)
     $('#db_artists').text('Artists ' + dbinfo.artists_count)
     $('#db_engine').text("ComicDB " + dbinfo.db_engine + " version " + dbinfo.db_scheme)
-    $('#cache_info_2').text("Size " + dbinfo.cache_filled + "mb Filled "+ ((dbinfo.cache_filled/dbinfo.cache_max)*100).toFixed(1) + "% ");
+    $('#cache_info_2').text("Size " + dbinfo.cache_max + "mb Filled "+ dbinfo.cache_filled + " " + ((dbinfo.cache_filled/dbinfo.cache_max)*100).toFixed(1) + "% ");
     if (dbinfo.cache_active)
     { var miss_corr = 1
       if (dbinfo.cache_miss != 0) miss_corr = dbinfo.cache_miss
