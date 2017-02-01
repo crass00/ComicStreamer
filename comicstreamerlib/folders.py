@@ -99,6 +99,10 @@ class AppFolders():
     @staticmethod
     def appCache():
         return os.path.join(AppFolders.appData(), "cache")
+
+    @staticmethod
+    def missingPath(filename):
+        return os.path.join(AppFolders.appBase(), "static", "images", "missing", filename)
     
     @staticmethod
     def imagePath(filename):

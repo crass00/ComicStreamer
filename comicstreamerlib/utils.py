@@ -12,11 +12,16 @@ import time
 import base64
 import ctypes
 
+import logging
+
 from PIL import Image
 try:
     from PIL import WebPImagePlugin
 except:
     pass
+
+#from PIL import ImageFile
+#ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 import StringIO
 from comicstreamerlib.folders import AppFolders
@@ -101,7 +106,7 @@ def resizeImage(max, image_data):
     
     #imtype = imghdr.what(StringIO.StringIO(image_data))
     #if imtype == "webp":
-    #    with open(AppFolders.imagePath("missing.png"), 'rb') as fd:
+    #    with open(AppFolders.missingPath("page.png"), 'rb') as fd:
     #        image_data = fd.read()
 
     im = Image.open(StringIO.StringIO(image_data)).convert('RGB')
@@ -122,7 +127,7 @@ def resizeImage(max, image_data):
 # 2.90805196762
 #
 # taken from http://united-coders.com/christian-harms/image-resizing-tips-every-coder-should-know/
-def resize(img, box, out, fit=False):
+def resize(img, box, out, default=None, fit=False):
     '''Downsample the image.
     @param img: Image -  an Image-object
     @param box: tuple(x, y) - the bounding box of the result image
@@ -142,6 +147,7 @@ def resize(img, box, out, fit=False):
             img.thumbnail((img.size[0]/factor, img.size[1]/factor), Image.NEAREST)
         except IOError:
             print >> sys.stderr, u"Error reading in page. Image Corrupted"
+            raise IOError;
 
     #calculate the cropping box and get the cropped part
     if fit:
@@ -157,23 +163,30 @@ def resize(img, box, out, fit=False):
             x2 = int(x2/2+box[0]*hRatio/2)
         img = img.crop((x1,y1,x2,y2))
 
-    #Resize the image with best quality algorithm ANTI-ALIAS
-    img.thumbnail(box, Image.ANTIALIAS)
+    img_t = img
 
-    img = img.convert('RGB')
+    #from PIL import ImageFile
+    #ImageFile.LOAD_TRUNCATED_IMAGES = True
+    try:
+        #Resize the image with best quality algorithm ANTI-ALIAS
+        img.thumbnail(box, Image.ANTIALIAS)
+        img = img.convert('RGBA')
+        #save it into a file-like object
+        img.save(out, "PNG", quality=100)
+    except:
+        print >> sys.stderr, u"Error reading in page. Image Corrupted"
+        raise IOError;
 
-    #save it into a file-like object
-    img.save(out, "JPEG", quality=100)
 
-    # somebody should patch the book reader... for now convert to jpg
+    # somebody should patch the book reader... for now convert to png
 def webp_patch_convert(img):
     imtype = imghdr.what(StringIO.StringIO(img))
     if imtype == "webp":
         if type(img) != Image and type(img) == str:
             img = Image.open(StringIO.StringIO(img))
         out = StringIO.StringIO()
-        img = img.convert('RGB')
-        img.save(out, "JPEG", quality=100)
+        img = img.convert('RGBA')
+        img.save(out, "PNG", quality=100)
         return out.getvalue()
     else:
         return img

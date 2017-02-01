@@ -1081,7 +1081,8 @@ class ComicArchive:
             retcode = self.removeCoMet()
         return retcode
 
-    def getPage( self, index ):
+    def getPage( self, index , error_img=None):
+        # very bad handling of missing...
 
         image_data = None
 
@@ -1092,13 +1093,19 @@ class ComicArchive:
 
                 image_data = self.archiver.readArchiveFile( filename )
             except IOError:
-                print >> sys.stderr, u"Error reading in page.  Substituting logo page."
-                image_data = ComicArchive.logo_data
+                print >> sys.stderr, u"Error reading in page.  Substituting missing page."
+                if error_img:
+                    image_data = error_img
+                else:
+                    image_data = ComicArchive.logo_data
         try:
                 Image.open(StringIO.StringIO(image_data))
         except IOError:
-            print >> sys.stderr, u"Error reading in page.  Substituting logo page."
-            image_data = ComicArchive.logo_data
+            print >> sys.stderr, u"Error reading in page.  Substituting missing page."
+            if error_img:
+                image_data = error_img
+            else:
+                image_data = ComicArchive.logo_data
         return image_data
 
     def getPageName( self, index ):

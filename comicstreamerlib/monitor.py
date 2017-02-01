@@ -79,10 +79,10 @@ class Monitor():
         self.status = u"INDEXING"
         for path in self.paths:
             if os.path.exists(path):
-                self.setStatusDetail(u"Watchdog")
-                logging.debug("Monitor: Watchdog Indexing (BUG)")
+                self.setStatusDetail(u"Watchdog (BUG?)")
+                logging.debug("Monitor: Watchdog Indexing")
                 self.observer.schedule(self.eventHandler, path, recursive=True)
-                logging.debug("Monitor: Watchdog Indexing Finished (BUG)")
+                logging.debug("Monitor: Watchdog Indexing Finished")
         self.observer.start()
         while True:
             try:
@@ -176,7 +176,7 @@ class Monitor():
 
     def getComicMetadata(self, path):
 
-        ca = ComicArchive(path,  default_image_path=AppFolders.imagePath("missing.png"))
+        ca = ComicArchive(path,  default_image_path=AppFolders.missingPath("page.png"))
         
         if ca.seemsToBeAComicArchive():
             logging.debug(u"Monitor: Reading File {0} {1}\r".format(self.read_count, path))
@@ -203,12 +203,16 @@ class Monitor():
             md.hash = ""
 
             #thumbnail generation
-            image_data = ca.getPage(0)
+            image_data = ca.getPage(0, AppFolders.missingPath("cover.png"))
+            
             #now resize it
             thumb = StringIO.StringIO()
-            utils.resize(image_data, (400, 400), thumb)
-            md.thumbnail = thumb.getvalue()
-
+            
+            try:
+                utils.resize(image_data, (400, 400), thumb)
+                md.thumbnail = thumb.getvalue()
+            except:
+                md.thumbnail = None
             return md
         return None
 

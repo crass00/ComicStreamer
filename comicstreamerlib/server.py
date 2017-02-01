@@ -537,50 +537,45 @@ class ThumbnailLargeAPIHandler(ImageAPIHandler):
     def get(self, comic_id):
         self.validateAPIKey()
         thumbnail = self.library.getComicThumbnail(comic_id)
-
+        self.setContentType('image/jpg')
+        
         if thumbnail != None:
-            self.setContentType('image/jpg')
             self.write(thumbnail)
         else:
-            default_img_file = AppFolders.imagePath("missing.png")
-            with open(default_img_file, 'rb') as fd:
-                image_data = fd.read()
-            self.setContentType('image/jpg')
-            self.write(image_data)
+            with open(AppFolders.missingPath("cover.png"), 'rb') as fd:
+                thumbnail = fd.read()
+                fd.close()
+            thumb = StringIO.StringIO()
+            utils.resize(thumbnail, (400, 400), thumb)
+            self.write(thumb.getvalue())
 
 class ThumbnailSmallAPIHandler(ImageAPIHandler):
     def get(self, comic_id):
         self.validateAPIKey()
         thumbnail = self.library.getComicThumbnail(comic_id)
-        
-        if thumbnail != None:
-            self.setContentType('image/jpg')
-            thumb = StringIO.StringIO()
-            utils.resize(thumbnail, (100, 100), thumb)
-            self.write(thumb.getvalue())
-        else:
-            default_img_file = AppFolders.imagePath("missing.png")
+        thumb = StringIO.StringIO()
+        if thumbnail == None:
+            default_img_file = AppFolders.missingPath("cover.png")
             with open(default_img_file, 'rb') as fd:
-                image_data = fd.read()
-            self.setContentType('image/jpg')
-            self.write(image_data)
+                thumbnail = fd.read()
+                fd.close()
+        utils.resize(thumbnail, (100, 100), thumb)
+        self.setContentType('image/jpg')
+        self.write(thumb.getvalue())
 
 class ThumbnailAPIHandler(ImageAPIHandler):
     def get(self, comic_id):
         self.validateAPIKey()
         thumbnail = self.library.getComicThumbnail(comic_id)
-        
-        if thumbnail != None:
-            self.setContentType('image/jpg')
-            thumb = StringIO.StringIO()
-            utils.resize(thumbnail, (200, 200), thumb)
-            self.write(thumb.getvalue())
-        else:
-            default_img_file = AppFolders.imagePath("missing.png")
+        thumb = StringIO.StringIO()
+        if thumbnail == None:
+            default_img_file = AppFolders.missingPath("cover.png")
             with open(default_img_file, 'rb') as fd:
-                image_data = fd.read()
-            self.setContentType('image/jpg')
-            self.write(image_data)
+                thumbnail = fd.read()
+                fd.close()
+        utils.resize(thumbnail, (200, 200), thumb)
+        self.setContentType('image/jpg')
+        self.write(thumb.getvalue())
 
 class FileAPIHandler(GenericAPIHandler):
     @tornado.web.asynchronous
