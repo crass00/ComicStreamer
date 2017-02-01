@@ -16,6 +16,9 @@ Or general web page
 - css (text to big or to small :/
 - publisher with / in name not recognized in entity browser
 - Fix some gui stuff (redirect with restarting & resetting)
+- Remove showing null comics in table
+- Add link to entity browser in popup
+- Add popup to table make the thumb open the comic instead of the comic!
 
 Or you are a database wizard...
 
