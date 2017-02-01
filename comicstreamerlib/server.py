@@ -8,7 +8,6 @@ import tornado.web
 import urllib
 import mimetypes
 import re
-import shutil
 
 from urllib2 import quote
 
@@ -365,7 +364,10 @@ class ServerAPIHandler(GenericAPIHandler):
         elif cmd == "stop":
             logging.info("Stop command")
             self.application.shutdown()
-
+        elif cmd == "cache":
+            logging.info("Clear cache command")
+            self.application.library.cache_clear()
+            
 class ImageAPIHandler(GenericAPIHandler):
     def setContentType(self, image_data):
         
@@ -385,12 +387,25 @@ class DBInfoAPIHandler(JSONResultAPIHandler):
     def get(self):
         self.validateAPIKey()
         stats = self.library.getStats()
+        if mysql_active:
+            s = "MySQL"
+        else:
+            s = "SQLite"
         response = { 'id': stats['uuid'],
-                    'last_updated':  stats['last_updated'].isoformat(),
-                    'created':  stats['created'].isoformat(),
-                    'comic_count': stats['total'],
-                    'series_count': stats['series'],
-                    'artists_count': stats['persons']
+                    'last_updated'  : stats['last_updated'].isoformat(),
+                    'created'       : stats['created'].isoformat(),
+                    'comic_count'   : stats['total'],
+                    'series_count'  : stats['series'],
+                    'artists_count' : stats['persons'],
+                    'cache_active'  : self.library.cache_active,
+                    'cache_filled'  : self.library.cache_filled / 1048576,
+                    'cache_pages'   : len(self.library.cache_list),
+                    'cache_miss'    : self.library.cache_miss,
+                    'cache_hit'     : self.library.cache_hit,
+                    'cache_discard' : self.library.cache_discard,
+                    'cache_max'     : self.library.cache_maxsize,
+                    'db_engine' : s,
+                    'db_scheme' : SCHEMA_VERSION
                     }
         self.setContentType()
         self.write(response)
@@ -1311,8 +1326,7 @@ class APIServer(tornado.web.Application):
             logging.info( "Deleting any existing database!")
             self.dm.delete()
             logging.info( "Deleting any existing cache!")
-            if os.path.exists(AppFolders.appCache()) and os.path.isdir(AppFolders.appCache()):
-                shutil.rmtree(AppFolders.appCache())
+            self.library.cache_clear()
             
         # quit on a standard reset
         if opts.reset:

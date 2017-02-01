@@ -6,7 +6,7 @@ import random
 
 from sqlalchemy import func, distinct
 from sqlalchemy.orm import subqueryload
-
+import shutil
 import utils
 from database import Comic, DatabaseInfo, Person, Role, Credit, Character, GenericTag, Team, Location, \
     StoryArc, Genre, DeletedComic,AlternateSeries
@@ -27,6 +27,15 @@ class Library:
         self.namedEntities = {}
         self.cache_active = False
 
+    def cache_clear(self):
+        if os.path.exists(AppFolders.appCache()) and os.path.isdir(AppFolders.appCache()):
+            shutil.rmtree(AppFolders.appCache())
+        self.cache_filled = 0
+        self.cache_list = []
+        self.cache_hit = 0
+        self.cache_miss = 0
+        self.cache_discard = 0
+    
     def cache(self,path,active,size,free):
         self.cache_active = active
         self.cache_size = size
@@ -34,6 +43,10 @@ class Library:
         self.cache_path = path
         self.cache_filled = 0
         self.cache_list = []
+        self.cache_hit = 0
+        self.cache_miss = 0
+        self.cache_discard = 0
+        self.cache_maxsize = size
         
         try:
             if not os.path.exists(path):
@@ -53,10 +66,17 @@ class Library:
 
         self.cache_list = sorted(self.cache_list, key = lambda x: int(x[3]))
         
-        x = utils.get_free_space(self.cache_path) - self.cache_free*1048576 - self.cache_filled
-        if x < 0:
-            self.cache_delete(abs(x))
-        
+        cache_free_size = utils.get_free_space(self.cache_path)
+        self.cache_maxsize = cache_free_size - self.cache_free*1048576 - self.cache_filled
+        if self.cache_maxsize < 0:
+            self.cache_maxsize += self.cache_delete(abs(x))
+            if self.cache_maxsize < 0:
+                self.cache_maxsize = 0
+        if self.cache_size > 0 and self.cache_maxsize > self.cache_size*1048576:
+                self.cache_maxsize = self.cache_size
+        else:
+            self.cache_maxsize = (self.cache_maxsize + self.cache_filled) / 1048576
+    
         """
         print "Cache: " + str(self.cache_active)
         if self.cache_size == 0:
@@ -67,7 +87,7 @@ class Library:
         print "Free FS: " + str(utils.get_free_space(self.cache_path)/1024/1024) + "mb"
         print "Filled: " + str(self.cache_filled/1024/1024) + "mb"
         print "Files: " + str(len(self.cache_list))
-        print "Remaining: " + str(x/1024/1024)
+        print "Remaining: " + str(cache_free_size/1024/1024) + "mb"
         """
 
     def cache_delete(self, size):
@@ -81,10 +101,11 @@ class Library:
             os.remove(os.path.join(self.cache_path,x[0],x[1]))
             self.cache_filled -= x[2]
             deleted += x[2]
+            self.cache_discard += 1
             self.cache_list.pop(0)
         return deleted
 
-    def cache_hit(self, comic_id, page_number, path):
+    def cache_load(self, comic_id, page_number, path):
         if self.cache_active:
             cachepath = self.cache_path + "/" + comic_id + "/"
             cachefile = cachepath + str(page_number)
@@ -101,15 +122,27 @@ class Library:
                 
                 cache_free_size = utils.get_free_space(self.cache_path)
                 x = cache_free_size - self.cache_free*1048576 - self.cache_filled
+                
                 if x < 0:
-                    self.cache_delete(abs(x))
+                    cache_free_size += self.cache_delete(abs(x))
                 
                 deleted = 0
                 if self.cache_size > 0 and self.cache_filled + cache_file_size > self.cache_size*1048576:
                     deleted = self.cache_delete(cache_file_size)
+                    cache_free_size += deleted
                 else:
                     deleted = cache_file_size
                 
+                self.cache_maxsize = cache_free_size - self.cache_free*1048576 - self.cache_filled
+                if self.cache_maxsize < 0:
+                    self.cache_maxsize = 0
+                if self.cache_size > 0 and self.cache_maxsize > self.cache_size*1048576:
+                        self.cache_maxsize = self.cache_size
+                else:
+                    self.cache_maxsize = (self.cache_maxsize + self.cache_filled) / 1048576
+            
+                
+                self.cache_miss += 1
                 if cache_file_size <= deleted:
                     file = open(cachefile, "w")
                     file.write(image)
@@ -127,12 +160,12 @@ class Library:
                 print "Free FS: " + str(utils.get_free_space(self.cache_path)/1024/1024) + "mb"
                 print "Filled: " + str(self.cache_filled/1024/1024) + "mb"
                 print "Files: " + str(len(self.cache_list))
-                print "Remaining: " + str(x/1024/1024)
+                print "Remaining: " + str(x/1024/1024) + "mb"
                 """
-
             else:
                 file = open(cachefile, "r")
                 image = file.read()
+                self.cache_hit += 1
                 # DEBUG
                 #print "Hit"
         else:
@@ -164,7 +197,7 @@ class Library:
         
         if path is not None:
             if int(page_number) < page_count:
-                image_data = self.cache_hit(comic_id,page_number,path)
+                image_data = self.cache_load(comic_id,page_number,path)
         
         if image_data is None:
             with open(default_img_file, 'rb') as fd:

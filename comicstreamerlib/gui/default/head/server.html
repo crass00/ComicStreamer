@@ -5,7 +5,7 @@
     </style>
 
 <style type="text/css">
-    #coverStop, #coverStopped, #coverReset, #coverRestart{
+    #coverCache, #coverStop, #coverStopped, #coverReset, #coverRestart{
         position:absolute;
         top:0;
         left:0;
@@ -21,7 +21,7 @@ body {
   
   
 }
-#dialogRestart, #dialogReset, #dialogStop, #dialogStopped
+#dialogCache, #dialogRestart, #dialogReset, #dialogStop, #dialogStopped
 {   z-index:110;
     display:none;
     position:fixed;
@@ -33,7 +33,7 @@ body {
     width:40%;
 }
 
-#dialogStopped:target, #dialogRestart:target, #dialogReset:target, #dialogStop:target, #dialogStopped:target + #coverStopped, #dialogStop:target + #coverStop, #dialogRestart:target + #coverRestart, #dialogReset:target + #coverReset {
+#dialogCache:target, #dialogStopped:target, #dialogRestart:target, #dialogReset:target, #dialogStop:target, #dialogCache:target + #coverCache, #dialogStopped:target + #coverStopped, #dialogStop:target + #coverStop, #dialogRestart:target + #coverRestart, #dialogReset:target + #coverReset {
     display:block;
     opacity:2;
 }
@@ -89,7 +89,7 @@ function processs_scanstatus(scanstatus)
     }
     
     // update some elements here
-    $('#scan_status').text(scanstatus.status)
+    $('#scan_status').text("Monitor " + scanstatus.status)
     $('#scan_status_detail').text(scanstatus.detail)
     var delay = 5000;
     if (scanstatus.status != 'IDLE')
@@ -103,9 +103,21 @@ function processs_scanstatus(scanstatus)
 function processs_dbinfo(dbinfo)
 {
     // update some elements here
-    $('#db_comics').text(dbinfo.comic_count)
-    $('#db_series').text(dbinfo.series_count)
-    $('#db_artists').text(dbinfo.artists_count)
+    $('#db_comics').text('Comics ' + dbinfo.comic_count)
+    $('#db_series').text('Series ' + dbinfo.series_count)
+    $('#db_artists').text('Artists ' + dbinfo.artists_count)
+    $('#db_engine').text("ComicDB " + dbinfo.db_engine + " version " + dbinfo.db_scheme)
+    $('#cache_info_2').text("Size " + dbinfo.cache_filled + "mb Filled "+ ((dbinfo.cache_filled/dbinfo.cache_max)*100).toFixed(1) + "% ");
+    if (dbinfo.cache_active)
+    { var miss_corr = 1
+      if (dbinfo.cache_miss != 0) miss_corr = dbinfo.cache_miss
+      $('#cache_info_1').text("Cache " + dbinfo.cache_pages + " pages (" + ((dbinfo.cache_hit/miss_corr)*100).toFixed(1) + "%)");
+      $('#cache_info_3').text("Hits " + dbinfo.cache_hit + " Misses " + dbinfo.cache_miss  + " Removed " + dbinfo.cache_discard);
+    }
+    else
+    { $('#cache_info_3').text("Disabled");
+      $('#cache_info_1').text("Cache " + dbinfo.cache_pages + " pages");
+    }
     var delay = 10000;
     setTimeout(fetch_dbinfo, delay);
 }
@@ -136,14 +148,14 @@ function redirectCmd(cmd)
 {   if (cmd == 'restart' ) location.reload();
     if (cmd == 'reset' )   location.reload();
     if (cmd == 'stop' )   location = "#dialogStopped";
-    
 }
 
 function doCmd(cmd)
 {
     if (cmd == 'restart' ) delay = 5000;
     if (cmd == 'reset' )   delay = 7000;
-    if (cmd == 'stop' )   delay = 500;
+    if (cmd == 'stop' )    delay = 500;
+    if (cmd == 'cache' )   delay = 500;
     $.getJSON( '/command?api_key={{api_key}}&cmd='+cmd);
     setTimeout(redirectCmd, delay, cmd);
 }

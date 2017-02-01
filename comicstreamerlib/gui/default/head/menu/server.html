@@ -1,19 +1,16 @@
 <div id="menu">
         &nbsp;
         <a href="{{handler.webroot}}/"><img src="{{ static_url('icons/navigation/back.png') }}"></a>
-        <a href="{{handler.webroot}}/settings">
-            <img id="ctrl_button" src="{{ static_url('icons/server/server.png') }}">
-        </a>
+        <a href="{{handler.webroot}}/settings"><img id="ctrl_button" src="{{ static_url('icons/server/settings.png') }}"></a>
         <a href="{{handler.webroot}}/about"><img src="{{ static_url('icons/about/about.png') }}"></a>
-        <a href="#dialogReset" >
-            <img src="{{ static_url('icons/server/reset.png') }}">
-        </a>
+        <a href="#dialogReset" ><img src="{{ static_url('icons/server/reset.png') }}"></a>
+        <a href="#dialogCache" ><img src="{{ static_url('icons/server/cache.png') }}"></a>
         
                       <!--
                 <a href="#dialogStop"><img id="ctrl_button" src="{{ static_url('icons/server/stop.png') }}"></a> -->
         <a href="{{handler.webroot}}/log"><img src="{{ static_url('icons/server/log.png') }}"></a>
 </div>
-
+<center>
     <div id="dialogReset">
         <img class="dialog_balloon" src="{{ static_url('images/smallballoon.png') }}">
             <div class="dialog_question">Reset Server?</div>
@@ -23,7 +20,17 @@
     </div>
     <div id="coverReset" >
     </div>
-    
+
+    <div id="dialogCache">
+        <img class="dialog_balloon" src="{{ static_url('images/smallballoon.png') }}">
+            <div class="dialog_question">Reset Cache?</div>
+            <a href="#"><img class="dialog_cancel" src="{{ static_url('icons/dialog/think.png') }}"></a>
+            <a href="javascript:sendCmd('cache')"><img class="dialog_ok" src="{{ static_url('icons/dialog/ok.png') }}"></a>
+            <img class="dialog_avatar" src="{{ static_url('icons/server/server.png') }}">
+    </div>
+    <div id="coverCache" >
+    </div>
+</center>
     <!--
     <div id="dialogStop">
         <img class="dialog_balloon" src="{{ static_url('images/smallballoon.png') }}">
