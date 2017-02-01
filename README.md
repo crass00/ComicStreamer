@@ -19,6 +19,9 @@ Or general web page
 - Remove showing null comics in table
 - Add link to entity browser in popup
 - Add popup to table make the thumb open the comic instead of the comic!
+- Log should be automaticlly updated
+- secondary sort on table (e.g. date/year then issue)
+- setup redirect with first run
 
 Or you are a database wizard...
 
@@ -43,6 +46,7 @@ Keep clicking on "tha brain" :-) Did I mention the fron-end help wanted :-)
 
 - Find a good epub page to png/jpg converter for ebook support (pdf works great! better then any ebook reader)
 - OSX Calibre works... in remark to previous line :-) so other options/settings/windows?
+- ebook caching
 - Folder with images add as comic
 - Create Windows & Mac packages
 - Fix Cache did not work on xp :-/ (missing webp?)

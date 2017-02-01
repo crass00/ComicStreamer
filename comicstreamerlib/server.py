@@ -975,9 +975,11 @@ class HelpPageHandler(BaseHandler):
     def get(self):
         self.render(deviceroot(self)+"help.html", api_key=self.application.config['security']['api_key'])
 
+
 class LogPageHandler(BaseHandler):
     
     @tornado.web.authenticated
+
     def get(self):
 
         log_file = os.path.join(AppFolders.logs(), "ComicStreamer.log")
@@ -985,6 +987,7 @@ class LogPageHandler(BaseHandler):
         logtxt = ""
         for line in reversed(open(log_file).readlines()):
             logtxt += line.rstrip() + '\n'
+
 
         self.render(deviceroot(self)+"log.html",
                     logtxt=logtxt)

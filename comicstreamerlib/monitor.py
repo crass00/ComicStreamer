@@ -178,8 +178,8 @@ class Monitor():
 
         ca = ComicArchive(path,  default_image_path=AppFolders.missingPath("page.png"))
         
+        logging.debug(u"Monitor: Reading File {0} {1}\r".format(self.read_count, path))
         if ca.seemsToBeAComicArchive():
-            logging.debug(u"Monitor: Reading File {0} {1}\r".format(self.read_count, path))
             sys.stdout.flush()
             self.read_count += 1
 
@@ -328,6 +328,7 @@ class Monitor():
         md_list = []
         self.read_count = 0
         for filename in filelist:
+        
             md = self.getComicMetadata(filename)
             if md is not None:
                 md_list.append(md)
