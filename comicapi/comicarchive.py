@@ -652,11 +652,8 @@ class PdfArchiver:
     def readArchiveFile( self, page_num ):
         resolution = 300
         
-        print page_num
         page_num_corr = page_num
-        
         cover = os.path.join(os.path.dirname(self.path),'cover.jpg')
-        print cover
         if os.path.isfile(cover):
             if page_num_corr == '0.jpg':
                 data = ""
@@ -665,11 +662,10 @@ class PdfArchiver:
                     with open( fname, 'rb' ) as f:
                         data = f.read()
                         f.close()
-                except IOError as e:
-                    print str(e)
+                        return data
+                except:
                     pass
-                return data
-        
+    
         #return subprocess.check_output(['pdftopng', '-r', str(resolution), '-f', str(int(os.path.basename(page_num)[:-4])), '-l', str(int(os.path.basename(page_num)[:-4])), self.path,  '-'])
         
         if platform.system() == "Windows":
@@ -748,13 +744,10 @@ class EpubArchiver(PdfArchiver):
                     with open( fname, 'rb' ) as f:
                         data = f.read()
                         f.close()
-                except IOError as e:
-                    print str(e)
+                        return data
+                except:
                     pass
-                print "cover.jpg"
-                return data
-
-        print page_num
+    
         #return subprocess.check_output(['pdftopng', '-r', str(resolution), '-f', str(int(os.path.basename(page_num)[:-4])), '-l', str(int(os.path.basename(page_num)[:-4])), self.path,  '-'])
         
         if platform.system() == "Windows":
