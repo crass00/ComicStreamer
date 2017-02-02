@@ -698,7 +698,10 @@ class PdfArchiver:
             print >> sys.stderr, u"PDF Unreadable [{0}]: {1}".format(str(e),self.path)
         return out
 
-class EpubArchiver(PdfArchiver):
+ebook_extentions = [".epub",".mobi",".chm",".azw3",".lit",".fb2",".rtf",".txt"]
+
+class EbookArchiver(PdfArchiver):
+
 
 
     def getCover(self):
@@ -721,7 +724,8 @@ class EpubArchiver(PdfArchiver):
 
     def readArchiveFile( self, page_num ):
         corrected_path = self.path
-        if os.path.basename(self.path)[-4:] == 'epub':
+        ext = os.path.splitext(self.path)[1].lower()
+        if ext in ebook_extentions:
             corrected_path = self.path + u".tmp.pdf"
         
         resolution = 300
@@ -762,7 +766,8 @@ class EpubArchiver(PdfArchiver):
                 out.append("0.jpg")
 
             corrected_path = self.path
-            if os.path.basename(self.path)[-4:] == 'epub':
+            ext = os.path.splitext(self.path)[1].lower()
+            if ext in ebook_extentions:
                 if not os.path.isfile(self.path+ u".tmp.pdf"):
                     if platform.system() == "Windows":
                         subprocess.check_output(['%PROGRAMFILES%\calibre\ebook-convert.exe', self.path, self.path + u".tmp.pdf"])
@@ -794,12 +799,10 @@ class ComicArchive:
     logo_data = None
 
     class ArchiveType:
-        Zip, SevenZip, Rar, Folder, Pdf, Epub, Tar, Unknown = range(8)
+        Zip, SevenZip, Rar, Folder, Pdf, Ebook, Tar, Unknown = range(8)
     
     def __init__( self, path, rar_exe_path=None, default_image_path=None ):
         self.path = path
-
-#CACHE PDF,EPUB HERE
         self.rar_exe_path = rar_exe_path
         self.ci_xml_filename = 'ComicInfo.xml'
         self.comet_default_filename = 'CoMet.xml'
@@ -835,13 +838,13 @@ class ComicArchive:
                 self.archive_type = self.ArchiveType.Zip
                 self.archiver = ZipArchiver( self.path )
             
-            elif self.sevenZipTest():
-                self.archive_type = self.ArchiveType.SevenZip
-                self.archiver = SevenZipArchiver( self.path )
-
             elif self.rarTest():
                 self.archive_type =  self.ArchiveType.Rar
                 self.archiver = RarArchiver( self.path, rar_exe_path=self.rar_exe_path )
+
+            elif self.sevenZipTest():
+                self.archive_type = self.ArchiveType.SevenZip
+                self.archiver = SevenZipArchiver( self.path )
 
             elif self.tarTest():
                 self.archive_type = self.ArchiveType.Tar
@@ -869,29 +872,27 @@ class ComicArchive:
                 self.archive_type = self.ArchiveType.Tar
                 self.archiver = TarArchiver( self.path )
 
-            elif self.sevenZipTest():
-                self.archive_type = self.ArchiveType.SevenZip
-                self.archiver = SevenZipArchiver( self.path )
-
             elif self.zipTest():
                 self.archive_type =  self.ArchiveType.Zip
                 self.archiver = ZipArchiver( self.path )
 
+            elif self.sevenZipTest():
+                self.archive_type = self.ArchiveType.SevenZip
+                self.archiver = SevenZipArchiver( self.path )
+
             elif self.rarTest():
                 self.archive_type =  self.ArchiveType.Rar
                 self.archiver = RarArchiver( self.path, rar_exe_path=self.rar_exe_path )
-
+        elif ext == ".pdf":
+            # skip converted ebook
+            if os.path.basename(self.path)[-8:] != '.tmp.pdf':
+                self.archive_type = self.ArchiveType.Pdf
+                self.archiver = PdfArchiver(self.path)
+        elif ext in ebook_extentions:
+            self.archive_type = self.ArchiveType.Ebook
+            self.archiver = EbookArchiver(self.path)
         else:
-            if os.path.basename(self.path)[-3:] == 'pdf':
-                if os.path.basename(self.path)[-8:] != '.tmp.pdf':
-                    self.archive_type = self.ArchiveType.Pdf
-                    self.archiver = PdfArchiver(self.path)
-
-            elif os.path.basename(self.path)[-4:] == 'epub':
-                self.archive_type = self.ArchiveType.Epub
-                self.archiver = EpubArchiver(self.path)
-
-            elif self.zipTest():
+            if self.zipTest():
                 self.archive_type =  self.ArchiveType.Zip
                 self.archiver = ZipArchiver( self.path )
 
@@ -973,8 +974,8 @@ class ComicArchive:
         return self.archive_type ==  self.ArchiveType.Rar
     def isPdf(self):
         return self.archive_type ==  self.ArchiveType.Pdf
-    def isEpub(self):
-        return self.archive_type ==  self.ArchiveType.Epub
+    def isEbook(self):
+        return self.archive_type ==  self.ArchiveType.Ebook
     def isTar(self):
         return self.archive_type ==  self.ArchiveType.Tar
     def isFolder( self ):
@@ -993,7 +994,7 @@ class ComicArchive:
         elif self.isPdf():
             return False
 
-        elif self.isEpub():
+        elif self.isBook():
             return False
 
         elif self.isTar():
@@ -1021,7 +1022,7 @@ class ComicArchive:
         ext = os.path.splitext(self.path)[1].lower()
 
         if (
-              ( self.isZip() or self.isTar() or  self.isRar() or self.isPdf() or self.isEpub() or self.isSevenZip() or self.isFolder() )
+              ( self.isZip() or self.isTar() or  self.isRar() or self.isPdf() or self.isEbook() or self.isSevenZip() or self.isFolder() )
               and
               ( self.getNumberOfPages() > 0)
 

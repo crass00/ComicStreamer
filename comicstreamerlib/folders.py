@@ -97,8 +97,12 @@ class AppFolders():
 
 
     @staticmethod
-    def appCache():
-        return os.path.join(AppFolders.appData(), "cache")
+    def appCachePages():
+        return os.path.join(AppFolders.appData(), "cache", "pages")
+
+    @staticmethod
+    def appCacheEbooks():
+        return os.path.join(AppFolders.appData(), "cache", "ebooks")
 
     @staticmethod
     def missingPath(filename):

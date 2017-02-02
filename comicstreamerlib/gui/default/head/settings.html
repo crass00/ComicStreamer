@@ -86,12 +86,11 @@ body {
                       //}
                       use_api_key_toggle();
                       use_auth_toggle();
-                      use_mysql_toggle();
+                      use_db_toggle();
                       use_https_toggle();
                       use_cache_toggle();
-                      use_cache_toggle();
                       use_pdf_toggle();
-                      use_epub_toggle();
+                      use_ebook_toggle();
                       }
                       );
                       function create_key()
@@ -112,23 +111,20 @@ body {
  
 function use_api_key_toggle()
 {
-/*  $("#api_key").prop('disabled', !($("#use_key").is(':checked')));
-    $("#key_btn").prop('disabled', !($("#use_key").is(':checked')));
-  */
     if (!($("#use_key").is(':checked'))) {
       document.getElementById("settings_api").style.display = "none";
+      document.getElementById("key_btn").style.display = "none";
+      
+      
     }
     else {
        document.getElementById("settings_api").style.display = "inline";
+       document.getElementById("key_btn").style.display = "inline";
     }
 }
 
 function use_auth_toggle()
 {
-/*    $("#username").prop('disabled', !($("#use_auth").is(':checked')));
-    $("#password").prop('disabled', !($("#use_auth").is(':checked')));
-    $("#password_confirm").prop('disabled', !($("#use_auth").is(':checked')));
- */
     if (!($("#use_auth").is(':checked'))) {
         document.getElementById("settings_auth").style.display = "none";
     }
@@ -139,9 +135,6 @@ function use_auth_toggle()
 }
 function use_cache_toggle()
 {
-   /* $("#cache_size").prop('disabled', !($("#use_cache").is(':checked')));
-    $("#cache_free").prop('disabled', !($("#use_cache").is(':checked')));
-    */
    if (!($("#use_cache").is(':checked'))) {
         document.getElementById("settings_cache").style.display = "none";
     }
@@ -150,71 +143,102 @@ function use_cache_toggle()
     }
 }
 function use_https_toggle()
-{/*
-    $("#https_port").prop('disabled', !($("#use_https").is(':checked')));
-  */
-    if (!($("#use_https").is(':checked'))) {
+{
+    if (!($("#use_https").is(':checked')))
+    {
         document.getElementById("settings_https").style.display = "none";
     }
-    else {
+    else
+    {
         document.getElementById("settings_https").style.display = "inline";
     }
 }
-function use_mysql_toggle()
+
+function use_db_toggle()
 {
-/*  $("#mysql_username").prop('disabled', !($("#use_mysql").is(':checked')));
-    $("#mysql_password").prop('disabled', !($("#use_mysql").is(':checked')));
-    $("#mysql_database").prop('disabled', !($("#use_mysql").is(':checked')));
-    $("#mysql_host").prop('disabled', !($("#use_mysql").is(':checked')));
-    $("#mysql_port").prop('disabled', !($("#use_mysql").is(':checked')));
- */
-    if (!($("#use_mysql").is(':checked'))) {
-        document.getElementById("settings_mysql").style.display = "none";
-    }
-    else {
-        document.getElementById("settings_mysql").style.display = "inline";
-    }
+        if ($("#use_mysql").is(':checked')) {
+            document.getElementById("settings_sqlite").style.display = "none";
+            document.getElementById("settings_mysql").style.display = "inline";
+        }
+        else { //if ($("#use_sqlite").is(':checked')) {
+            document.getElementById("settings_sqlite").style.display = "inline";
+            document.getElementById("settings_mysql").style.display = "none";
+        }
+
 }
 
-
-function use_pdf_toggle()
+function use_ebook_toggle()
 {
-    if (!($("#use_epub").is(':checked')) && !($("#use_pdf").is(':checked'))) {
-            document.getElementById("settings_pdf").style.display = "none";
-    }
-    else {
-        document.getElementById("settings_pdf").style.display = "inline";
-    }
-}
-
-function use_epub_toggle()
-{
-    if (!($("#use_epub").is(':checked'))) {
-        document.getElementById("settings_epub").style.display = "none";
+    if (!($("#use_ebook").is(':checked'))) {
+        document.getElementById("settings_ebook").style.display = "none";
         if (!($("#use_pdf").is(':checked'))) {
             document.getElementById("settings_pdf").style.display = "none";
         }
     }
     else {
+        $('#use_pdf').prop('checked', true);
         document.getElementById("settings_pdf").style.display = "inline";
-        document.getElementById("settings_epub").style.display = "inline";
+        document.getElementById("settings_ebook").style.display = "inline";
+        if ($("#use_mutool").is(':checked')) use_mutool_toggle();
+        if ($("#use_mudraw").is(':checked')) use_mudraw_toggle();
+        if ($("#use_pdf2png").is(':checked')) use_pdf2png_toggle();
+    }
+}
+
+function use_pdf_toggle()
+{//!($("#use_ebook").is(':checked')) &&
+    if ( !($("#use_pdf").is(':checked'))) {
+            document.getElementById("settings_pdf").style.display = "none";
+            document.getElementById("settings_ebook").style.display = "none";
+            $('#use_ebook').prop('checked', false);
+    }
+    else {
+        document.getElementById("settings_pdf").style.display = "inline";
+        if ($("#use_mutool").is(':checked')) use_mutool_toggle();
+        if ($("#use_mudraw").is(':checked')) use_mudraw_toggle();
+        if ($("#use_pdf2png").is(':checked')) use_pdf2png_toggle();
     }
 }
 
 
-    function doCmd(cmd)
-    {
-        if (cmd == 'restart' ) delay = 5000;
-        if (cmd == 'reset' )   delay = 7000;
-        if (cmd == 'stop' )   delay = 500;
-        $.getJSON( '/command?api_key={{api_key}}&cmd='+cmd);
-        setTimeout(redirectCmd, delay, cmd);
-    }
+function use_mudraw_toggle()
+{
+        document.getElementById("settings_pdf2png").style.display = "none";
+        document.getElementById("settings_mudraw").style.display = "inline";
+        document.getElementById("settings_mutool").style.display = "none";
+}
     
-    function sendCmd(cmd)
-    {  // dialog box here
-       doCmd(cmd)
-    }
+
+function use_mutool_toggle()
+{
+        document.getElementById("settings_mutool").style.display = "inline";
+        document.getElementById("settings_mudraw").style.display = "none";
+        document.getElementById("settings_pdf2png").style.display = "none";
+    
+}
+
+function use_pdf2png_toggle()
+{
+        document.getElementById("settings_pdf2png").style.display = "inline";
+        document.getElementById("settings_mudraw").style.display = "none";
+        document.getElementById("settings_mutool").style.display = "none";
+    
+}
+
+
+function doCmd(cmd)
+{
+    if (cmd == 'restart' ) delay = 5000;
+    if (cmd == 'reset' )   delay = 7000;
+    if (cmd == 'stop' )   delay = 500;
+    $.getJSON( '/command?api_key={{api_key}}&cmd='+cmd);
+    setTimeout(redirectCmd, delay, cmd);
+}
+
+function sendCmd(cmd)
+{  // dialog box here
+   doCmd(cmd)
+}
 </script>
     </head>
     <body>

@@ -23,19 +23,14 @@ class ComicStreamerConfig(ConfigObj):
             folder_list=string_list(default=list())
             launch_client=boolean(default="True")
             first_run=boolean(default="True")
-            [formats]
-            epub=boolean(default="False")
-            pdf=boolean(default="False")
-            [convert]
-            epub2pdf=string(default="/Applications/calibre.app/Contents/MacOS/ebook-convert")
-            pdf2jpg=string(default="./mudraw")
-            resolution=300
-            [server]
-            use_https=boolean(default="False")
-            certificate_file=string(default="server.crt")
-            key_file=string(default="server.key")
+            [web]
             port=integer(default=32500)
             webroot=string(default="")
+            [web.secure]
+            active=boolean(default="False")
+            port=integer(default=32501)
+            certificate_file=string(default="server.crt")
+            key_file=string(default="server.key")
             [security]
             use_authentication=boolean(default="False")
             username=string(default="")
@@ -43,17 +38,35 @@ class ComicStreamerConfig(ConfigObj):
             use_api_key=boolean(default="False")
             api_key=string(default="")
             cookie_secret=string(default="")
-            [mysql]
+            [cache]
+            location=string(default="")
             active=boolean(default="False")
+            size=integer(default=0)
+            free=integer(default=3000)
+            [database]
+            engine=string(default="sqlite")
+            [database.sqlite]
+            location=string(default="")
+            [database.mysql]
             database=string(default="comicdb")
             username=string(default="comic")
             password=string(default="")
             host=string(default="localhost")
             port=integer(default=3306)
-            [cache]
+            [pdf]
             active=boolean(default="False")
+            engine=string(default="mudraw")
+            mudraw=string(default="./mudraw")
+            mutool=string(default="./mutool")
+            pdf2png=string(default="./pdf2png")
+            resolution=integer(default=300)
+            [ebook]
+            active=boolean(default="False")
+            calibre=string(default="/Applications/calibre.app/Contents/MacOS/ebook-convert")
+            [ebook.cache]
             size=integer(default=0)
             free=integer(default=3000)
+            location=string(default="")
            """
     
 
@@ -87,7 +100,7 @@ class ComicStreamerConfig(ConfigObj):
 
         # normalize the folder list
         tmp['general']['folder_list'] = [os.path.abspath(os.path.normpath(unicode(a))) for a in tmp['general']['folder_list']]
-        tmp['mysql']['password'] = utils.encode(tmp['general']['install_id'],'comic')
+        tmp['database.mysql']['password'] = utils.encode(tmp['general']['install_id'],'comic')
 
         self.merge(tmp)
         if not os.path.exists( self.filename ):
@@ -104,14 +117,15 @@ class ComicStreamerConfig(ConfigObj):
         modified = False
         
         if opts.port is not None:
-            self['server']['port'] = opts.port
+            self['web']['port'] = opts.port
             modified = True
 
         if opts.folder_list is not None:
             self['general']['folder_list'] = [os.path.abspath(os.path.normpath(unicode(a))) for a in opts.folder_list]
             modified = True
+        
         if opts.webroot is not None:
-            self['server']['webroot'] = opts.webroot
+            self['web']['webroot'] = opts.webroot
             modified = True
             
         if modified:

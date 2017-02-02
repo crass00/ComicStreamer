@@ -427,14 +427,29 @@ ui-tooltip .ui-tooltip-content,
 	color: #22aa22;
 }              
 .entry_form input    {
-	width:375px;
+	width:300px;
 	display:block;
 	border: 1px solid #999;
 	height: 25px;
 }
+
+.entry_form #api_key    {
+	width:220px;
+}
+
+.entry_form h1 {
+	color:#505050;
+}
+
+#port, #secure_port, #mysql_port, #cache_size, #cache_free {
+}
+
+.entry_form h2 {
+	color:#707070;
+}
 .entry_form textarea#folders {
-	width:375px;
-	height:75px;
+	width:300px;
+	height:60px;
 }
 
 .entry_form textarea#folders {

@@ -50,6 +50,10 @@ Keep clicking on "tha brain" :-) Did I mention the fron-end help wanted :-)
 - Folder with images add as comic
 - Create Windows & Mac packages
 - Fix Cache did not work on xp :-/ (missing webp?)
+- Command Line options
+- Broke monitor
+- Fix sqlite database is locked with large dataset
+- Show unscanned/error files!
 
 ![screw](https://raw.githubusercontent.com/Tristan79/ComicStreamer/master/ad.png)
    

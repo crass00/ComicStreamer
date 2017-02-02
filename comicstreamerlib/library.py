@@ -28,15 +28,15 @@ class Library:
         self.cache_active = False
 
     def cache_clear(self):
-        if os.path.exists(AppFolders.appCache()) and os.path.isdir(AppFolders.appCache()):
-            shutil.rmtree(AppFolders.appCache())
+        if os.path.exists(AppFolders.appCachePages()) and os.path.isdir(AppFolders.appCachePages()):
+            shutil.rmtree(AppFolders.appCachePages())
         self.cache_filled = 0
         self.cache_list = []
         self.cache_hit = 0
         self.cache_miss = 0
         self.cache_discard = 0
     
-    def cache(self,path,active,size,free):
+    def cache(self,path,active,size,free,location):
         self.cache_active = active
         self.cache_size = size
         self.cache_free = free
@@ -47,6 +47,7 @@ class Library:
         self.cache_miss = 0
         self.cache_discard = 0
         self.cache_maxsize = size
+        self.cache_location = location
         
         try:
             if not os.path.exists(path):

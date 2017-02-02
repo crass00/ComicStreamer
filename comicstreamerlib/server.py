@@ -359,7 +359,7 @@ class ServerAPIHandler(GenericAPIHandler):
             logging.info("Restart command")
             self.application.restart()
         elif cmd == "reset":
-            logging.info("Rebuild DB command")
+            logging.info("Rebuild database command")
             self.application.rebuild()
         elif cmd == "stop":
             logging.info("Stop command")
@@ -1026,10 +1026,15 @@ class ConfigPageHandler(BaseHandler):
         #convert boolean to "checked" or ""
 
         formdata['use_pdf'] = "checked" if formdata['use_pdf'] else ""
-        formdata['use_epub'] = "checked" if formdata['use_epub'] else ""
+        formdata['use_ebook'] = "checked" if formdata['use_ebook'] else ""
 
+        formdata['use_pdf2png'] = "checked" if formdata['use_pdf2png'] else ""
+        formdata['use_mutool'] = "checked" if formdata['use_mutool'] else ""
+        formdata['use_mudraw'] = "checked" if formdata['use_mudraw'] else ""
+        
 
         formdata['use_https'] = "checked" if formdata['use_https'] else ""
+        formdata['use_sqlite'] = "checked" if formdata['use_sqlite'] else ""
         formdata['use_mysql'] = "checked" if formdata['use_mysql'] else ""
         formdata['use_api_key'] = "checked" if formdata['use_api_key'] else ""
         formdata['use_cache'] = "checked" if formdata['use_cache'] else ""
@@ -1057,11 +1062,13 @@ class ConfigPageHandler(BaseHandler):
         formdata['use_cache'] = self.application.config['cache']['active']
         formdata['cache_size'] = self.application.config['cache']['size']
         formdata['cache_free'] = self.application.config['cache']['free']
-        formdata['port'] = self.application.config['server']['port']
-        formdata['key_file'] = self.application.config['server']['key_file']
-        formdata['certificate_file'] = self.application.config['server']['certificate_file']
-        formdata['use_https'] = self.application.config['server']['use_https']
-        formdata['webroot'] = self.application.config['server']['webroot']
+        formdata['cache_location'] = self.application.config['cache']['location']
+        formdata['port'] = self.application.config['web']['port']
+        formdata['secure_port'] = self.application.config['web.secure']['port']
+        formdata['key_file'] = self.application.config['web.secure']['key_file']
+        formdata['certificate_file'] = self.application.config['web.secure']['certificate_file']
+        formdata['use_https'] = self.application.config['web.secure']['active']
+        formdata['webroot'] = self.application.config['web']['webroot']
         formdata['folders'] = "\n".join(self.application.config['general']['folder_list'])
         formdata['use_authentication'] = self.application.config['security']['use_authentication'] 
         formdata['username'] = self.application.config['security']['username']
@@ -1070,17 +1077,34 @@ class ConfigPageHandler(BaseHandler):
         formdata['use_api_key'] = self.application.config['security']['use_api_key'] 
         formdata['api_key'] = self.application.config['security']['api_key']
         formdata['launch_client'] = self.application.config['general']['launch_client']
-        formdata['use_mysql'] = self.application.config['mysql']['active']
-        formdata['mysql_database'] = self.application.config['mysql']['database']
-        formdata['mysql_username'] = self.application.config['mysql']['username']
-        formdata['mysql_password'] = utils.decode(self.application.config['general']['install_id'],self.application.config['mysql']['password'])
-        formdata['mysql_host'] = self.application.config['mysql']['host']
-        formdata['mysql_port'] = self.application.config['mysql']['port']
+        formdata['use_mysql'] = self.application.config['database']['engine'] == 'mysql'
+        formdata['use_sqlite'] = self.application.config['database']['engine'] == 'sqlite'
         
-        formdata['use_pdf'] = self.application.config['formats']['pdf']
-        formdata['use_epub'] = self.application.config['formats']['epub']
-        formdata['epub2pdf'] = self.application.config['convert']['epub2pdf']
-        formdata['pdf2jpg'] = self.application.config['convert']['pdf2jpg']
+        print self.application.config['database']['engine'] 
+        formdata['sqlite_location'] = self.application.config['database.sqlite']['location']
+        formdata['mysql_database'] = self.application.config['database.mysql']['database']
+        formdata['mysql_username'] = self.application.config['database.mysql']['username']
+        formdata['mysql_password'] = utils.decode(self.application.config['general']['install_id'],self.application.config['database.mysql']['password'])
+        formdata['mysql_host'] = self.application.config['database.mysql']['host']
+        formdata['mysql_port'] = self.application.config['database.mysql']['port']
+        formdata['pdf_resolution'] = self.application.config['pdf']['resolution']
+        formdata['pdf_engine'] = self.application.config['pdf']['engine']
+        
+        formdata['use_mudraw'] = formdata['pdf_engine'] == 'mudraw'
+        formdata['use_mutool'] = formdata['pdf_engine'] == 'mutool'
+        formdata['use_pdf2png'] = formdata['pdf_engine'] == 'pdf2png'
+        
+        formdata['mudraw'] = self.application.config['pdf']['mudraw']
+        formdata['mutool'] = self.application.config['pdf']['mutool']
+        formdata['pdf2png'] = self.application.config['pdf']['pdf2png']
+        
+        
+        formdata['use_pdf'] = self.application.config['pdf']['active']
+        formdata['use_ebook'] = self.application.config['ebook']['active']
+        formdata['calibre'] = self.application.config['ebook']['calibre']
+        formdata['ebook_cache_location'] = self.application.config['ebook.cache']['location']
+        formdata['ebook_cache_free'] = self.application.config['ebook.cache']['free']
+        formdata['ebook_cache_size'] = self.application.config['ebook.cache']['size']
         self.render_config(formdata)
 
     @tornado.web.authenticated
@@ -1089,11 +1113,13 @@ class ConfigPageHandler(BaseHandler):
         formdata['folders'] = self.get_argument(u"folders", default="")
         formdata['webroot'] = self.get_argument(u"webroot", default="")
         formdata['port'] = self.get_argument(u"port", default="")
+        formdata['secure_port'] = self.get_argument(u"secure_port", default="")
         formdata['key_file'] = self.get_argument(u"key_file", default="")
         formdata['certificate_file'] = self.get_argument(u"certificate_file", default="")
         formdata['use_https'] = (len(self.get_arguments("use_https"))!=0)
         formdata['cache_size'] = self.get_argument(u"cache_size", default="")
         formdata['cache_free'] = self.get_argument(u"cache_free", default="")
+        formdata['cache_location'] = self.get_argument(u"cache_location", default="")
         formdata['use_cache'] = (len(self.get_arguments("use_cache"))!=0)
         formdata['use_authentication'] = (len(self.get_arguments("use_authentication"))!=0)
         formdata['username'] = self.get_argument(u"username", default="")
@@ -1102,17 +1128,32 @@ class ConfigPageHandler(BaseHandler):
         formdata['use_api_key'] = (len(self.get_arguments("use_api_key"))!=0)
         formdata['api_key'] = self.get_argument(u"api_key", default="")
         formdata['launch_client'] = (len(self.get_arguments("launch_client"))!=0)
-        formdata['use_mysql'] = (len(self.get_arguments("use_mysql"))!=0)
+        formdata['db_engine'] = self.get_arguments("db_engine")[0]
+        formdata['use_mysql'] = formdata['db_engine'] == 'mysql'
+        formdata['use_sqlite'] = formdata['db_engine'] == 'sqlite'
+        
         formdata['mysql_username'] = self.get_argument(u"mysql_username", default="")
         formdata['mysql_database'] = self.get_argument(u"mysql_database", default="")
         formdata['mysql_host'] = self.get_argument(u"mysql_host", default="")
         formdata['mysql_port'] = self.get_argument(u"mysql_port", default="")
         formdata['mysql_password'] = self.get_argument(u"mysql_password", default="")
-        
+        formdata['sqlite_location'] = self.get_argument(u"sqlite_location", default="")
+        formdata['pdf_resolution'] = self.get_argument(u"pdf_resolution", default="")
+        formdata['pdf_engine'] = self.get_argument(u"pdf_engine")
+
+        formdata['use_mutool'] = formdata['pdf_engine'] == 'mutool'
+        formdata['use_mudraw'] = formdata['pdf_engine'] == 'mudraw'
+        formdata['use_pdf2png'] = formdata['pdf_engine'] == 'pdf2png'
+
+        formdata['mudraw'] = self.get_argument(u"mudraw", default="")
+        formdata['mutool'] = self.get_argument(u"mutool", default="")
+        formdata['pdf2png'] = self.get_argument(u"pdf2png", default="")
         formdata['use_pdf'] = (len(self.get_arguments("use_pdf"))!=0)
-        formdata['use_epub'] = (len(self.get_arguments("use_epub"))!=0)
-        formdata['epub2pdf'] = self.get_argument(u"epub2pdf", default="")
-        formdata['pdf2jpg'] = self.get_argument(u"pdf2jpg", default="")
+        formdata['use_ebook'] = (len(self.get_arguments("use_ebook"))!=0)
+        formdata['calibre'] = self.get_argument(u"calibre", default="")
+        formdata['ebook_cache_location'] = self.get_argument(u"ebook_cache_location", default="")
+        formdata['ebook_cache_free'] = self.get_argument(u"ebook_cache_free", default="")
+        formdata['ebook_cache_size'] = self.get_argument(u"ebook_cache_size", default="")
        
         failure_str = ""
         success_str = ""
@@ -1143,7 +1184,7 @@ class ConfigPageHandler(BaseHandler):
             
 
         port_failed = False
-        old_port = self.application.config['server']['port']
+        old_port = self.application.config['web']['port']
 
         #validate numeric port
         if not formdata['port'].isdigit():
@@ -1205,33 +1246,46 @@ class ConfigPageHandler(BaseHandler):
                 password_changed = False
         
             if (new_port != old_port or
-                formdata['webroot'] != self.application.config['server']['webroot'] or
+                formdata['webroot'] != self.application.config['web']['webroot'] or
+                formdata['secure_port'] != self.application.config['web.secure']['port'] or
+                formdata['key_file'] != self.application.config['web.secure']['key_file'] or
+                formdata['certificate_file'] != self.application.config['web.secure']['certificate_file'] or
+                formdata['use_https'] != self.application.config['web.secure']['active'] or
                 new_folder_list != old_folder_list or
                 formdata['username'] != self.application.config['security']['username'] or
                 password_changed or
                 formdata['use_api_key'] != self.application.config['security']['use_api_key'] or
                 formdata['api_key'] != self.application.config['security']['api_key'] or
-                formdata['use_mysql'] != self.application.config['mysql']['active'] or
-                formdata['mysql_database'] != self.application.config['mysql']['database'] or
-                utils.encode(self.application.config['general']['install_id'],formdata['mysql_password']) != self.application.config['mysql']['password'] or
-                formdata['mysql_username'] != self.application.config['mysql']['username'] or
-                formdata['mysql_port'] != self.application.config['mysql']['port'] or
-                formdata['mysql_host'] != self.application.config['mysql']['host'] or
-                formdata['use_pdf'] != self.application.config['formats']['pdf'] or
-                formdata['use_epub'] != self.application.config['formats']['epub'] or
-                formdata['epub2pdf'] != self.application.config['convert']['epub2pdf'] or
-                formdata['pdf2jpg'] != self.application.config['convert']['pdf2jpg'] or
+                formdata['db_engine'] != self.application.config['database']['engine'] or
+                formdata['mysql_database'] != self.application.config['database.mysql']['database'] or
+                utils.encode(self.application.config['general']['install_id'],formdata['mysql_password']) != self.application.config['database.mysql']['password'] or
+                formdata['mysql_username'] != self.application.config['database.mysql']['username'] or
+                formdata['mysql_port'] != self.application.config['database.mysql']['port'] or
+                formdata['mysql_host'] != self.application.config['database.mysql']['host'] or
+                formdata['sqlite_location'] != self.application.config['database.sqlite']['location'] or
+                formdata['use_pdf'] != self.application.config['pdf']['active'] or
+                formdata['pdf_resolution'] != self.application.config['pdf']['resolution'] or
+                formdata['pdf_engine'] != self.application.config['pdf']['engine'] or
+                formdata['mudraw'] != self.application.config['pdf']['mudraw'] or
+                formdata['mutool'] != self.application.config['pdf']['mutool'] or
+                formdata['pdf2png'] != self.application.config['pdf']['pdf2png'] or
+                formdata['use_ebook'] != self.application.config['ebook']['active'] or
+                formdata['calibre'] != self.application.config['ebook']['calibre'] or
+                formdata['ebook_cache_location'] != self.application.config['ebook.cache']['location'] or
+                formdata['ebook_cache_free'] != self.application.config['ebook.cache']['free'] or
+                formdata['ebook_cache_size'] != self.application.config['ebook.cache']['size'] or
                 formdata['launch_client'] != self.application.config['general']['launch_client'] or
                 formdata['use_cache'] != self.application.config['cache']['active'] or
                 formdata['cache_size'] != self.application.config['cache']['size'] or
-                formdata['cache_free'] != self.application.config['cache']['free']
+                formdata['cache_free'] != self.application.config['cache']['free'] or
+                formdata['cache_location'] != self.application.config['cache']['location']
                ):
 
 
                 # apply everything from the form
                 self.application.config['general']['folder_list'] = new_folder_list
-                self.application.config['server']['port'] = new_port
-                self.application.config['server']['webroot'] = formdata['webroot']
+                self.application.config['web']['port'] = new_port
+                self.application.config['web']['webroot'] = formdata['webroot']
                 self.application.config['security']['use_authentication'] = formdata['use_authentication']
                 self.application.config['security']['username'] = formdata['username']
                 if formdata['password'] != ConfigPageHandler.fakepass:
@@ -1243,24 +1297,40 @@ class ConfigPageHandler(BaseHandler):
                     self.application.config['security']['api_key'] = ""
                     formdata['api_key'] = ""
                 self.application.config['general']['launch_client'] = formdata['launch_client']
-                
+
+                self.application.config['web.secure']['port'] = formdata['secure_port']
+                self.application.config['web.secure']['active'] = formdata['use_https']
+                self.application.config['web.secure']['key_file'] = formdata['key_file']
+                self.application.config['web.secure']['certificate_file'] = formdata['certificate_file']
+
                 self.application.config['cache']['active'] = formdata['use_cache']
                 self.application.config['cache']['size'] = formdata['cache_size']
                 self.application.config['cache']['free'] = formdata['cache_free']
+                self.application.config['cache']['location'] = formdata['cache_location']
 
-                self.application.config['convert']['epub2pdf'] =  formdata['epub2pdf']
-                self.application.config['convert']['pdf2jpg'] =  formdata['pdf2jpg']
-                self.application.config['formats']['pdf'] =  formdata['use_pdf']
-                self.application.config['formats']['epub'] =  formdata['use_epub']
-              
-                self.application.config['mysql']['active'] = formdata['use_mysql']
+                self.application.config['ebook']['calibre'] = formdata['calibre']
+                self.application.config['ebook.cache']['location'] = formdata['ebook_cache_location']
+                self.application.config['ebook.cache']['free'] = formdata['ebook_cache_free']
+                self.application.config['ebook.cache']['size'] = formdata['ebook_cache_size']
+                self.application.config['ebook']['active'] =  formdata['use_ebook']
+
+                self.application.config['pdf']['active'] =  formdata['use_pdf']
+                self.application.config['pdf']['resolution'] =  formdata['pdf_resolution']
+
+                self.application.config['pdf']['engine'] = formdata['pdf_engine']
+                self.application.config['pdf']['mudraw'] = formdata['mudraw']
+                self.application.config['pdf']['mutool'] = formdata['mutool']
+                self.application.config['pdf']['pdf2png'] = formdata['pdf2png']
+          
+                self.application.config['database']['engine'] = formdata['db_engine']
                 
+                self.application.config['database.sqlite']['location'] = formdata['sqlite_location']
                 # lame password hide should be better...
-                self.application.config['mysql']['password'] = utils.encode(self.application.config['general']['install_id'],formdata['mysql_password'])
-                self.application.config['mysql']['username'] = formdata['mysql_username']
-                self.application.config['mysql']['database'] = formdata['mysql_database']
-                self.application.config['mysql']['host'] = formdata['mysql_host']
-                self.application.config['mysql']['port'] = formdata['mysql_port']
+                self.application.config['database.mysql']['password'] = utils.encode(self.application.config['general']['install_id'],formdata['mysql_password'])
+                self.application.config['database.mysql']['username'] = formdata['mysql_username']
+                self.application.config['database.mysql']['database'] = formdata['mysql_database']
+                self.application.config['database.mysql']['host'] = formdata['mysql_host']
+                self.application.config['database.mysql']['port'] = formdata['mysql_port']
                 
                 
                 success_str = "Saved. Server restart needed"                
@@ -1308,8 +1378,8 @@ class APIServer(tornado.web.Application):
         self.config = config
         self.opts = opts
         
-        self.port = self.config['server']['port']
-        self.webroot = self.config['server']['webroot']
+        self.port = self.config['web']['port']
+        self.webroot = self.config['web']['webroot']
         
         self.comicArchiveList = []
         
@@ -1320,7 +1390,7 @@ class APIServer(tornado.web.Application):
         #self.dm = DataManager()
         self.dm = DataManager(config)
         self.library = Library(self.dm.Session)
-        self.library.cache(AppFolders.appCache(),self.config['cache']['active'],self.config['cache']['size'],self.config['cache']['free'])
+        self.library.cache(AppFolders.appCachePages(),self.config['cache']['active'],self.config['cache']['size'],self.config['cache']['free'],self.config['cache']['location'])
 
         if opts.reset or opts.reset_and_run:
             logging.info( "Deleting any existing database!")
@@ -1341,7 +1411,7 @@ class APIServer(tornado.web.Application):
             sys.exit(-1)
         except sqlalchemy.exc.OperationalError as e:
             msg = e.orig.args[1]
-            self.config['mysql']['active'] = False;
+            #"HERE" FIX self.config['mysql']['active'] = False;
             logging.error("MySQL: " + msg)
             utils.alert("MySQL Error", msg)
             self.dm = DataManager(self.config)
@@ -1366,12 +1436,12 @@ class APIServer(tornado.web.Application):
 
         logging.info( "Stream server running on port {0}...".format(self.port))
         
-        if self.config['server']['use_https']:
+        if self.config['web.secure']['active']:
             http_server = tornado.httpserver.HTTPServer(self, no_keep_alive = True, ssl_options={
-                "certfile": self.config['server']['certificate_file'], # "server.crt",
-                "keyfile": self.config['server']['key_file'] # "server.key",
+                "certfile": self.config['web.secure']['certificate_file'], # "server.crt",
+                "keyfile": self.config['web.secure']['key_file'] # "server.key",
             })
-            http_server.listen(port+1)
+            http_server.listen(self.config['web.secure']['port'])
          
         self.version = csversion.version
 

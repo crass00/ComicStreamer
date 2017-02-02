@@ -1,94 +1,113 @@
 {% autoescape None %}
 {% set title = "Settings" %}
 {% include head/settings.html %}
+<center>
 <form class="entry_form" action="settings" method="post">
 	{% module xsrf_form_html() %}
     <span id="statusbad">{{failure}}</span><span id="statusgood">{{success}}</span>
+
     <div>
-        <h1>General</h1>
+        <h1>Data</h1>
         <br>
         <span>Comic Folders</span> <span class="help">one folder per line</span><textarea id="folders" name="folders" >{{formdata['folders']}}</textarea>
         <br>
-        <span>Launch Client At Startup</span><input type="checkbox" name="launch_client" class="formcheck" id="launch_client" value="{{formdata['launch_client']}}">
-    </div>
-    <br>
-    <div>
-        <h1>Server</h1>
-        <br>
-        <div>
-            <span>HTTPS</span><input type="checkbox" name="use_https" class="formcheck" id="use_https" onclick="use_https_toggle()" value="use" {{formdata['use_https']}}>
-        
-        <div id="settings_https">
-        <span>Key File</span><input id="key_file" type="text" name="key_file" value="{{formdata['key_file']}}" />
-        <span>Certificate File</span><input id="certificate_file" type="text" name="certificate_file" value="{{formdata['certificate_file']}}" />
+        <h2><input style="display:inline" type="radio" id="use_mysql" name="db_engine" class="formcheck" value="mysql"  onclick="use_db_toggle()" {{formdata['use_mysql']}}>MySQL&nbsp;<input style="display:inline" type="radio" id="use_sqlite" name="db_engine" class="formcheck" value="sqlite" onclick="use_db_toggle()" {{formdata['use_sqlite']}}>SQLite</h2>
+
+        <p>
+        <div id="settings_sqlite">
+            <span>Database Location</span><input disabled id="sqlite_location" type="text" name="sqlite_location" value="{{formdata['sqlite_location']}}" />
         </div>
+        <div id="settings_mysql">
+            <span>Database</span><input id="mysql_database" type="text" name="mysql_database" value="{{formdata['mysql_database']}}" />
+            <br>
+            <span>Host</span><input id="mysql_host" type="text" name="mysql_host" value="{{formdata['mysql_host']}}" />
+            <span>Port</span><input id="mysql_port" type="number" name="mysql_port" value="{{formdata['mysql_port']}}" />
+            <br>
+            <span>Username</span><input id="mysql_username" type="text" name="mysql_username" value="{{formdata['mysql_username']}}" />
+            <span>Password</span> <span class="help">default: comic</span><input id="mysql_password" type="password" name="mysql_password" value="{{formdata['mysql_password']}}" />
+        </div>
+        <br>   
+        <h2>Cache <input style="display:inline" type="checkbox" name="use_cache" class="formcheck" id="use_cache" value="use" onclick="use_cache_toggle()" {{formdata['use_cache']}} /></h2>
+        <div id="settings_cache">
+        <br>
+        <span>Location</span><input id="cache_location" disabled type="text" name="cache_location" value="{{formdata['cache_location']}}" />
+        <span>Size</span> <span class="help">(megabytes)</span><input id="cache_size" type="number" name="cache_size" value="{{formdata['cache_size']}}" />
+        <span>Free Space</span> <span class="help">(megabytes)</span><input id="cache_free" type="number" name="cache_free" value="{{formdata['cache_free']}}" />
         </div>
         <br>
-        <span>Port</span><input id="port" type="text" name="port" value="{{formdata['port']}}" />
-        <br>
-        <span>Webroot</span><input id="webroot" type="text" name="webroot" value="{{formdata['webroot']}}" />
-    </div>
-    <br>
-    <div>
-        <h1>Formats</h1>
+        <h2>Formats</h2>
         <br>
         <span>CBZ</span><input style="display:inline" type="checkbox" disabled name="use_cbz" class="formcheck" id="use_cbz" value="use" checked />
         <span>CBR</span><input style="display:inline" type="checkbox" disabled name="use_cbr" class="formcheck" id="use_cbr" value="use" checked />
         <span>CB7</span><input style="display:inline" type="checkbox" disabled name="use_cb7" class="formcheck" id="use_cb7" value="use" checked />
         <span>CBT</span><input style="display:inline" type="checkbox" disabled name="use_cbt" class="formcheck" id="use_cbt" value="use" checked />
         <span>PDF</span><input style="display:inline" type="checkbox" name="use_pdf" class="formcheck" id="use_pdf" value="use" onclick="use_pdf_toggle()" {{formdata['use_pdf']}} />
-        <span>EPUB</span><input style="display:inline" type="checkbox" name="use_epub" class="formcheck" id="use_epub" value="use" onclick="use_epub_toggle()" {{formdata['use_epub']}} />
+        <span>EBOOK</span><input style="display:inline" type="checkbox" name="use_ebook" class="formcheck" id="use_ebook" value="use" onclick="use_ebook_toggle()" {{formdata['use_ebook']}} />
         <br>
         <br>
         <div id="settings_pdf">
-            <span>mudraw</span><input id="pdf2jpg" type="text" name="pdf2jpg" value="{{formdata['pdf2jpg']}}" />
+            <h2>PDF</h2>
+            <br>
+            <input type="radio" style="display:inline"  class="formcheck"  name="pdf_engine" id="use_mudraw" value="mudraw" onclick="use_mudraw_toggle()"  {{formdata['use_mudraw']}} />Mudraw
+            <input type="radio" style="display:inline"  class="formcheck" name="pdf_engine" id="use_mutool" value="mutool" onclick="use_mutool_toggle()"  {{formdata['use_mutool']}}/>Mutool
+            <input type="radio" style="display:inline"  class="formcheck" name="pdf_engine" id="use_pdf2png" value="pdf2png" onclick="use_pdf2png_toggle()"  {{formdata['use_pdf2png']}}/>PDF2PNG
+            
+            <span id="settings_mudraw"><input id="mudraw" type="text" name="mudraw" value="{{formdata['mudraw']}}" /></span>
+            <span id="settings_mutool"><input id="mutool" type="text" name="mutool" value="{{formdata['mutool']}}" /></span>
+            <span id="settings_pdf2png"><input id="pdf2png" type="text" name="pdf2png" value="{{formdata['pdf2png']}}" /></span>
+            <br>
+            <span>Resolution</span><input id="pdf_resolution" type="number" name="pdf_resolution" value="{{formdata['pdf_resolution']}}" />
         </div>
-        <div id="settings_epub">
-            <span>calibre</span><input id="epub2pdf" type="text" name="epub2pdf" value="{{formdata['epub2pdf']}}" />
+
+        <div id="settings_ebook">
+        <br>
+            <h2>Ebook</h2>
+            <br>
+            <span>Calibre</span><input id="calibre" type="text" name="calibre" value="{{formdata['calibre']}}" />
+
+            <div style="display:none">
+            <br>
+            <span>Cache Location</span><input disabled id="ebook_cache_location" type="text" name="ebook_cache_location" value="{{formdata['ebook_cache_location']}}" />
+            <span>Cache Size</span> <span class="help">(megabytes)</span><input id="ebook_cache_size" type="number" name="ebook_cache_size" value="{{formdata['ebook_cache_size']}}" />
+            <span>Cache Free Space</span> <span class="help">(megabytes)</span><input id="ebook_cache_free" type="number" name="ebook_cache_free" value="{{formdata['ebook_cache_free']}}" />
+            </div>
         </div>
     </div>
-    <br>
+    <br><br><br>
     <div>
-        <h1>Security</h1>
+        <h1>Server</h1>
         <br>
-        <span>Use Authenication</span><input type="checkbox" name="use_authentication" class="formcheck" id="use_auth" value="use" onclick="use_auth_toggle()" {{formdata['use_authentication']}}>
+        <span>Port</span><input id="port" type="number" name="port" value="{{formdata['port']}}" />
+        <br>
+        <h2><span>Authenication<input style="display:inline"  type="checkbox" name="use_authentication" class="formcheck" id="use_auth" value="use" onclick="use_auth_toggle()" {{formdata['use_authentication']}}></span></h2>
         <div id="settings_auth">
-        <span>Username</span><input id="username" type="text" name="username" value="{{formdata['username']}}" />
+        <br><span>Name</span><input id="username" type="text" name="username" value="{{formdata['username']}}" />
         <span>Password</span><input id="password" type="password" name="password" value="{{formdata['password']}}" />
         <span>Password</span> <span class="help">re-enter</span><input id="password_confirm" type="password" name="password_confirm" value="{{formdata['password']}}" />
         </div>
         <br>
-        <span>Use API Key</span><input type="checkbox" name="use_api_key" class="formcheck" id="use_key" value="use" onclick="use_api_key_toggle()" {{formdata['use_api_key']}}>
+        <h2><span>API Key<input style="display:inline"  type="checkbox" name="use_api_key" class="formcheck" id="use_key" value="use" onclick="use_api_key_toggle()" {{formdata['use_api_key']}}></span></h2>
         <div id="settings_api">
-        <input id="api_key" type="text" name="api_key" value="{{formdata['api_key']}}" />
-        <button type="button" class="formbutton" id="key_btn" onclick="create_key()">Generate</button>
-        </div>
-    </div>
-    <br>
-    <div>
-        <h1>Database</h1>
+        <br><input id="api_key" type="text" name="api_key" value="{{formdata['api_key']}}" /><button type="button" class="formbutton" id="key_btn" onclick="create_key()">Generate</button>
         <br>
-        <span>Use MySQL</span><input type="checkbox" name="use_mysql" class="formcheck" id="use_mysql" value="use" onclick="use_mysql_toggle()" {{formdata['use_mysql']}} />
-        <div id="settings_mysql">
-            <span>Database</span><input id="mysql_database" type="text" name="mysql_database" value="{{formdata['mysql_database']}}" />
-            <br>
-            <span>Host</span><input id="mysql_host" type="text" name="mysql_host" value="{{formdata['mysql_host']}}" />
-            <span>Port</span><input id="mysql_port" type="text" name="mysql_port" value="{{formdata['mysql_port']}}" />
-            <br>
-            <span>Username</span><input id="mysql_username" type="text" name="mysql_username" value="{{formdata['mysql_username']}}" />
-            <span>Password</span> <span class="help">default: comic</span><input id="mysql_password" type="password" name="mysql_password" value="{{formdata['mysql_password']}}" />
         </div>
-    </div>
-    <br>
-    <div>
-        <h1>Cache</h1>
         <br>
-        <span>Use Cache</span><input type="checkbox" name="use_cache" class="formcheck" id="use_cache" value="use" onclick="use_cache_toggle()" {{formdata['use_cache']}} />
-        <div id="settings_cache">
-        <span>Size</span> <span class="help">(megabytes)</span><input id="cache_size" type="text" name="cache_size" value="{{formdata['cache_size']}}" />
-        <span>Free Space</span> <span class="help">(megabytes)</span><input id="cache_free" type="text" name="cache_free" value="{{formdata['cache_free']}}" />
+        <h2><span>Secure<input style="display:inline"  type="checkbox" name="use_https" class="formcheck" id="use_https" onclick="use_https_toggle()" value="use" {{formdata['use_https']}}></span></h2>
+        
+        <div id="settings_https">
+        <br>
+        <span>Port</span><input id="secure_port" type="number" name="secure_port" value="{{formdata['secure_port']}}" />
+        <span>Key File</span><input id="key_file" type="text" name="key_file" value="{{formdata['key_file']}}" />
+        <span>Certificate File</span><input id="certificate_file" type="text" name="certificate_file" value="{{formdata['certificate_file']}}" />
         </div>
+        <br>
+        <span>WebRoot</span><input id="webroot" type="text" name="webroot" value="{{formdata['webroot']}}" />
+        <br>
+        <span><input  style="display:inline" type="checkbox" name="launch_client" class="formcheck" id="launch_client" value="{{formdata['launch_client']}}">Launch Client At Startup</span>
+        <br>
+        <br>
     </div>
+
     <br>
     <input type="submit" id="submit_btn" class="formbutton" value="Save" />
     <br>
@@ -96,4 +115,5 @@
     <br>
     <br>
 </form>
+<center>
 {% include foot/foot.html %}
