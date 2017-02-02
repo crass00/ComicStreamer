@@ -777,7 +777,7 @@ class EbookArchiver(PdfArchiver):
                 #rename file after process is done... tmp cache
                 os.rename(corrected_path_temp,self.cache_file)
                 return True
-            except:
+            except Exception as e:
                 print >> sys.stderr, u"EBOOK Unreadable [{0}]: {1}".format(str(e),self.path)
                 return False
 
