@@ -48,7 +48,7 @@ class ComicStreamerConfig(ConfigObj):
             [database.sqlite]
             location=string(default="")
             [database.mysql]
-            database=string(default="comicdb")
+            database=string(default="comicstreamer")
             username=string(default="comic")
             password=string(default="")
             host=string(default="localhost")
@@ -80,7 +80,12 @@ class ComicStreamerConfig(ConfigObj):
             os.makedirs( self.csfolder )
 
         # set up initial values
-        self.filename = os.path.join(self.csfolder, "settings")
+        self.filename = os.path.join(self.csfolder, "comicstreamer")
+        if  platform.system() == "Windows":
+            self.filename += ".ini"
+        else: #if platform.system() == "Darwin":
+            self.filename += ".conf"
+        
         self.configspec=io.StringIO(ComicStreamerConfig.configspec)
         self.encoding="UTF8"
         

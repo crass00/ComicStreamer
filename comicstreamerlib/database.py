@@ -558,16 +558,34 @@ class DataManager():
         if mysql_active:
             logging.info("Database: MySQL Engine")
             try:
-                 self.engine = create_engine("mysql://"+self.config['database.mysql']['username']+":"+utils.decode(self.config['general']['install_id'],self.config['database.mysql']['password'])+"@"+self.config['database.mysql']['host']+":"+str(self.config['database.mysql']['port'])+"/"+self.config['database.mysql']['database']+"?charset=utf8", pool_recycle=3600,  echo=False, isolation_level="READ COMMITTED")
+                self.engine = create_engine("mysql://"+self.config['database.mysql']['username']+":"+utils.decode(self.config['general']['install_id'],self.config['database.mysql']['password'])+"@"+self.config['database.mysql']['host']+":"+str(self.config['database.mysql']['port'])+"/"+self.config['database.mysql']['database']+"?charset=utf8", pool_recycle=3600,  echo=False, isolation_level="READ COMMITTED")
+                logging.info("Database: MySQL " + self.config['database.mysql']['database'] + " (" + self.config['database.mysql']['host'] + ":" + self.config['database.mysql']['port'] + ")")
             except:
+                mysql_active = False
+                logging.error("Database: MySQL Failed (" + self.config['database.mysql']['database'] + " [" + self.config['database.mysql']['host'] + ":" + self.config['database.mysql']['port'] + "])")
                 logging.warning("Database: Switching to SQLite Engine")
-                logging.info("Database: SQLite Engine")
-                self.dbfile = os.path.join(AppFolders.appData(), "comicdb.sqlite")
-                self.engine = create_engine('sqlite:///'+ self.dbfile, echo=False)
-        else:
+
+        if not mysql_active:
             logging.info("Database: SQLite Engine")
-            self.dbfile = os.path.join(AppFolders.appData(), "comicdb.sqlite")
-            self.engine = create_engine('sqlite:///'+ self.dbfile, echo=False)
+            self.dbfile = self.config['database.sqlite']['location']
+            print self.dbfile
+            if self.dbfile == "":
+                self.dbfile = os.path.join(AppFolders.appData(), "comicstreamer.sqlite")
+            elif os.path.isdir(self.dbfile):
+                self.dbfile = os.path.join(self.dbfile, "comicstreamer.sqlite")
+            try:
+                self.engine = create_engine('sqlite:///'+ self.dbfile, echo=False)
+                logging.info("Database: SQLite (" + self.dbfile + ")")
+            except:
+                logging.error("Database: SQLite Failed (" + self.dbfile + ")")
+                logging.warning("Database: Switching to SQLite Engine Default Location")
+                self.dbfile = os.path.join(AppFolders.appData(), "comicstreamer.sqlite")
+                try:
+                    self.engine = create_engine('sqlite:///'+ self.dbfile, echo=False)
+                    logging.error("Database: SQLite (" + self.dbfile + ")")
+                except:
+                    logging.error("Database: SQLite Failed (" + self.dbfile + ")")
+
         if mysql_active:
             session_factory = sessionmaker(bind=self.engine, expire_on_commit=True, autoflush=False, autocommit=False) #, autoflush=False, autocommit=True, expire_on_commit=True) #,autocommit=True)
         else:
