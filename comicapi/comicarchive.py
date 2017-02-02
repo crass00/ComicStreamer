@@ -780,7 +780,7 @@ class EbookArchiver(PdfArchiver):
             except Exception as e:
                 print >> sys.stderr, u"EBOOK Unreadable [{0}]: {1}".format(str(e),self.path)
                 return False
-        else
+        else:
             return True
 
     def getArchiveFilenameList( self ):
