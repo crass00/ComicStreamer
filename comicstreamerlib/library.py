@@ -395,12 +395,17 @@ class Library:
 
     def deleteComics(self, comic_id_list):
         s = self.getSession()
+        i = 0
         for comic_id in comic_id_list:
-            print "DEBUG DELETE: " + str(comic_id)
+#            print "DEBUG DELETE: " + str(comic_id)
             deleted = DeletedComic()
             deleted.comic_id = int(comic_id)
             s.add(deleted)
             s.delete(s.query(Comic).get(comic_id))
+            i += 1
+            if i > 100:
+                i = 0;
+                s.commit()
         if len(comic_id_list) > 0:
             self._dbUpdated()
         s.commit()
