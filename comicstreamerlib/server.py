@@ -1079,8 +1079,6 @@ class ConfigPageHandler(BaseHandler):
         formdata['launch_client'] = self.application.config['general']['launch_client']
         formdata['use_mysql'] = self.application.config['database']['engine'] == 'mysql'
         formdata['use_sqlite'] = self.application.config['database']['engine'] == 'sqlite'
-        
-        print self.application.config['database']['engine'] 
         formdata['sqlite_location'] = self.application.config['database.sqlite']['location']
         formdata['mysql_database'] = self.application.config['database.mysql']['database']
         formdata['mysql_username'] = self.application.config['database.mysql']['username']

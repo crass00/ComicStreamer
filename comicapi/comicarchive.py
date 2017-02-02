@@ -26,6 +26,8 @@ except:
     pass
 
 
+from comicstreamerlib.folders import AppFolders
+
 class OpenableRarFile(rarfile.RarFile):
     def open(self, member):
         #print "opening %s..." % member
@@ -702,7 +704,7 @@ ebook_extentions = [".epub",".mobi",".chm",".azw3",".lit",".fb2",".rtf",".txt"]
 
 class EbookArchiver(PdfArchiver):
 
-
+    cache_file = None
 
     def getCover(self):
         data = None
@@ -723,11 +725,11 @@ class EbookArchiver(PdfArchiver):
 
 
     def readArchiveFile( self, page_num ):
-        corrected_path = self.path
+  
         ext = os.path.splitext(self.path)[1].lower()
         if ext in ebook_extentions:
-            corrected_path = self.path + u".tmp.pdf"
-        
+            self.convert()
+
         resolution = 300
         
         if page_num == '0.jpg':
@@ -755,9 +757,20 @@ class EbookArchiver(PdfArchiver):
         #return subprocess.check_output(['pdftopng', '-r', str(resolution), '-f', str(int(os.path.basename(page_num)[:-4])), '-l', str(int(os.path.basename(page_num)[:-4])), self.path,  '-'])
         
         if platform.system() == "Windows":
-            return subprocess.check_output(['.\mutool.exe', 'draw','-r', str(resolution), '-o','-', corrected_path, str(int(os.path.basename(page_num)[:-4]))])
+            return subprocess.check_output(['.\mutool.exe', 'draw','-r', str(resolution), '-o','-', self.cache_file, str(int(os.path.basename(page_num)[:-4]))])
         else:
-            return subprocess.check_output(['./mudraw', '-r', str(resolution), '-o','-', corrected_path, str(int(os.path.basename(page_num)[:-4]))])
+            return subprocess.check_output(['./mudraw', '-r', str(resolution), '-o','-', self.cache_file, str(int(os.path.basename(page_num)[:-4]))])
+
+    def convert( self ):
+        self.cache_file = os.path.join(AppFolders.appCacheEbooks(),os.path.basename(self.path)+u".cache.pdf")
+        corrected_path_temp = self.cache_file + u".tmp.pdf"
+        if not os.path.isfile(self.cache_file):
+            if platform.system() == "Windows":
+                subprocess.check_output(['%PROGRAMFILES%\calibre\ebook-convert.exe', self.path, corrected_path_temp])
+            else:
+                subprocess.check_output(['/Applications/calibre.app/Contents/MacOS/ebook-convert', self.path, corrected_path_temp])
+            #rename file after process is done... tmp cache
+            os.rename(corrected_path_temp,self.cache_file)
 
     def getArchiveFilenameList( self ):
         out = []
@@ -765,18 +778,11 @@ class EbookArchiver(PdfArchiver):
             if os.path.isfile(os.path.join(os.path.dirname(self.path),'cover.jpg')):
                 out.append("0.jpg")
 
-            corrected_path = self.path
             ext = os.path.splitext(self.path)[1].lower()
             if ext in ebook_extentions:
-                if not os.path.isfile(self.path+ u".tmp.pdf"):
-                    if platform.system() == "Windows":
-                        subprocess.check_output(['%PROGRAMFILES%\calibre\ebook-convert.exe', self.path, self.path + u".tmp.pdf"])
-                    else:
-                        subprocess.check_output(['/Applications/calibre.app/Contents/MacOS/ebook-convert', self.path, self.path + u".tmp.pdf"])
-                #rename file after process is done... tmp cache
-                corrected_path = self.path + u".tmp.pdf"
-            
-            pdf = PdfFileReader(open(corrected_path, 'rb'))
+                self.convert()
+                           
+            pdf = PdfFileReader(open(self.cache_file, 'rb'))
             if pdf.isEncrypted:
                 try:
                     pdf.decrypt('')
@@ -788,7 +794,7 @@ class EbookArchiver(PdfArchiver):
                 for page in range(1, pdf.getNumPages() + 1):
                     out.append(str(page) + ".jpg")
         except Exception as e:
-            print >> sys.stderr, u"PDF Unreadable [{0}]: {1}".format(str(e),corrected_path)
+            print >> sys.stderr, u"PDF Unreadable [{0}]: {1}".format(str(e),self.cache_file)
         return out
 
 #------------------------------------------------------------------
