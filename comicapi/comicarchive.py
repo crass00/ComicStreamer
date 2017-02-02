@@ -700,7 +700,7 @@ class PdfArchiver:
             print >> sys.stderr, u"PDF Unreadable [{0}]: {1}".format(str(e),self.path)
         return out
 
-ebook_extentions = [".epub",".mobi",".chm",".azw3",".lit",".fb2",".rtf",".txt"]
+ebook_extentions = [".epub",".mobi",".chm",".azw3",".lit",".fb2"]
 
 class EbookArchiver(PdfArchiver):
 
