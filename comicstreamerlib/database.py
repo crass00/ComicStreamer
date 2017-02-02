@@ -253,7 +253,7 @@ class Comic(Base):
     added_ts = Column(DateTime, default=datetime.utcnow)  # when the comic was added to the DB
     mod_ts = Column(DateTime)  # the last modified date of the file
     
-     """
+    """
     # chanhef to all instead of save-update
     alternateseries_raw = relationship('AlternateSeries', secondary=comics_alternateseries_table, cascade="save-update,delete", backref='comics')
     credits_raw = relationship('Credit',secondary=credits,cascade="save-update, delete", backref='comics')
