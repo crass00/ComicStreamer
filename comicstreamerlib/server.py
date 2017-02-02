@@ -1391,9 +1391,9 @@ class APIServer(tornado.web.Application):
         self.library.cache(AppFolders.appCachePages(),self.config['cache']['active'],self.config['cache']['size'],self.config['cache']['free'],self.config['cache']['location'])
 
         if opts.reset or opts.reset_and_run:
-            logging.info( "Deleting any existing database!")
+            logging.info( "Wiping database!")
             self.dm.delete()
-            logging.info( "Deleting any existing cache!")
+            logging.info( "Wiping cache!")
             self.library.cache_clear()
             
         # quit on a standard reset
@@ -1409,7 +1409,7 @@ class APIServer(tornado.web.Application):
             sys.exit(-1)
         except sqlalchemy.exc.OperationalError as e:
             msg = e.orig.args[1]
-            #"HERE" FIX self.config['mysql']['active'] = False;
+            self.config['mysql']['active'] = False;
             logging.error("MySQL: " + msg)
             utils.alert("MySQL Error", msg)
             self.dm = DataManager(self.config)
@@ -1432,7 +1432,7 @@ class APIServer(tornado.web.Application):
             utils.alert("Port not available", msg)
             sys.exit(-1)
 
-        logging.info( "Stream server running on port {0}...".format(self.port))
+        logging.info( "ComicStreamer server running on port {0}...".format(self.port))
         
         if self.config['web.secure']['active']:
             http_server = tornado.httpserver.HTTPServer(self, no_keep_alive = True, ssl_options={

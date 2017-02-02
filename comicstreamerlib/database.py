@@ -183,6 +183,24 @@ class Comic(Base):
         #thumbnail = Column(LargeBinary(1024*1024*10*10))
         thumbnail = deferred(Column(LargeBinary(1024*1024*3)))
         alternateIssue = Column(String(1000))
+        alternateseries_raw = relationship('AlternateSeries', secondary=comics_alternateseries_table,
+                                cascade="save-update,delete") #, backref='comics')
+        credits_raw = relationship('Credit', #secondary=credits_,
+                                    cascade="all, delete", )#, backref='comics')
+        characters_raw = relationship('Character', secondary=comics_characters_table,
+                                    cascade="save-update,delete")#, backref='comics')
+        teams_raw = relationship('Team', secondary=comics_teams_table,
+                                    cascade="save-update,delete") #)#, backref='comics')
+        locations_raw = relationship('Location', secondary=comics_locations_table,
+                                    cascade="save-update,delete") #, backref='comics')
+        storyarcs_raw = relationship('StoryArc', secondary=comics_storyarcs_table,
+                                    cascade="save-update,delete") #, backref='comics')
+        generictags_raw = relationship('GenericTag', secondary=comics_generictags_table,
+                                    cascade="save-update,delete") #, backref='comics')
+        genres_raw = relationship('Genre', secondary=comics_genres_table,
+                                    cascade="save-update,delete") #, backref='comics')
+      
+
 
     else:
         path = Column(String, unique=True)
@@ -199,6 +217,25 @@ class Comic(Base):
         language = Column(String)
         thumbnail = deferred(Column(LargeBinary))
         alternateIssue = Column(String)
+        alternateseries_raw = relationship('AlternateSeries', secondary=comics_alternateseries_table,
+                                    cascade="save-update,delete") #, backref='comics')
+
+        credits_raw = relationship('Credit', #secondary=credits_,
+                                    cascade="all, delete", )#, backref='comics')
+        characters_raw = relationship('Character', secondary=comics_characters_table,
+                                    cascade="save-update,delete")#, backref='comics')
+        teams_raw = relationship('Team', secondary=comics_teams_table,
+                                    cascade="save-update,delete") #)#, backref='comics')
+        locations_raw = relationship('Location', secondary=comics_locations_table,
+                                    cascade="save-update,delete") #, backref='comics')
+        storyarcs_raw = relationship('StoryArc', secondary=comics_storyarcs_table,
+                                    cascade="save-update,delete") #, backref='comics')
+        generictags_raw = relationship('GenericTag', secondary=comics_generictags_table,
+                                    cascade="save-update,delete") #, backref='comics')
+        genres_raw = relationship('Genre', secondary=comics_genres_table,
+                                    cascade="save-update,delete") #, backref='comics')
+  
+
     filesize = Column(BigInteger)
     id = Column(Integer, primary_key=True)
     issue_num = Column(Float)
@@ -216,25 +253,7 @@ class Comic(Base):
     added_ts = Column(DateTime, default=datetime.utcnow)  # when the comic was added to the DB
     mod_ts = Column(DateTime)  # the last modified date of the file
     
-    alternateseries_raw = relationship('AlternateSeries', secondary=comics_alternateseries_table,
-                                cascade="save-update,delete") #, backref='comics')
-
-    credits_raw = relationship('Credit', #secondary=credits_,
-                                cascade="all, delete", )#, backref='comics')
-    characters_raw = relationship('Character', secondary=comics_characters_table,
-                                cascade="save-update,delete")#, backref='comics')
-    teams_raw = relationship('Team', secondary=comics_teams_table,
-                                cascade="save-update,delete") #)#, backref='comics')
-    locations_raw = relationship('Location', secondary=comics_locations_table,
-                                cascade="save-update,delete") #, backref='comics')
-    storyarcs_raw = relationship('StoryArc', secondary=comics_storyarcs_table,
-                                cascade="save-update,delete") #, backref='comics')
-    generictags_raw = relationship('GenericTag', secondary=comics_generictags_table,
-                                cascade="save-update,delete") #, backref='comics')
-    genres_raw = relationship('Genre', secondary=comics_genres_table,
-                                cascade="save-update,delete") #, backref='comics')
-  
-    """
+     """
     # chanhef to all instead of save-update
     alternateseries_raw = relationship('AlternateSeries', secondary=comics_alternateseries_table, cascade="save-update,delete", backref='comics')
     credits_raw = relationship('Credit',secondary=credits,cascade="save-update, delete", backref='comics')
@@ -556,7 +575,7 @@ class DataManager():
         self.Session = scoped_session(session_factory)
 
     def delete(self):
-        logging.info("Database: Delete Database")
+        logging.info("Database: Wiping Database")
         if mysql_active:
             Base.metadata.drop_all(self.engine)
             self.engine.dispose()
