@@ -1080,6 +1080,7 @@ class ConfigPageHandler(BaseHandler):
         formdata['use_mysql'] = self.application.config['database']['engine'] == 'mysql'
         formdata['use_sqlite'] = self.application.config['database']['engine'] == 'sqlite'
         formdata['sqlite_location'] = self.application.config['database.sqlite']['location']
+        formdata['sqlite_database'] = self.application.config['database.sqlite']['database']
         formdata['mysql_database'] = self.application.config['database.mysql']['database']
         formdata['mysql_username'] = self.application.config['database.mysql']['username']
         formdata['mysql_password'] = utils.decode(self.application.config['general']['install_id'],self.application.config['database.mysql']['password'])
@@ -1136,6 +1137,7 @@ class ConfigPageHandler(BaseHandler):
         formdata['mysql_port'] = self.get_argument(u"mysql_port", default="")
         formdata['mysql_password'] = self.get_argument(u"mysql_password", default="")
         formdata['sqlite_location'] = self.get_argument(u"sqlite_location", default="")
+        formdata['sqlite_database'] = self.get_argument(u"sqlite_database", default="")
         formdata['pdf_resolution'] = self.get_argument(u"pdf_resolution", default="")
         formdata['pdf_engine'] = self.get_argument(u"pdf_engine")
 
@@ -1260,6 +1262,7 @@ class ConfigPageHandler(BaseHandler):
                 formdata['mysql_username'] != self.application.config['database.mysql']['username'] or
                 formdata['mysql_port'] != self.application.config['database.mysql']['port'] or
                 formdata['mysql_host'] != self.application.config['database.mysql']['host'] or
+                formdata['sqlite_database'] != self.application.config['database.sqlite']['database'] or
                 formdata['sqlite_location'] != self.application.config['database.sqlite']['location'] or
                 formdata['use_pdf'] != self.application.config['pdf']['active'] or
                 formdata['pdf_resolution'] != self.application.config['pdf']['resolution'] or
@@ -1323,6 +1326,7 @@ class ConfigPageHandler(BaseHandler):
                 self.application.config['database']['engine'] = formdata['db_engine']
                 
                 self.application.config['database.sqlite']['location'] = formdata['sqlite_location']
+                self.application.config['database.sqlite']['database'] = formdata['sqlite_database']
                 # lame password hide should be better...
                 self.application.config['database.mysql']['password'] = utils.encode(self.application.config['general']['install_id'],formdata['mysql_password'])
                 self.application.config['database.mysql']['username'] = formdata['mysql_username']

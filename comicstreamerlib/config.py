@@ -46,6 +46,7 @@ class ComicStreamerConfig(ConfigObj):
             [database]
             engine=string(default="sqlite")
             [database.sqlite]
+            database=string(default="comicstreamer")
             location=string(default="")
             [database.mysql]
             database=string(default="comicstreamer")

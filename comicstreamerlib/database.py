@@ -567,12 +567,17 @@ class DataManager():
 
         if not mysql_active:
             logging.info("Database: SQLite Engine")
+            
+            db = self.config['database.sqlite']['database']
+            if db == "": db = "comicstreamer"
+            db += ".sqlite"
+
             self.dbfile = self.config['database.sqlite']['location']
-            print self.dbfile
             if self.dbfile == "":
-                self.dbfile = os.path.join(AppFolders.appData(), "comicstreamer.sqlite")
+                self.dbfile = os.path.join(AppFolders.appData(), db)
             elif os.path.isdir(self.dbfile):
-                self.dbfile = os.path.join(self.dbfile, "comicstreamer.sqlite")
+                self.dbfile = os.path.join(self.dbfile, db)
+            
             try:
                 self.engine = create_engine('sqlite:///'+ self.dbfile, echo=False)
                 logging.info("Database: SQLite (" + self.dbfile + ")")
