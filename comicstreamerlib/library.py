@@ -396,6 +396,7 @@ class Library:
     def deleteComics(self, comic_id_list):
         s = self.getSession()
         for comic_id in comic_id_list:
+            print "DEBUG DELETE: " + str(comic_id)
             deleted = DeletedComic()
             deleted.comic_id = int(comic_id)
             s.add(deleted)
