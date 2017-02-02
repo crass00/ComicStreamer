@@ -56,6 +56,7 @@ Keep clicking on "tha brain" :-) Did I mention the fron-end help wanted :-)
 - Fix sqlite database is locked with large dataset
 - Show unscanned/error files!
 - Server won't shutdown if monitor is still checking files...
+- SWF support??
 
 ![screw](https://raw.githubusercontent.com/Tristan79/ComicStreamer/master/ad.png)
    
