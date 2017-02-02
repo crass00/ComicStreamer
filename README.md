@@ -29,6 +29,7 @@ Or you are a database wizard...
 - Other databases backend support
 - Faster (or better database, __sqlalchemy wizard help needed!!!__)
 - New db features...
+- Very large dataset sqlite will bump into locked db file
 
 Please help!
 
@@ -54,6 +55,7 @@ Keep clicking on "tha brain" :-) Did I mention the fron-end help wanted :-)
 - Broke monitor
 - Fix sqlite database is locked with large dataset
 - Show unscanned/error files!
+- Server won't shutdown if monitor is still checking files...
 
 ![screw](https://raw.githubusercontent.com/Tristan79/ComicStreamer/master/ad.png)
    
