@@ -550,7 +550,7 @@ class DataManager():
             self.dbfile = os.path.join(AppFolders.appData(), "comicdb.sqlite")
             self.engine = create_engine('sqlite:///'+ self.dbfile, echo=False)
         if mysql_active:
-            session_factory = sessionmaker(bind=self.engine, expire_on_commit=True, autoflush=False, autocommit=True) #, autoflush=False, autocommit=True, expire_on_commit=True) #,autocommit=True)
+            session_factory = sessionmaker(bind=self.engine, expire_on_commit=True, autoflush=False, autocommit=False) #, autoflush=False, autocommit=True, expire_on_commit=True) #,autocommit=True)
         else:
             session_factory = sessionmaker(bind=self.engine, expire_on_commit=True) #, autocommit=True) #, autoflush=False, autocommit=True, expire_on_commit=True) #,autocommit=True)
         self.Session = scoped_session(session_factory)
