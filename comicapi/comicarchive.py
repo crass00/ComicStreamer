@@ -670,10 +670,13 @@ class PdfArchiver:
     
         #return subprocess.check_output(['pdftopng', '-r', str(resolution), '-f', str(int(os.path.basename(page_num)[:-4])), '-l', str(int(os.path.basename(page_num)[:-4])), self.path,  '-'])
         
-        if platform.system() == "Windows":
-            return subprocess.check_output(['.\mutool.exe', 'draw','-r', str(resolution), '-o','-', self.path, str(int(os.path.basename(page_num_corr)[:-4]))])
-        else:
-            return subprocess.check_output(['./mudraw', '-r', str(resolution), '-o','-', self.path, str(int(os.path.basename(page_num_corr)[:-4]))])
+        try:
+            if platform.system() == "Windows":
+                return subprocess.check_output(['.\mutool.exe', 'draw','-r', str(resolution), '-o','-', self.path, str(int(os.path.basename(page_num_corr)[:-4]))])
+            else:
+                return subprocess.check_output(['./mudraw', '-r', str(resolution), '-o','-', self.path, str(int(os.path.basename(page_num_corr)[:-4]))])
+        except:
+            pass
 
     def writeArchiveFile( self, archive_file, data ):
         return False
@@ -707,6 +710,7 @@ class EbookArchiver(PdfArchiver):
     cache_file = None
 
     def getCover(self):
+        # bad bad, should follow the manifest or use a ebooklib...
         data = None
         zf = zipfile.ZipFile( self.path, 'r' )
         try:
@@ -728,7 +732,7 @@ class EbookArchiver(PdfArchiver):
   
         ext = os.path.splitext(self.path)[1].lower()
         if ext in ebook_extentions:
-            self.convert()
+            if not self.convert(): return
 
         resolution = 300
         
@@ -765,12 +769,17 @@ class EbookArchiver(PdfArchiver):
         self.cache_file = os.path.join(AppFolders.appCacheEbooks(),os.path.basename(self.path)+u".cache.pdf")
         corrected_path_temp = self.cache_file + u".tmp.pdf"
         if not os.path.isfile(self.cache_file):
-            if platform.system() == "Windows":
-                subprocess.check_output(['%PROGRAMFILES%\calibre\ebook-convert.exe', self.path, corrected_path_temp])
-            else:
-                subprocess.check_output(['/Applications/calibre.app/Contents/MacOS/ebook-convert', self.path, corrected_path_temp])
-            #rename file after process is done... tmp cache
-            os.rename(corrected_path_temp,self.cache_file)
+            try:
+                if platform.system() == "Windows":
+                    subprocess.check_output(['%PROGRAMFILES%\calibre\ebook-convert.exe', self.path, corrected_path_temp])
+                else:
+                    subprocess.check_output(['/Applications/calibre.app/Contents/MacOS/ebook-convert', self.path, corrected_path_temp])
+                #rename file after process is done... tmp cache
+                os.rename(corrected_path_temp,self.cache_file)
+                return True
+            except:
+                print >> sys.stderr, u"EBOOK Unreadable [{0}]: {1}".format(str(e),self.path)
+                return False
 
     def getArchiveFilenameList( self ):
         out = []
@@ -780,7 +789,7 @@ class EbookArchiver(PdfArchiver):
 
             ext = os.path.splitext(self.path)[1].lower()
             if ext in ebook_extentions:
-                self.convert()
+                if not self.convert(): return out
                            
             pdf = PdfFileReader(open(self.cache_file, 'rb'))
             if pdf.isEncrypted:
@@ -789,12 +798,12 @@ class EbookArchiver(PdfArchiver):
                     for page in range(1, pdf.getNumPages() + 1):
                         out.append("/%04d.jpg" % (page))
                 except Exception as e:
-                    print >> sys.stderr, u"PDF Decrypted Failed [{0}]: {1}".format(str(e),self.path)
+                    print >> sys.stderr, u"EBOOK Cached PDF Decrypted Failed [{0}]: {1}".format(str(e),self.path)
             else:
                 for page in range(1, pdf.getNumPages() + 1):
                     out.append(str(page) + ".jpg")
         except Exception as e:
-            print >> sys.stderr, u"PDF Unreadable [{0}]: {1}".format(str(e),self.cache_file)
+            print >> sys.stderr, u"EBOOK Cached PDF Unreadable [{0}]: {1}".format(str(e),self.cache_file)
         return out
 
 #------------------------------------------------------------------
