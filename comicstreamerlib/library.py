@@ -48,7 +48,7 @@ class Library:
         self.cache_maxsize = size
         self.cache_location = location
         
-        os.path.join(self.cache_location,ComicStreamerConfig()['database']['engine'])
+        self.cache_location = os.path.join(self.cache_location,ComicStreamerConfig()['database']['engine'])
         
         try:
             if not os.path.exists(location):
