@@ -1444,6 +1444,8 @@ class APIServer(tornado.web.Application):
             msg = "Could not open database."
             logging.error(msg)
             utils.alert("Database Error", msg)
+            
+            # "HERE FIX open sqlite temp db so you canfix the problem......
             sys.exit(-1)        
         
         try:
