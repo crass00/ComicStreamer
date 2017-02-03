@@ -1444,7 +1444,7 @@ class APIServer(tornado.web.Application):
             msg = "Could not open database."
             logging.error(msg)
             utils.alert("Database Error", msg)
-        
+            sys.exit(-1)        
         
         try:
             self.listen(self.port, no_keep_alive = True)
