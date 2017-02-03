@@ -574,20 +574,22 @@ class DataManager():
 
             self.dbfile = self.config['database.sqlite']['location']
             
-            if self.dbfile == "" or not os.path.isdir(self.dbfile):
+            if self.dbfile == "":
                 self.dbfile = os.path.join(AppFolders.appData(), db)
             else:
-                self.dbfile = os.path.abspath(self.dbfile)
-                self.dbfile = os.path.join(self.dbfile, db)
-            
-            print self.dbfile
-            
+                if os.path.isdir(self.dbfile):
+                    self.dbfile = os.path.join(self.dbfile, db)
+                else:
+                    logging.error("Database: SQLite Database Location Unavailable (" + self.dbfile + ")")
+                    logging.warning("Database: Switching to SQLite Engine Default Database Location")
+                    self.dbfile = os.path.join(AppFolders.appData(), db)
+        
             try:
                 self.engine = create_engine('sqlite:///'+ self.dbfile, echo=False)
                 logging.info("Database: SQLite (" + self.dbfile + ")")
             except:
                 logging.error("Database: SQLite Failed (" + self.dbfile + ")")
-                logging.warning("Database: Switching to SQLite Engine Default Location")
+                logging.warning("Database: Switching to SQLite Engine Default Database Location")
                 self.dbfile = os.path.join(AppFolders.appData(), "comicstreamer.sqlite")
                 try:
                     self.engine = create_engine('sqlite:///'+ self.dbfile, echo=False)

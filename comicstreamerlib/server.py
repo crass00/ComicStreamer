@@ -1209,7 +1209,20 @@ class ConfigPageHandler(BaseHandler):
         #validate password and username are set
         if formdata['use_authentication'] and (formdata['username']=="" or formdata['password']==""):
             failure_strs.append(u"Username and password must be filled in if the 'use authentication' box is checked")
+        
+        if formdata['sqlite_location'] != "":
+            if not os.path.isdir(formdata['sqlite_location']):
+                failure_strs.append(u"SQLite database location does not exists")
             
+        if formdata['sqlite_database'] != "":
+        try:
+            import tempfile
+            test = os.path.join(tempfile.gettempdir(),formdata['sqlite_database'])
+            open(test, "wb").close()
+            os.remove(test)
+        except:
+            failure_strs.append(u"SQLite database location does not exists")
+        
         #validate password pair is the same
         if formdata['password'] != formdata['password_confirm']:
             failure_strs.append(u"Password fields don't match.")
@@ -1228,7 +1241,7 @@ class ConfigPageHandler(BaseHandler):
         except:
             failure_strs.append(u"Cache free size not a number")
         
-        # need more validation here on mysql!!!!
+        # need more validation here on mysql!!!! secure https! database names?
         # FIX: RELEASE1
         
         if len(failure_strs) == 0:
