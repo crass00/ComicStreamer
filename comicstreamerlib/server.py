@@ -1442,7 +1442,7 @@ class APIServer(tornado.web.Application):
             sys.exit(-1)
         except sqlalchemy.exc.OperationalError as e:
             msg = e.orig.args[1]
-            self.config['mysql']['active'] = False;
+#            self.config['database']['engine'] = 'sqlite';
             logging.error("MySQL: " + msg)
             utils.alert("MySQL Error", msg)
             self.dm = DataManager(self.config)
