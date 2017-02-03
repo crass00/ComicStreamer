@@ -573,10 +573,14 @@ class DataManager():
             db += ".sqlite"
 
             self.dbfile = self.config['database.sqlite']['location']
-            if self.dbfile == "":
+            
+            if self.dbfile == "" or not os.path.isdir(self.dbfile):
                 self.dbfile = os.path.join(AppFolders.appData(), db)
-            elif os.path.isdir(self.dbfile):
+            else:
+                self.dbfile = os.path.abspath(self.dbfile)
                 self.dbfile = os.path.join(self.dbfile, db)
+            
+            print self.dbfile
             
             try:
                 self.engine = create_engine('sqlite:///'+ self.dbfile, echo=False)
