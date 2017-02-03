@@ -1232,10 +1232,10 @@ class ConfigPageHandler(BaseHandler):
             except:
                 failure_strs.append(u"SQLite database name contains strange symbols")
             
-        if formdata['pdf_resolution'] < 50:
+        if int(formdata['pdf_resolution']) < 50:
             failure_strs.append(u"Min PDF Resoltion is 50")
         
-        if formdata['pdf_resolution'] > 600:
+        if int(formdata['pdf_resolution']) > 600:
             failure_strs.append(u"Max PDF Resoltion is 600")
             
         #validate password pair is the same
