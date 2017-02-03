@@ -1215,14 +1215,14 @@ class ConfigPageHandler(BaseHandler):
                 failure_strs.append(u"SQLite database location does not exists")
             
         if formdata['sqlite_database'] != "":
-        try:
-            import tempfile
-            test = os.path.join(tempfile.gettempdir(),formdata['sqlite_database'])
-            open(test, "wb").close()
-            os.remove(test)
-        except:
-            failure_strs.append(u"SQLite database location does not exists")
-        
+            try:
+                import tempfile
+                test = os.path.join(tempfile.gettempdir(),formdata['sqlite_database'])
+                open(test, "wb").close()
+                os.remove(test)
+            except:
+                failure_strs.append(u"SQLite database name contains strange symbols")
+            
         #validate password pair is the same
         if formdata['password'] != formdata['password_confirm']:
             failure_strs.append(u"Password fields don't match.")
