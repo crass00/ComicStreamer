@@ -63,6 +63,7 @@ class ComicStreamerConfig(ConfigObj):
             resolution=integer(default=150)
             [ebook]
             active=boolean(default="False")
+            resolution=integer(default=72)
             calibre=string(default="/Applications/calibre.app/Contents/MacOS/ebook-convert")
             [ebook.cache]
             size=integer(default=0)

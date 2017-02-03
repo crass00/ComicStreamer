@@ -739,8 +739,8 @@ class EbookArchiver(PdfArchiver):
         if ext in ebook_extentions:
             if not self.convert(): return
 
-        resolution = config['pdf']['resolution']
-        #resolution = 150
+        resolution = config['ebook']['resolution']
+        #resolution = 72
         
         if page_num == '0.png':
             

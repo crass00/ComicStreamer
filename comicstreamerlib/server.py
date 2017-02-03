@@ -1086,6 +1086,7 @@ class ConfigPageHandler(BaseHandler):
         formdata['mysql_password'] = utils.decode(self.application.config['general']['install_id'],self.application.config['database.mysql']['password'])
         formdata['mysql_host'] = self.application.config['database.mysql']['host']
         formdata['mysql_port'] = self.application.config['database.mysql']['port']
+        formdata['ebook_resolution'] = self.application.config['ebook']['resolution']
         formdata['pdf_resolution'] = self.application.config['pdf']['resolution']
         formdata['pdf_engine'] = self.application.config['pdf']['engine']
         
@@ -1139,6 +1140,7 @@ class ConfigPageHandler(BaseHandler):
         formdata['sqlite_location'] = self.get_argument(u"sqlite_location", default="")
         formdata['sqlite_database'] = self.get_argument(u"sqlite_database", default="")
         formdata['pdf_resolution'] = self.get_argument(u"pdf_resolution", default="")
+        formdata['ebook_resolution'] = self.get_argument(u"ebook_resolution", default="")
         formdata['pdf_engine'] = self.get_argument(u"pdf_engine")
 
         formdata['use_mutool'] = formdata['pdf_engine'] == 'mutool'
@@ -1232,12 +1234,19 @@ class ConfigPageHandler(BaseHandler):
             except:
                 failure_strs.append(u"SQLite database name contains strange symbols")
             
-        if int(formdata['pdf_resolution']) < 50:
-            failure_strs.append(u"Min PDF Resoltion is 50")
+        if int(formdata['pdf_resolution']) < 72:
+            failure_strs.append(u"Min PDF Resoltion is 72")
         
         if int(formdata['pdf_resolution']) > 600:
             failure_strs.append(u"Max PDF Resoltion is 600")
-            
+
+        if int(formdata['ebook_resolution']) < 72:
+            failure_strs.append(u"Min PDF Resoltion is 50")
+        
+        if int(formdata['ebook_resolution']) > 600:
+            failure_strs.append(u"Max PDF Resoltion is 600")
+
+
         #validate password pair is the same
         if formdata['password'] != formdata['password_confirm']:
             failure_strs.append(u"Password fields don't match.")
@@ -1294,6 +1303,7 @@ class ConfigPageHandler(BaseHandler):
                 formdata['sqlite_location'] != self.application.config['database.sqlite']['location'] or
                 formdata['use_pdf'] != self.application.config['pdf']['active'] or
                 formdata['pdf_resolution'] != self.application.config['pdf']['resolution'] or
+                formdata['ebook_resolution'] != self.application.config['ebook']['resolution'] or
                 formdata['pdf_engine'] != self.application.config['pdf']['engine'] or
                 formdata['mudraw'] != self.application.config['pdf']['mudraw'] or
                 formdata['mutool'] != self.application.config['pdf']['mutool'] or
@@ -1345,6 +1355,7 @@ class ConfigPageHandler(BaseHandler):
 
                 self.application.config['pdf']['active'] =  formdata['use_pdf']
                 self.application.config['pdf']['resolution'] =  formdata['pdf_resolution']
+                self.application.config['ebook']['resolution'] = formdata['ebook_resolution']
 
                 self.application.config['pdf']['engine'] = formdata['pdf_engine']
                 self.application.config['pdf']['mudraw'] = formdata['mudraw']
