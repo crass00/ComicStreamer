@@ -1209,7 +1209,16 @@ class ConfigPageHandler(BaseHandler):
         #validate password and username are set
         if formdata['use_authentication'] and (formdata['username']=="" or formdata['password']==""):
             failure_strs.append(u"Username and password must be filled in if the 'use authentication' box is checked")
-        
+
+
+        if formdata['cache_location'] != "":
+            if not os.path.isdir(formdata['cache_location']):
+                try:
+                    os.makedirs(location)
+                except:
+                    failure_strs.append(u"Cache location failure")
+            
+            
         if formdata['sqlite_location'] != "":
             if not os.path.isdir(formdata['sqlite_location']):
                 failure_strs.append(u"SQLite database location does not exists")
@@ -1402,10 +1411,17 @@ class APIServer(tornado.web.Application):
         #    logging.error("No folders on either command-line or config file.  Quitting.")
         #    sys.exit(-1)
 
+        cache_location = self.config['cache']['location']
+        cache_active = self.config['cache']['active']
+        if cache_location == "": cache_location = AppFolders.appCachePages()
+        else:
+            if not os.path.isdir(cache_location):
+                cache_active = False
+        
         #self.dm = DataManager()
         self.dm = DataManager(config)
         self.library = Library(self.dm.Session)
-        self.library.cache(AppFolders.appCachePages(),self.config['cache']['active'],self.config['cache']['size'],self.config['cache']['free'],self.config['cache']['location'])
+        self.library.cache(cache_location,cache_active,self.config['cache']['size'],self.config['cache']['free'],)
 
         if opts.reset or opts.reset_and_run:
             logging.info( "Wiping database!")

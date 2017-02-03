@@ -17,7 +17,7 @@
         <div id="settings_sqlite">
             <span>Database</span><input id="sqlite_database" type="text" name="sqlite_database" value="{{formdata['sqlite_database']}}" />
             <br>
-            <span>Location</span><input id="sqlite_location" type="text" name="sqlite_location" value="{{formdata['sqlite_location']}}" />
+            <span>Location Override</span><input id="sqlite_location" type="text" name="sqlite_location" value="{{formdata['sqlite_location']}}" />
         </div>
         <div id="settings_mysql">
             <span>Database</span><input id="mysql_database" type="text" name="mysql_database" value="{{formdata['mysql_database']}}" />
@@ -32,9 +32,10 @@
         <h2>Cache <input style="display:inline" type="checkbox" name="use_cache" class="formcheck" id="use_cache" value="use" onclick="use_cache_toggle()" {{formdata['use_cache']}} /></h2>
         <div id="settings_cache">
         <br>
-        <span>Location</span><input id="cache_location" disabled type="text" name="cache_location" value="{{formdata['cache_location']}}" />
         <span>Size</span> <span class="help">(megabytes)</span><input id="cache_size" type="number" name="cache_size" value="{{formdata['cache_size']}}" />
         <span>Free Space</span> <span class="help">(megabytes)</span><input id="cache_free" type="number" name="cache_free" value="{{formdata['cache_free']}}" />
+        <br>
+        <span>Location Override</span><input id="cache_location" type="text" name="cache_location" value="{{formdata['cache_location']}}" />
         </div>
         <br>
         <h2>Formats</h2>
@@ -69,7 +70,7 @@
 
             <div style="display:none">
             <br>
-            <span>Cache Location</span><input disabled id="ebook_cache_location" type="text" name="ebook_cache_location" value="{{formdata['ebook_cache_location']}}" />
+            <span>Cache Location</span><input id="ebook_cache_location" type="text" name="ebook_cache_location" value="{{formdata['ebook_cache_location']}}" />
             <span>Cache Size</span> <span class="help">(megabytes)</span><input id="ebook_cache_size" type="number" name="ebook_cache_size" value="{{formdata['ebook_cache_size']}}" />
             <span>Cache Free Space</span> <span class="help">(megabytes)</span><input id="ebook_cache_free" type="number" name="ebook_cache_free" value="{{formdata['ebook_cache_free']}}" />
             </div>

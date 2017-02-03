@@ -28,19 +28,18 @@ class Library:
         self.cache_active = False
 
     def cache_clear(self):
-        if os.path.exists(AppFolders.appCachePages()) and os.path.isdir(AppFolders.appCachePages()):
-            shutil.rmtree(AppFolders.appCachePages())
+        if os.path.exists(self.cache_location) and os.path.isdir(self.cache_location):
+            shutil.rmtree(self.cache_location)
         self.cache_filled = 0
         self.cache_list = []
         self.cache_hit = 0
         self.cache_miss = 0
         self.cache_discard = 0
     
-    def cache(self,path,active,size,free,location):
+    def cache(self,location,active,size,free):
         self.cache_active = active
         self.cache_size = size
         self.cache_free = free
-        self.cache_path = path
         self.cache_filled = 0
         self.cache_list = []
         self.cache_hit = 0
@@ -50,12 +49,12 @@ class Library:
         self.cache_location = location
         
         try:
-            if not os.path.exists(path):
-                os.makedirs(path)
+            if not os.path.exists(location):
+                os.makedirs(location)
         except:
             self.cache_active = False;
         
-        for subdir, dirs, files in os.walk(self.cache_path):
+        for subdir, dirs, files in os.walk(self.cache_location):
             if os.path.split(subdir)[-1] == 'cache': continue
             for file in files:
                 cachefile = os.path.join(subdir, file)
@@ -67,7 +66,7 @@ class Library:
 
         self.cache_list = sorted(self.cache_list, key = lambda x: int(x[3]))
         
-        cache_free_size = utils.get_free_space(self.cache_path)
+        cache_free_size = utils.get_free_space(self.cache_location)
         self.cache_maxsize = cache_free_size - self.cache_free*1048576 - self.cache_filled
         if self.cache_maxsize < 0:
             self.cache_maxsize += self.cache_delete(abs(x))
@@ -85,7 +84,7 @@ class Library:
         else:
             print "Size: " + str(self.cache_size) + "mb"
         print "Free: " + str(self.cache_free) + "mb"
-        print "Free FS: " + str(utils.get_free_space(self.cache_path)/1024/1024) + "mb"
+        print "Free FS: " + str(utils.get_free_space(self.cache_location)/1024/1024) + "mb"
         print "Filled: " + str(self.cache_filled/1024/1024) + "mb"
         print "Files: " + str(len(self.cache_list))
         print "Remaining: " + str(cache_free_size/1024/1024) + "mb"
@@ -98,8 +97,8 @@ class Library:
             if self.cache_list == []:
                 return deleted
             x = self.cache_list[0]
-            #print "remove:" + os.path.join(self.cache_path,x[0],x[1])
-            os.remove(os.path.join(self.cache_path,x[0],x[1]))
+            #print "remove:" + os.path.join(self.cache_location,x[0],x[1])
+            os.remove(os.path.join(self.cache_location,x[0],x[1]))
             self.cache_filled -= x[2]
             deleted += x[2]
             self.cache_discard += 1
@@ -108,7 +107,7 @@ class Library:
 
     def cache_load(self, comic_id, page_number, path):
         if self.cache_active:
-            cachepath = self.cache_path + "/" + comic_id + "/"
+            cachepath = self.cache_location + "/" + comic_id + "/"
             cachefile = cachepath + str(page_number)
             if not os.path.exists(cachepath):
                 os.makedirs(cachepath)
@@ -121,7 +120,7 @@ class Library:
 
                 cache_file_size = len(image)
                 
-                cache_free_size = utils.get_free_space(self.cache_path)
+                cache_free_size = utils.get_free_space(self.cache_location)
                 x = cache_free_size - self.cache_free*1048576 - self.cache_filled
                 
                 if x < 0:
@@ -145,12 +144,16 @@ class Library:
                 
                 self.cache_miss += 1
                 if cache_file_size <= deleted:
-                    file = open(cachefile, "w")
-                    file.write(image)
-                    file.close()
-                    self.cache_filled += cache_file_size
-                    self.cache_list += [(comic_id,page_number,cache_file_size,os.path.getmtime(cachefile))]
-
+                    try:
+                        file = open(cachefile, "w")
+                        file.write(image)
+                        file.close()
+                        self.cache_filled += cache_file_size
+                        self.cache_list += [(comic_id,page_number,cache_file_size,os.path.getmtime(cachefile))]
+                    except:
+                        # logging would be better...
+                        print "Could not write to cache: " + cachefile
+                
                 # DEBUG
                 """
                 if self.cache_size == 0:
@@ -158,7 +161,7 @@ class Library:
                 else:
                     print "Size: " + str(self.cache_size) + "mb"
                 print "Free: " + str(self.cache_free) + "mb"
-                print "Free FS: " + str(utils.get_free_space(self.cache_path)/1024/1024) + "mb"
+                print "Free FS: " + str(utils.get_free_space(self.cache_location)/1024/1024) + "mb"
                 print "Filled: " + str(self.cache_filled/1024/1024) + "mb"
                 print "Files: " + str(len(self.cache_list))
                 print "Remaining: " + str(x/1024/1024) + "mb"
