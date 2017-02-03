@@ -13,7 +13,7 @@ from database import Comic, DatabaseInfo, Person, Role, Credit, Character, Gener
 from folders import AppFolders
 from sqlalchemy.orm import load_only
 
-
+from config import ComicStreamerConfig
 from comicapi.comicarchive import ComicArchive
 
 from comicapi.issuestring import IssueString
@@ -48,13 +48,8 @@ class Library:
         self.cache_maxsize = size
         self.cache_location = location
         
-        # "HERE FIX should read from config...
-        global mysql_active
-        if mysql_active:
-            os.path.join(self.cache_location,'mysql')
-        else:
-            os.path.join(self.cache_location,'sqlite')
-            
+        os.path.join(self.cache_location,ComicStreamerConfig()['database']['engine'])
+        
         try:
             if not os.path.exists(location):
                 os.makedirs(location)
