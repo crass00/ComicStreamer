@@ -19,6 +19,10 @@ import pylzma
 from py7zlib import Archive7z
 from unrar import constants
 
+
+from comicstreamerlib.config import ComicStreamerConfig
+config = ComicStreamerConfig()
+
 from PIL import Image
 try:
     from PIL import WebPImagePlugin
@@ -652,12 +656,13 @@ class PdfArchiver:
     def setArchiveComment( self, comment ):
         return False
     def readArchiveFile( self, page_num ):
-        resolution = 150
+        resolution = config['pdf']['resolution']
+        #resolution = 150
         
         page_num_corr = page_num
         cover = os.path.join(os.path.dirname(self.path),'cover.jpg')
         if os.path.isfile(cover):
-            if page_num_corr == '0.jpg':
+            if page_num_corr == '0.png':
                 data = ""
                 fname = cover
                 try:
@@ -686,18 +691,18 @@ class PdfArchiver:
         out = []
         try:
             if os.path.isfile(os.path.join(os.path.dirname(self.path),'cover.jpg')):
-                out.append("0.jpg")
+                out.append("0.png")
             pdf = PdfFileReader(open(self.path, 'rb'))
             if pdf.isEncrypted:
                 try:
                     pdf.decrypt('')
                     for page in range(1, pdf.getNumPages() + 1):
-                        out.append(str(page) + ".jpg")
+                        out.append(str(page) + ".png")
                 except Exception as e:
                     print >> sys.stderr, u"PDF Decrypted Failed [{0}]: {1}".format(str(e),self.path)
             else:
                 for page in range(1, pdf.getNumPages() + 1):
-                    out.append(str(page) + ".jpg")
+                    out.append(str(page) + ".png")
                     
         except Exception as e:
             print >> sys.stderr, u"PDF Unreadable [{0}]: {1}".format(str(e),self.path)
@@ -734,9 +739,10 @@ class EbookArchiver(PdfArchiver):
         if ext in ebook_extentions:
             if not self.convert(): return
 
-        resolution = 150
+        resolution = config['pdf']['resolution']
+        #resolution = 150
         
-        if page_num == '0.jpg':
+        if page_num == '0.png':
             
             try:
                 x = self.getCover()
@@ -766,7 +772,10 @@ class EbookArchiver(PdfArchiver):
             return subprocess.check_output(['./mudraw', '-r', str(resolution), '-o','-', self.cache_file, str(int(os.path.basename(page_num)[:-4]))])
 
     def convert( self ):
-        self.cache_file = os.path.join(AppFolders.appCacheEbooks(),os.path.basename(self.path)+u".cache.pdf")
+        cache_location = config['ebook.cache']['location']
+        if cache_location == "":
+            cache_location = AppFolders.appCacheEbooks()
+        self.cache_file = os.path.join(cache_location,os.path.basename(self.path)+u".cache.pdf")
         corrected_path_temp = self.cache_file + u".tmp.pdf"
         if not os.path.isfile(self.cache_file):
             try:
@@ -787,7 +796,7 @@ class EbookArchiver(PdfArchiver):
         out = []
         try:
             if os.path.isfile(os.path.join(os.path.dirname(self.path),'cover.jpg')):
-                out.append("0.jpg")
+                out.append("0.png")
 
             ext = os.path.splitext(self.path)[1].lower()
             if ext in ebook_extentions:
@@ -798,12 +807,12 @@ class EbookArchiver(PdfArchiver):
                 try:
                     pdf.decrypt('')
                     for page in range(1, pdf.getNumPages() + 1):
-                        out.append("/%04d.jpg" % (page))
+                        out.append(str(page) + ".png")
                 except Exception as e:
                     print >> sys.stderr, u"EBOOK Cached PDF Decrypted Failed [{0}]: {1}".format(str(e),self.path)
             else:
                 for page in range(1, pdf.getNumPages() + 1):
-                    out.append(str(page) + ".jpg")
+                    out.append(str(page) + ".png")
         except Exception as e:
             print >> sys.stderr, u"EBOOK Cached PDF Unreadable [{0}]: {1}".format(str(e),self.cache_file)
         return out

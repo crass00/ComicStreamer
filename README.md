@@ -57,6 +57,7 @@ Keep clicking on "tha brain" :-) Did I mention the fron-end help wanted :-)
 - Show unscanned/error files!
 - Server won't shutdown if monitor is still checking files...
 - SWF support??
+- user dir/port (command line arguments) are not passed when restartexd
 
 ![screw](https://raw.githubusercontent.com/Tristan79/ComicStreamer/master/ad.png)
    

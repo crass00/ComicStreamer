@@ -1232,6 +1232,12 @@ class ConfigPageHandler(BaseHandler):
             except:
                 failure_strs.append(u"SQLite database name contains strange symbols")
             
+        if formdata['pdf_resolution'] < 50:
+            failure_strs.append(u"Min PDF Resoltion is 50")
+        
+        if formdata['pdf_resolution'] > 600:
+            failure_strs.append(u"Max PDF Resoltion is 600")
+            
         #validate password pair is the same
         if formdata['password'] != formdata['password_confirm']:
             failure_strs.append(u"Password fields don't match.")
