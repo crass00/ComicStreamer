@@ -1214,6 +1214,7 @@ class ConfigPageHandler(BaseHandler):
         if formdata['cache_location'] != "":
             if not os.path.isdir(formdata['cache_location']):
                 try:
+                    print location
                     os.makedirs(location)
                 except:
                     failure_strs.append(u"Cache location failure")
