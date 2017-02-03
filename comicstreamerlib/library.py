@@ -48,6 +48,13 @@ class Library:
         self.cache_maxsize = size
         self.cache_location = location
         
+        # "HERE FIX should read from config...
+        global mysql_active
+        if mysql_active:
+            os.path.join(self.cache_location,'mysql')
+        else:
+            os.path.join(self.cache_location,'sqlite')
+            
         try:
             if not os.path.exists(location):
                 os.makedirs(location)
@@ -55,6 +62,7 @@ class Library:
             self.cache_active = False;
         
         for subdir, dirs, files in os.walk(self.cache_location):
+            # why is this here?
             if os.path.split(subdir)[-1] == 'cache': continue
             for file in files:
                 cachefile = os.path.join(subdir, file)

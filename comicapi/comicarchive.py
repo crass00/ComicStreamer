@@ -1104,6 +1104,7 @@ class ComicArchive:
 
                 image_data = self.archiver.readArchiveFile( filename )
             except IOError:
+                # "HERE FIX also return error!
                 print >> sys.stderr, u"Error reading in page.  Substituting missing page."
                 if error_img:
                     image_data = error_img
@@ -1112,6 +1113,7 @@ class ComicArchive:
         try:
                 Image.open(StringIO.StringIO(image_data))
         except IOError:
+            # "HERE FIX also return error!
             print >> sys.stderr, u"Error reading in page.  Substituting missing page."
             if error_img:
                 image_data = error_img
