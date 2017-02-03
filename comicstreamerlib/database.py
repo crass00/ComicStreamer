@@ -559,10 +559,10 @@ class DataManager():
             logging.info("Database: MySQL Engine")
             try:
                 self.engine = create_engine("mysql://"+self.config['database.mysql']['username']+":"+utils.decode(self.config['general']['install_id'],self.config['database.mysql']['password'])+"@"+self.config['database.mysql']['host']+":"+str(self.config['database.mysql']['port'])+"/"+self.config['database.mysql']['database']+"?charset=utf8", pool_recycle=3600,  echo=False, isolation_level="READ COMMITTED")
-                logging.info("Database: MySQL " + self.config['database.mysql']['database'] + " (" + self.config['database.mysql']['host'] + ":" + self.config['database.mysql']['port'] + ")")
+                logging.info("Database: MySQL " + self.config['database.mysql']['database'] + " (" + self.config['database.mysql']['host'] + ":" + str(self.config['database.mysql']['port']) + ")")
             except:
                 mysql_active = False
-                logging.error("Database: MySQL Failed (" + self.config['database.mysql']['database'] + " [" + self.config['database.mysql']['host'] + ":" + self.config['database.mysql']['port'] + "])")
+                logging.error("Database: MySQL Failed (" + self.config['database.mysql']['database'] + " [" + self.config['database.mysql']['host'] + ":" + str(self.config['database.mysql']['port']) + "])")
                 logging.warning("Database: Switching to SQLite Engine")
 
         if not mysql_active:
@@ -570,7 +570,7 @@ class DataManager():
             
             db = self.config['database.sqlite']['database']
             if db == "": db = "comicstreamer"
-            db += ".sqlite"
+            db += u".sqlite"
 
             self.dbfile = self.config['database.sqlite']['location']
             
@@ -585,7 +585,7 @@ class DataManager():
                     self.dbfile = os.path.join(AppFolders.appData(), db)
         
             try:
-                self.engine = create_engine('sqlite:///'+ self.dbfile, echo=False)
+                self.engine = create_engine(u'sqlite:///'+ self.dbfile, echo=False)
                 logging.info("Database: SQLite (" + self.dbfile + ")")
             except:
                 logging.error("Database: SQLite Failed (" + self.dbfile + ")")
