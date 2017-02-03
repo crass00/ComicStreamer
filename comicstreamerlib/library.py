@@ -51,8 +51,8 @@ class Library:
         self.cache_location = os.path.join(self.cache_location,ComicStreamerConfig()['database']['engine'])
         
         try:
-            if not os.path.exists(location):
-                os.makedirs(location)
+            if not os.path.exists(self.cache_location):
+                os.makedirs(self.cache_location)
         except:
             self.cache_active = False;
         
