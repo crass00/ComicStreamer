@@ -652,7 +652,7 @@ class PdfArchiver:
     def setArchiveComment( self, comment ):
         return False
     def readArchiveFile( self, page_num ):
-        resolution = 300
+        resolution = 150
         
         page_num_corr = page_num
         cover = os.path.join(os.path.dirname(self.path),'cover.jpg')
@@ -734,7 +734,7 @@ class EbookArchiver(PdfArchiver):
         if ext in ebook_extentions:
             if not self.convert(): return
 
-        resolution = 300
+        resolution = 150
         
         if page_num == '0.jpg':
             
