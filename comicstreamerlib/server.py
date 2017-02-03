@@ -1441,19 +1441,9 @@ class APIServer(tornado.web.Application):
             utils.alert("Schema change", msg)
             sys.exit(-1)
         except sqlalchemy.exc.OperationalError as e:
-            msg = e.orig.args[1]
-#            self.config['database']['engine'] = 'sqlite';
-            logging.error("MySQL: " + msg)
-            utils.alert("MySQL Error", msg)
-            self.dm = DataManager(self.config)
-            self.library = Library(self.dm.Session)
-            try:
-                self.dm.create()
-            except SchemaVersionException as e:
-                msg = "Couldn't open database.  Probably the schema has changed."
-                logging.error(msg)
-                utils.alert("Schema change", msg)
-                sys.exit(-1)
+            msg = "Could not open database."
+            logging.error(msg)
+            utils.alert("Database Error", msg)
         
         
         try:
