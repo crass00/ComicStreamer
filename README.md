@@ -20,18 +20,30 @@ _...Or general web page_
 - secondary sort on table (e.g. date/year then issue)
 - Fix setup stuff (redirect with restarting & resetting)
 
-
 Please help!
 
-## Intermission end...
+![screw](https://raw.githubusercontent.com/Tristan79/ComicStreamer/master/ad.png)
+   
+## Work done
 
-For now no mac or windows package! 
+Tristan79 Work on this fork (januari 31 2017)
 
-ComicStreamer ToiletStreamer Edition Windows Alplha (https://dl.dropboxusercontent.com/u/12474226/32/ComicStreamer%200.9.5.exe) with broken web settings so edit the settings manually! Will fix soon!
-    (cache is also broken, probably old python package or windows xp)
+- EBook support (except metadata)
+- Much better (faster) random comic query
+- MySQL support (experimental) 
+- Fixed bug (appartently source didn't work for months)
+- Added cbt/tar support
+- Patched webp (it does not load in web comic book, haven't tested chunky so converted to jpeg :/)
+- Experimental Cache System (since remote storage could be slow, even usb2 vs ssd :-)
 
-## Settings
-Keep clicking on "tha brain" :-) Did I mention the fron-end help wanted :-)
+Tristan79 Work on this fork (may 15 2016)
+
+- Lot of bug fixes, 
+- New (tryout gui) the old gui is still there for use
+- Fixes for jpg, bmp, 7z, pdf & other bugfull stuff
+- Added option to have alternative mobile site for android/ipad/etc...
+
+If you have web development or graphic design skills, and would like to help out, please contact me at tristan@monkeycat.nl.
 
 ## Further ToDo! / Help Wanted!
 
@@ -64,29 +76,6 @@ General
 - user dir/port (command line arguments) are not passed when restarted
 - PDF and Calibre converters location not working (hardcoded)
 - Better cache system with preloading
-
-![screw](https://raw.githubusercontent.com/Tristan79/ComicStreamer/master/ad.png)
-   
-## Work done
-
-Tristan79 Work on this fork (januari 31 2017)
-
-- EBook support (except metadata)
-- Much better (faster) random comic query
-- MySQL support (experimental) 
-- Fixed bug (appartently source didn't work for months)
-- Added cbt/tar support
-- Patched webp (it does not load in web comic book, haven't tested chunky so converted to jpeg :/)
-- Experimental Cache System (since remote storage could be slow, even usb2 vs ssd :-)
-
-Tristan79 Work on this fork (may 15 2016)
-
-- Lot of bug fixes, 
-- New (tryout gui) the old gui is still there for use
-- Fixes for jpg, bmp, 7z, pdf & other bugfull stuff
-- Added option to have alternative mobile site for android/ipad/etc...
-
-If you have web development or graphic design skills, and would like to help out, please contact me at tristan@monkeycat.nl.
 
 
 
