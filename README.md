@@ -1,35 +1,25 @@
 # ComicStream: ToiletStreamer Edition
 
 ## Help wanted
-There is something missing... yes! Not mention the name, which could be better or changed... or the interface design...
+There is something missing... yes! 
 
-Are you a web magician and able to fix the build in html webcomicbooks reader...
+_Or you are a database wizard..._
+
+-  __MySQL support__ it drops the connection after some time :-/
+-  __MySQL support__ you can not delete commics... (good for static libs if not for the previous point)
+
+_... or are you a web magician and able to fix the build in html webcomicbooks reader..._
 
 - webp support
 - back arrow missing...
 - go back to navigation missing...
 - page chooser (slider and/or page number selection?)
 
-
-Or general web page
-- search result not limited to 10/20../100
-- css (text to big or to small :/
-- publisher with / in name not recognized in entity browser
-- Fix some gui stuff (redirect with restarting & resetting)
-- Remove showing null comics in table
-- Add link to entity browser in popup
-- Add popup to table make the thumb open the comic instead of the comic!
-- Log should be automaticlly updated
+_...Or general web page_
+- Add link to result tables to the entity browser in popup
 - secondary sort on table (e.g. date/year then issue)
-- setup redirect with first run
+- Fix setup stuff (redirect with restarting & resetting)
 
-Or you are a database wizard...
-
-- MySQL support (currently no changing files!)
-- Other databases backend support
-- Faster (or better database, __sqlalchemy wizard help needed!!!__)
-- New db features...
-- Very large dataset sqlite will bump into locked db file
 
 Please help!
 
@@ -45,19 +35,35 @@ Keep clicking on "tha brain" :-) Did I mention the fron-end help wanted :-)
 
 ## Further ToDo! / Help Wanted!
 
+Web Page
+- search result not limited to 10/20../100 
+- publisher with special chars in name not recognized in entity browser
+- Remove showing null comics in table
+- Add popup to table make the thumb open the comic instead of the comic!
+- Log should be automaticlly updated
+- setup redirect with first run
+
+Database
+- Other databases backend support
+- Faster (or better database, __sqlalchemy wizard help needed!!!__)
+- New db features...
+- Very large dataset sqlite will bump into locked db file
+
+General
 - Find a good epub page to png/jpg converter for ebook support (pdf works great! better then any ebook reader)
 - OSX Calibre works... in remark to previous line :-) so other options/settings/windows?
-- ebook caching
+- ebook caching (now it does not delete)
 - Folder with images add as comic
 - Create Windows & Mac packages
 - Fix Cache did not work on xp :-/ (missing webp?)
 - Command Line options
-- Broke monitor
-- Fix sqlite database is locked with large dataset
+- Broke monitor (check!)
 - Show unscanned/error files!
 - Server won't shutdown if monitor is still checking files...
 - SWF support??
-- user dir/port (command line arguments) are not passed when restartexd
+- user dir/port (command line arguments) are not passed when restarted
+- PDF and Calibre converters location not working (hardcoded)
+- Better cache system with preloading
 
 ![screw](https://raw.githubusercontent.com/Tristan79/ComicStreamer/master/ad.png)
    
@@ -65,8 +71,9 @@ Keep clicking on "tha brain" :-) Did I mention the fron-end help wanted :-)
 
 Tristan79 Work on this fork (januari 31 2017)
 
+- EBook support (except metadata)
 - Much better (faster) random comic query
-- MySQL support (experimental) in database..py -> rename to database.py to check it out!
+- MySQL support (experimental) 
 - Fixed bug (appartently source didn't work for months)
 - Added cbt/tar support
 - Patched webp (it does not load in web comic book, haven't tested chunky so converted to jpeg :/)
