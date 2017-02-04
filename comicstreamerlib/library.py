@@ -327,6 +327,8 @@ class Library:
                 comic.volume = int(md.volume)
             if md.publisher is not None:
                 comic.publisher = unicode(md.publisher)
+            if md.language is not None:
+                comic.language = unicode(md.language)
             if md.title is not None:
                 comic.title = unicode(md.title)
             if md.comments is not None:

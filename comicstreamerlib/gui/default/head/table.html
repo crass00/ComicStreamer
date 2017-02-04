@@ -8,7 +8,7 @@ function populateComicDetails(cd, comic)
     var download_url = '{{handler.webroot}}/comic/'+ comic.id +'/file?api_key={{api_key}}';
     var json_url = '{{handler.webroot}}/comic/'+ comic.id +'?api_key={{api_key}}';
     
-    $(cd).find('.cd_thumbnail').attr('src', thumb_url);
+    $(cd).find(".cd_thumbnail").attr('src', thumb_url);
     $(cd).find(".cd_reader_link").attr('href', reader_url);
     
     //$(cd).find(".cd_file_link").text(comic.path);
@@ -40,9 +40,7 @@ function populateComicDetails(cd, comic)
     }
     
     if (comic.language !== "") {
-        str = '"' + comic.language + '"';
-        
-        $(cd).find(".cd_language").text(str);
+        $(cd).find(".cd_language").text(comic.language);
     }
     
     if (comic.volume !== "") {
@@ -101,7 +99,7 @@ function myAttributeWriter(record)
     if (this.id == 'publisher')
     {
 
-        val = '<a href="{{handler.webroot}}/entities/browse/publisher/'+ record.publisher +'">'+ record.publisher +'</a>';
+        val = '<a href="{{handler.webroot}}/entities/browse/publishers/'+ record.publisher +'">'+ record.publisher +'</a>';
     }
 
 
