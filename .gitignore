@@ -14,6 +14,7 @@ test.py
 /windows/nsis/release.nsh
 /mac/dist
 /mac/build
+/release
 /mac/ComicStreamer.spec
 
 libunrar/libunrar.so
