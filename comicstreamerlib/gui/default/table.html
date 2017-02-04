@@ -8,14 +8,14 @@ function coverview_toggle()
 
     if($('#comic_cover').css('display') == 'none' || $('#comic_view').css('display') != 'none')
     {
-        document.getElementById("comic_switch").src = img_cover;
+        document.getElementById("comic_switch").src = img_table;
         document.getElementById("comic_view").style.display = "none";
         document.getElementById("comic_cover").style.display = "block";
 
     }
 else
     {
-        document.getElementById("comic_switch").src = img_table;
+        document.getElementById("comic_switch").src = img_cover;
         document.getElementById("comic_view").style.display = "block";
         document.getElementById("comic_cover").style.display = "none";
     }
