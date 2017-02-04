@@ -13,7 +13,7 @@ from validate import Validator
 
 from options import Options
 from comicapi.utils import which, addtopath
-from comicstreamerlib.folders import AppFolders
+from folders import AppFolders
 
 class ComicStreamerConfig(ConfigObj):
 

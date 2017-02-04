@@ -1,8 +1,8 @@
-PYINSTALLER_CMD := ./pyinstaller/pyinstaller.py
+PYINSTALLER_CMD := pyinstaller
 STREAMER_BASE ?= ..
 STREAMER_SRC := $(STREAMER_BASE)/comicstreamerlib
 
-APP_NAME := ToiletStreamer
+APP_NAME := ComicStreamer
 VERSION_STR := $(shell grep version $(STREAMER_SRC)/csversion.py| cut -d= -f2 | sed 's/\"//g')
 
 MAC_BASE := $(STREAMER_BASE)/mac
@@ -26,7 +26,7 @@ small: clean dist html diskimage
 some: clean dist
 
 dist:
-	$(PYINSTALLER_CMD) -s -w -n $(APP_NAME) $(STREAMER_BASE)/comicstreamer --noupx
+	$(PYINSTALLER_CMD) -w -s -n $(APP_NAME) $(STREAMER_BASE)/comicstreamer --noupx
 	cp -a $(STREAMER_SRC)/gui $(APP_BUNDLE)/Contents/MacOS
 	cp -a $(STREAMER_SRC)/static $(APP_BUNDLE)/Contents/MacOS
 	cp $(MAC_BASE)/app.icns $(APP_BUNDLE)/Contents/Resources/icon-windowed.icns

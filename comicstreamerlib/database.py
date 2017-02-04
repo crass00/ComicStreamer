@@ -9,8 +9,8 @@ import logging
 import os
 
 import utils
-#from config import ComicStreamerConfig
-from comicstreamerlib.folders import AppFolders
+from config import ComicStreamerConfig
+from folders import AppFolders
 
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
@@ -29,7 +29,6 @@ from sqlalchemy.orm.properties import \
 from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
 from sqlalchemy.types import String
 from sqlalchemy.dialects import mysql
-from config import ComicStreamerConfig
 
 mysql_active = ComicStreamerConfig()['database']['engine'].lower() == "mysql"
 

@@ -5,5 +5,7 @@ os.environ['UNRAR_LIB_PATH'] = os.path.dirname(os.path.realpath(__file__)) + '/l
 
 from comicstreamerlib.main import main
 
-if __name__ == '__main__':
-    main()
+main()
+
+#if __name__ == '__main__':
+#    main()

@@ -1,4 +1,7 @@
-from libs.rumps import rumps
+# -*- coding: utf-8 -*-
+
+import rumps
+#from libs.rumps import rumps
 import time
 from PyObjCTools import AppHelper
 import webbrowser
@@ -10,12 +13,12 @@ rumps.debug_mode(False)  # turn on command line logging information for developm
 
 class MacGui(rumps.App):
     def __init__(self, apiServer):
-        super(MacGui, self).__init__("ComicStreamer", icon=AppFolders.imagePath("logo.png"))
+        super(MacGui, self).__init__("ComicStreamer", icon=AppFolders.imagePath("logo.png"), quit_button=None)
         self.apiServer =  apiServer
         
         self.menu = [
             #rumps.MenuItem('About'), 
-            'Show Interface',
+            'Interface',
             #None,  # None functions as a separator in your menu
             #{'Arbitrary':
             #    {"Depth": ["Menus", "It's pretty easy"],
@@ -28,15 +31,19 @@ class MacGui(rumps.App):
     #    #sender.title = 'NOM' if sender.title == 'About' else 'About'  # can adjust titles of menu items dynamically
     #    rumps.alert("ComicStreamer")
 
-    @rumps.clicked("Show Interface")
+    @rumps.clicked("Interface")
     def about(self, sender):
         webbrowser.open("http://localhost:{0}".format(self.apiServer.port), new=0)
         
     @rumps.clicked("Quit")
     def about(self, sender):
         #rumps.alert("My quit message")
-        self.apiServer.shutdown()
+        if self.apiServer:
+            self.apiServer.shutdown()
         AppHelper.stopEventLoop()
+        rumps.quit_application()
+        sys.exit()
+
         #print "after stop"
         
     

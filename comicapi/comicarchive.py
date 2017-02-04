@@ -21,6 +21,7 @@ from unrar import constants
 
 
 from comicstreamerlib.config import ComicStreamerConfig
+
 config = ComicStreamerConfig()
 
 from PIL import Image
@@ -28,6 +29,9 @@ try:
     from PIL import WebPImagePlugin
 except:
     pass
+
+from PIL import ImageFile
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
 from comicstreamerlib.folders import AppFolders

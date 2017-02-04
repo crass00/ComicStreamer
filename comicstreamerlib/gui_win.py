@@ -15,7 +15,7 @@ import win32api
 import win32con
 import win32gui_struct
 
-from comicstreamerlib.folders import AppFolders
+from folders import AppFolders
 
 try:
     import winxpgui as win32gui

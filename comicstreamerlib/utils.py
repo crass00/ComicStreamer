@@ -20,11 +20,11 @@ try:
 except:
     pass
 
-#from PIL import ImageFile
-#ImageFile.LOAD_TRUNCATED_IMAGES = True
+from PIL import ImageFile
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 import StringIO
-from comicstreamerlib.folders import AppFolders
+from folders import AppFolders
 import imghdr
 
 from datetime import datetime, timedelta

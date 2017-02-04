@@ -14,7 +14,7 @@ from urllib2 import quote
 
 from sqlalchemy import desc
 from sqlalchemy.orm import joinedload,subqueryload,aliased
-from  sqlalchemy.sql.expression import func, select
+from sqlalchemy.sql.expression import func, select
 
 import json
 import pprint
@@ -24,6 +24,8 @@ try:
     from PIL import WebPImagePlugin
 except:
     pass
+
+
 import StringIO
 import gzip
 import dateutil.parser
@@ -44,7 +46,7 @@ import utils
 from database import *
 from monitor import Monitor
 from config import ComicStreamerConfig
-from comicstreamerlib.folders import AppFolders
+from folders import AppFolders
 from options import Options
 from bonjour import BonjourThread
 from bookmarker import Bookmarker
