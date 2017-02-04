@@ -229,14 +229,15 @@ class JSONResultAPIHandler(GenericAPIHandler):
         query = addQueryOnList(query, Comic.storyarcs_raw, StoryArc.name, storyarc)
         query = addQueryOnList(query, Comic.alternateseries_raw, AlternateSeries.name, alternateseries)
         query = addQueryOnList(query, Comic.genres_raw, Genre.name, genre)
-        #if hasValue(series_filter):
-        #    query = query.filter( Comic.series.ilike(unicode(series_filter).replace("*","%") ))
-        #if hasValue(title_filter):
-        #    query = query.filter( Comic.title.ilike(unicode(title_filter).replace("*","%") ))
+        
+        if hasValue(series_filter):
+            query = query.filter( Comic.series.ilike(unicode(series_filter).replace("*","%") ))
+        if hasValue(title_filter):
+            query = query.filter( Comic.title.ilike(unicode(title_filter).replace("*","%") ))
         #if hasValue(filename_filter):
         #    query = query.filter( Comic.path.ilike(unicode(filename_filter).replace("*","%") ))
-        #if hasValue(publisher):
-        #    query = query.filter( Comic.publisher.ilike(unicode(publisher).replace("*","%") ))
+        if hasValue(publisher):
+            query = query.filter( Comic.publisher.ilike(unicode(publisher).replace("*","%") ))
         #if hasValue(character):
         #    query = query.filter( Comic.characters_raw.any(Character.name.ilike(unicode(character).replace("*","%") )))
         #if hasValue(tag):
@@ -704,6 +705,7 @@ class EntityAPIHandler(JSONResultAPIHandler):
         entities = {
                     'characters' : Character.name,
                     'persons' : Person.name,
+                    'language' : Comic.language,
                     'publishers' : Comic.publisher,
                     'roles' : Role.name,
                     'series': Comic.series,

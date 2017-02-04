@@ -39,9 +39,6 @@ function populateComicDetails(cd, comic)
         $(cd).find(".cd_title").text(str);
     }
     
-    if (comic.language !== "") {
-        $(cd).find(".cd_language").text(comic.language);
-    }
     
     if (comic.volume !== "") {
         str = "vol. " + comic.volume.toString() + ", ";
@@ -49,6 +46,14 @@ function populateComicDetails(cd, comic)
     }
     
     $(cd).find(".cd_publisher").text(comic.publisher);
+    if (comic.language !== "") {
+        $(cd).find(".cd_language").text(comic.language);
+    }
+    else {
+        $(cd).find(".cd_language").text("Unknown");
+    }
+    
+    
     $(cd).find(".cd_pagecount").text("[" + comic.page_count + " pages]") ;
     
     comments = comic.comments

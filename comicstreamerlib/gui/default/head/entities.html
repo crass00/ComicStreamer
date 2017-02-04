@@ -14,15 +14,18 @@
     {
         //items.push( "<li id='" + key + "'>" + val + "</li>" );
         if (!(val.count == 0  || (val.count == 1 && val.name != "comics")))
-        {
-            items.push( "<li><a href=\"" + document.URL +"/" + val.name + "\">" + val.name + " (" + val.count +")</a></li>" );
+        {   var vc = val.count;
+            if (val.name == "language") vc -= 1;
+            
+            items.push( "<li><a href=\"" + document.URL +"/" + val.name + "\">" + val.name + " (" + vc +")</a></li>" );
         }
     }
 
 function value_list_pusher( key, val )
 {
     //items.push( "<li id='" + key + "'>" + val + "</li>" );
-    items.push( "<li><a href=\"" + document.URL +"/" + val + "\">" + val+"</a></li>" );
+    if (val)
+        items.push( "<li><a href=\"" + document.URL +"/" + val + "\">" + val+"</a></li>" );
 }
 
 function processEntityList(data)
