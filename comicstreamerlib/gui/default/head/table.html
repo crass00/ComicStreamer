@@ -92,7 +92,7 @@ function myAttributeWriter(record)
     if (this.id == 'thumb_url')
     {
         
-        val = '<a href={{handler.webroot}}/comic/'+ record.id +'/reader?api_key={{api_key}}><img id="result_thumb" src="{{handler.webroot}}/comic/'+ record.id +'/thumbnail/small?api_key={{api_key}}" width=50/></a>';
+        val = '<a href={{handler.webroot}}/comic/'+ record.id +'/reader?api_key={{api_key}}><img id="result_thumb" src="{{handler.webroot}}/comic/'+ record.id +'/thumbnail/small?api_key={{api_key}}"/></a>';
     }
 
     if (this.id == 'series')
@@ -135,6 +135,18 @@ function myAttributeWriter(record)
     
     return val;
 }
+
+
+function myAttributeWriter2(record)
+{
+    if (this.id == 'thumb_url_big')
+    {
+        
+        val = '<a href={{handler.webroot}}/comic/'+ record.id +'/reader?api_key={{api_key}}><img id="result_thumb_big" src="{{handler.webroot}}/comic/'+ record.id +'/thumbnail/large?api_key={{api_key}}"/></a>';
+    }
+    return val;
+}
+
 function myRowWriter(rowIndex, record, columns, cellWriter)
 {
     var tr = '';
@@ -147,15 +159,30 @@ function myRowWriter(rowIndex, record, columns, cellWriter)
     
     // add a special id with the comic ID for lookup later on
     rowstr =  '<tr id="comic'+ record.id +'">' + tr + '</tr>';
-    
+
     //debugger;
     return rowstr;
+}
+
+function ulWriter(rowIndex, record, columns, cellWriter) {
+  var cssClass = "thumb_url_big", li;
+//  if (rowIndex % 3 === 0) { cssClass += ' first'; }
+  li = '<li class="' + cssClass + '"><div class="caption"><a href={{handler.webroot}}/comic/'+ record.id +'/reader?api_key={{api_key}}><img id="result_thumb_big" src="{{handler.webroot}}/comic/'+ record.id +'/thumbnail/large?api_key={{api_key}}"/></a></div></li>';
+  return li;
+}
+
+// Function that creates our records from the DOM when the page is loaded
+function ulReader(index, li, record) {
+  var $li = $(li),
+      $caption = $li.find('.caption');
+  record.id = $caption.html();
 }
 
 function addToolTips(rows)
 {
     
     var dynatable = $("#resultset").data("dynatable")
+
     var comics = dynatable.settings.dataset.records
     
     for(var i=0, len=comics.length; i < len; i++)
@@ -230,7 +257,7 @@ function setupTable()
             records: [],
             //ajaxCache: null,
             //ajaxMethod: 'GET',
-            perPageDefault: 10,
+            perPageDefault: 20,
             perPageOptions: [10,20,50,100,200],
             
         },
@@ -249,7 +276,51 @@ function setupTable()
             _attributeWriter: myAttributeWriter
         },
     }
-    
+
+    var table_big_init =
+    {
+        table: {
+            bodyRowSelector: 'li'
+        },
+        features:
+        {
+            paginate: true,
+            search: true
+        },
+
+        dataset:
+        {
+            ajax: true,
+            ajaxUrl: '{{src}}'+ args,
+            ajaxOnLoad: true,
+            records: [],
+            //ajaxCache: null,
+            //ajaxMethod: 'GET',
+            perPageDefault: 50,
+            perPageOptions: [10,20,50,100,200],
+            
+        },
+        params:
+        {
+            //queries: 'queries',
+            //sorts: 'order',
+            perPage: 'per_page',
+            records: 'comics',
+            queryRecordCount: 'total_count',
+            totalRecordCount: 'page_count'
+        },
+        writers: {
+            _rowWriter: ulWriter,
+            _attributeWriter: myAttributeWriter2
+        },
+        readers: {
+            _rowReader: ulReader
+        },
+    }
+
+
+    $('#resultset_big').dynatable( table_big_init);
+    $('#resultset_big').bind('dynatable:afterUpdate', addToolTips);
     $('#resultset').dynatable( table_init);
     $('#resultset').bind('dynatable:afterUpdate', addToolTips);
     

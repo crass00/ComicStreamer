@@ -304,6 +304,91 @@ a
 	border: 1px solid #000;
 }
 
+/*----------------------------------------------*
+ *
+ * COMIC TABLE
+ *
+ *----------------------------------------------*/
+
+#comic_switch
+{ width: 32px;
+    cursor: pointer;
+
+
+}
+#resultset_big
+{
+	font-family: 100% Gagalin-Regular, "Trebuchet MS", Arial, Helvetica, sans-serif;
+	width:100%;
+	border-collapse:collapse;
+    list-style-type: none;
+
+}
+
+#comic_cover
+{
+    display: none;
+}
+
+#resultset_big ul, #resultset_big li
+{
+	font-size:0.8em;
+	border:0px solid #f6b946;
+	padding:3px 7px 2px 7px;
+    display : inline-block;
+}
+
+
+#result_thumb_big {
+ width : 200px;
+     box-shadow: 0 0px 10px rgba(0, 0, 0, 0.4);
+
+}
+
+#result_thumb {
+ width : 50px;
+     box-shadow: 0 0px 10px rgba(0, 0, 0, 0.4);
+}
+
+#resultset_big td
+{  font-size:1.4em; /* font-family:  "Trebuchet MS", Arial, Helvetica, sans-serif; */
+
+}
+
+#resultset_big th
+{
+    font-color:#f6b946;
+    font-size:1.0em;
+	text-align:left;
+	padding-top:5px;
+	padding-bottom:4px;
+	background-color:#f6b946;
+	color:#ffffff;
+}
+
+#resultset_big tr.alt td
+{
+	color:#000000;
+	background-color:#EBF5FF;
+}
+
+#resultset_big tr:hover
+{
+    cursor: pointer;
+    background-color: #f6b946;
+}
+
+.dynatable-processing span{
+	/*position:fixed;*/
+	background:#fff;
+	color:#000;
+	font-size: 30px;
+	font-style: italic;
+    padding:3px 7px 2px 7px;
+
+	border: 1px solid #000;
+}
+
 
 /*----------------------------------------------*
  *
