@@ -1,9 +1,21 @@
 # ComicStream: ToiletStreamer Edition
 
+Improved ComicStreamer!
+
+With CBT, CB7 support, new interface, caching system and a lot of bug fixes
+
+__Experimental__
+
+MySQL support, static library only
+
+PDF, EPUB, MOBI, AZW3, FB2, LIT, DJVU, CHM Support through calibre's ebook-convert and mupdf's mudraw
+
+
+
 ## Help wanted
 There is something missing... yes! 
 
-_Or you are a database wizard..._
+_Are you are a database wizard..._
 
 -  __MySQL support__ it drops the connection after some time :-/
 -  __MySQL support__ you can not delete commics... (good for static libs if not for the previous point)
@@ -19,6 +31,7 @@ _...Or general web page_
 - Add link to result tables to the entity browser in popup
 - secondary sort on table (e.g. date/year then issue)
 - Fix setup stuff (redirect with restarting & resetting)
+
 
 Please help!
 
@@ -76,9 +89,6 @@ General
 - user dir/port (command line arguments) are not passed when restarted
 - PDF and Calibre converters location not working (hardcoded)
 - Better cache system with preloading
-
-
-
 
 # OLD README.md
 
