@@ -701,6 +701,7 @@ class EntityAPIHandler(JSONResultAPIHandler):
             
         arglist = filter(None, arglist)
         argcount = len(arglist)
+        arglist = [utils.unquote(a) for a in arglist]
         
         entities = {
                     'characters' : Character.name,

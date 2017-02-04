@@ -210,6 +210,12 @@ def convert_bytes(num):
             return "%3.1f %s" % (num, x)
         num /= 1024.0
 
+
+import re
+
+def unquote(url):
+  return re.compile('%([0-9a-fA-F]{2})',re.M).sub(lambda m: chr(int(m.group(1),16)), url)
+
 def file_size(file_path):
     """
     this function will return the file size
