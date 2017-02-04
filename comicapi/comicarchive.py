@@ -708,7 +708,7 @@ class PdfArchiver:
             print >> sys.stderr, u"PDF Unreadable [{0}]: {1}".format(str(e),self.path)
         return out
 
-ebook_extentions = [".epub",".mobi",".chm",".azw3",".lit",".fb2"]
+ebook_extentions = [".epub",".mobi",".chm",".azw3",".lit",".fb2",".djvu"]
 
 class EbookArchiver(PdfArchiver):
 
@@ -779,10 +779,12 @@ class EbookArchiver(PdfArchiver):
         corrected_path_temp = self.cache_file + u".tmp.pdf"
         if not os.path.isfile(self.cache_file):
             try:
+                margin = config['ebook']['margin']
+                format_arg = ["--pdf-page-numbers","--margin-top",str(margin),"--margin-bottom",str(margin),"--margin-left",str(margin),"--margin-right",str(margin),"--pdf-add-toc"]
                 if platform.system() == "Windows":
-                    subprocess.check_output(['%PROGRAMFILES%\calibre\ebook-convert.exe', self.path, corrected_path_temp])
+                    subprocess.check_output(['%PROGRAMFILES%\calibre\ebook-convert.exe', self.path, corrected_path_temp] + format_arg)
                 else:
-                    subprocess.check_output(['/Applications/calibre.app/Contents/MacOS/ebook-convert', self.path, corrected_path_temp])
+                    subprocess.check_output(['/Applications/calibre.app/Contents/MacOS/ebook-convert', self.path, corrected_path_temp] + format_arg)
                 #rename file after process is done... tmp cache
                 os.rename(corrected_path_temp,self.cache_file)
                 return True

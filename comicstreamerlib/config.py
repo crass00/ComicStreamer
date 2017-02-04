@@ -62,6 +62,7 @@ class ComicStreamerConfig(ConfigObj):
             pdf2png=string(default="./pdf2png")
             resolution=integer(default=150)
             [ebook]
+            margin=integer(default=72)
             active=boolean(default="False")
             resolution=integer(default=72)
             calibre=string(default="/Applications/calibre.app/Contents/MacOS/ebook-convert")
