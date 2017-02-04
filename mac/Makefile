@@ -26,7 +26,7 @@ small: clean dist html diskimage
 some: clean dist
 
 dist:
-	$(PYINSTALLER_CMD) -n $(APP_NAME) -w $(STREAMER_BASE)/comicstreamer
+	$(PYINSTALLER_CMD) -s -w -n $(APP_NAME) $(STREAMER_BASE)/comicstreamer --noupx
 	cp -a $(STREAMER_SRC)/gui $(APP_BUNDLE)/Contents/MacOS
 	cp -a $(STREAMER_SRC)/static $(APP_BUNDLE)/Contents/MacOS
 	cp $(MAC_BASE)/app.icns $(APP_BUNDLE)/Contents/Resources/icon-windowed.icns
