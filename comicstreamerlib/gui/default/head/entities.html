@@ -25,7 +25,7 @@ function value_list_pusher( key, val )
 {
     //items.push( "<li id='" + key + "'>" + val + "</li>" );
     if (val)
-        items.push( "<li><a href=\"" + document.URL +"/" + val + "\">" + val+"</a></li>" );
+        items.push( "<li><a href=\"" + document.URL +"/" + escape(val) + "\">" + val+"</a></li>" );
 }
 
 function processEntityList(data)
