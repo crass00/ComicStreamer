@@ -17,7 +17,7 @@
         {   var vc = val.count;
             if (val.name == "language") vc -= 1;
             
-            items.push( "<li><a href=\"" + document.URL +"/" + val.name + "\">" + val.name + " (" + vc +")</a></li>" );
+            items.push( "<li><a href=\"" + document.URL +"/" + escape(val.name) + "\">" + val.name + " (" + vc +")</a></li>" );
         }
     }
 
