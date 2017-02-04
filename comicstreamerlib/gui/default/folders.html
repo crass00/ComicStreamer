@@ -1,73 +1,17 @@
 {% set title = "Folders" %}
 {% autoescape xhtml_escape %}
 {% include head/folders.html %}
+
+<div class="browser_box">
+
 <div id="current" class="browser_current">
-    <br>
 </div>
+
 <div id="folders" class="browser_list">
-    <br>
 </div>
-<div id="comics">
-    <br>
-</div>
-<table id="resultset" >
-    <thead>
-        <tr>
-            <th data-dynatable-column="thumb_url"></th>
-            <th data-dynatable-column="series">Series</th>
-            <th>Title</th>
-            <th>Issue</th>
-            <th>Volume</th>
-            
-            <th data-dynatable-sorts="date" data-dynatable-column="datex">Date</th>
-            
-            <th>Publisher</th>
-            <!--    <th data-dynatable-column="path">Server Path</th> -->
-            <th>Language</th>
-        </tr>
-    </thead>
-    <tbody>
-    </tbody>
-</table>
-
 </div>
 
+<br>
 
-<!---------------------------------------------------------------------------->
-<!-- JS will clone and populate this hidden chunk later for each comic popup -->
-<div class="comicdetails" id="cd_template" style="display:none">
-    <div class="cd_links">
-        <center>
-            <span class="cd_title"></span>
-            <a class="cd_file_link">Download</a>
-            <!-- <span> -- </span>
-            <a class="cd_reader_link" > <!-- target="_blank" --.> Reader</a>
-            <span> -- </span> -->
-            <a class="cd_json_link" > <!-- target="_blank" --> JSON</a>
-        </center>
-    </div>
-    <div class="comicdetails_top"> <a class="cd_reader_link" > <!-- target="_blank" -->
-        <img class="cd_thumbnail" />
-    </a>
-    
-    <div class="comicdetails_top_right">
-        <div class="cd_issue"></div>
-        <!--div class="cd_title"></div-->
-        <div class="cd_volume"></div>
-        <div class="cd_publisher"></div>
-        <div class="cd_date"></div>
-        <div class="cd_pagecount"></div>
-        <div>
-            <table class="cd_credits"></table>
-        </div>
-    </div>
-    <br />
-    </div>
-    <div class="cd_comments"></div>
-    <br />
-    <div>
-        <table class="cd_lists"></table>
-    </div>
-    <div class="cd_path"></div>
-    
+{% include table.html %}
 {% include foot/foot.html %}

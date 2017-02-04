@@ -72,7 +72,7 @@ class Launcher():
         if getattr(sys, 'frozen', None):
             # A frozen app will run a GUI
             self.apiServer.runInThread()
-       
+           
             logging.info("UI Started")
             if platform.system() == "Darwin":
                 from gui_mac import MacGui

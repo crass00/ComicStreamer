@@ -99,7 +99,8 @@ class MetaDataStyle:
     CBI = 0
     CIX = 1
     COMET = 2
-    name = [ 'ComicBookLover', 'ComicRack', 'CoMet' ]
+    CALIBRE = 3
+    name = [ 'ComicBookLover', 'ComicRack', 'CoMet' , 'Calibre' ]
 
 class ZipArchiver:
 
@@ -846,7 +847,7 @@ class ComicArchive:
 
         self.archive_type =  self.ArchiveType.Unknown
         self.archiver = UnknownArchiver( self.path )
-
+        
         # test all known types even if they have the wrong extension
         if ext == ".cbr" or ext == ".rar":
             if self.rarTest():
@@ -898,8 +899,8 @@ class ComicArchive:
             elif self.tarTest():
                 self.archive_type = self.ArchiveType.Tar
                 self.archiver = TarArchiver( self.path )
+
         elif ext == ".cbt" or ext == ".tar":
-            
             if self.tarTest():
                 self.archive_type = self.ArchiveType.Tar
                 self.archiver = TarArchiver( self.path )
@@ -915,6 +916,7 @@ class ComicArchive:
             elif self.rarTest():
                 self.archive_type =  self.ArchiveType.Rar
                 self.archiver = RarArchiver( self.path, rar_exe_path=self.rar_exe_path )
+
         elif ext == ".pdf":
             # skip converted ebook
             if os.path.basename(self.path)[-8:] != '.tmp.pdf':
