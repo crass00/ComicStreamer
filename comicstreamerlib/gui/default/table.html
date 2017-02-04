@@ -1,3 +1,39 @@
+<script type="text/javascript" charset="utf-8">
+
+
+function coverview_toggle()
+{
+    img_cover = "{{ static_url('icons/view/cover.png') }}";
+    img_table = "{{ static_url('icons/view/table.png') }}";
+
+    if($('#comic_cover').css('display') == 'none' || $('#comic_view').css('display') != 'none')
+    {
+        document.getElementById("comic_switch").src = img_cover;
+        document.getElementById("comic_view").style.display = "none";
+        document.getElementById("comic_cover").style.display = "block";
+
+    }
+else
+    {
+        document.getElementById("comic_switch").src = img_table;
+        document.getElementById("comic_view").style.display = "block";
+        document.getElementById("comic_cover").style.display = "none";
+    }
+}
+</script>
+
+<img id="comic_switch" src="{{ static_url('icons/view/cover.png') }}" onclick="coverview_toggle()">
+
+<div  id="comic_cover">
+<ul id="resultset_big" name="comic_cover" class="row-fluid">
+    <li class="thumb_url_big" data-dynatable-column="thumb_url_big"  data-color="gray">
+         <div class="thumb"></div>
+    </li>
+</ul>
+</div>
+
+<div name="comic_view" id="comic_view">
+<table id="resultset">
     <thead>
         <tr>
             <th data-dynatable-column="thumb_url"></th>
@@ -16,6 +52,7 @@
     <tbody>
     </tbody>
 </table>
+</div>
 
 <!---------------------------------------------------------------------------->
 <!-- JS will clone and populate this hidden chunk later for each comic popup -->
