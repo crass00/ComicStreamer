@@ -60,11 +60,11 @@ class ComicStreamerConfig(ConfigObj):
             mudraw=string(default="./mudraw")
             mutool=string(default="./mutool")
             pdf2png=string(default="./pdf2png")
-            resolution=integer(default=150)
+            resolution=integer(default=200)
             [ebook]
             margin=integer(default=72)
             active=boolean(default="False")
-            resolution=integer(default=72)
+            resolution=integer(default=125)
             calibre=string(default="/Applications/calibre.app/Contents/MacOS/ebook-convert")
             [ebook.cache]
             size=integer(default=0)
