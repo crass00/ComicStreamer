@@ -1443,6 +1443,13 @@ class APIServer(tornado.web.Application):
         #    logging.error("No folders on either command-line or config file.  Quitting.")
         #    sys.exit(-1)
 
+
+        if not os.path.exists(AppFolders.appCachePages()):
+            os.makedirs(AppFolders.appCachePages())
+    
+        if not os.path.exists(AppFolders.appCacheEbooks()):
+            os.makedirs(AppFolders.appCacheEbooks())
+                
         cache_location = self.config['cache']['location']
         cache_active = self.config['cache']['active']
         if cache_location == "": cache_location = AppFolders.appCachePages()

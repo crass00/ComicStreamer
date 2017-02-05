@@ -173,10 +173,12 @@ function use_ebook_toggle()
         document.getElementById("settings_ebook").style.display = "none";
         if (!($("#use_pdf").is(':checked'))) {
             document.getElementById("settings_pdf").style.display = "none";
+            document.getElementById("settings_convert").style.display = "none";
         }
     }
     else {
         $('#use_pdf').prop('checked', true);
+        document.getElementById("settings_convert").style.display = "inline";
         document.getElementById("settings_pdf").style.display = "inline";
         document.getElementById("settings_ebook").style.display = "inline";
         if ($("#use_mutool").is(':checked')) use_mutool_toggle();
@@ -188,12 +190,14 @@ function use_ebook_toggle()
 function use_pdf_toggle()
 {//!($("#use_ebook").is(':checked')) &&
     if ( !($("#use_pdf").is(':checked'))) {
+            document.getElementById("settings_convert").style.display = "none";
             document.getElementById("settings_pdf").style.display = "none";
             document.getElementById("settings_ebook").style.display = "none";
             $('#use_ebook').prop('checked', false);
     }
     else {
         document.getElementById("settings_pdf").style.display = "inline";
+        document.getElementById("settings_convert").style.display = "inline";
         if ($("#use_mutool").is(':checked')) use_mutool_toggle();
         if ($("#use_mudraw").is(':checked')) use_mudraw_toggle();
         if ($("#use_pdf2png").is(':checked')) use_pdf2png_toggle();

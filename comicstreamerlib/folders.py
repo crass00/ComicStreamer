@@ -17,6 +17,8 @@ class AppFolders():
         make(AppFolders.logs())
         make(AppFolders.settings())
         make(AppFolders.appData())
+        make(AppFolders.appCachePages())
+        make(AppFolders.appCacheEbooks())
 
     @staticmethod
     def runningAtRoolLevel():

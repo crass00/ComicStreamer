@@ -65,7 +65,7 @@ class ComicStreamerConfig(ConfigObj):
             margin=integer(default=72)
             active=boolean(default="False")
             resolution=integer(default=125)
-            calibre=string(default="/Applications/calibre.app/Contents/MacOS/ebook-convert")
+            calibre=string(default="")
             [ebook.cache]
             size=integer(default=0)
             free=integer(default=3000)
@@ -98,6 +98,13 @@ class ComicStreamerConfig(ConfigObj):
         validator = Validator()
         tmp.validate(validator,  copy=True)
        
+       
+        if tmp['ebook']['calibre'] == '':
+            if platform.system() == "Darwin":
+                calibre = '/Applications/calibre.app/Contents/MacOS/ebook-convert'
+                if os.path.isfile(calibre):
+                    tmp['ebook']['calibre'] = calibre
+
         # set up the install ID
         if tmp['general']['install_id'] == '':
             tmp['general']['install_id'] = uuid.uuid4().hex

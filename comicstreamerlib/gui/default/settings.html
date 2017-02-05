@@ -11,6 +11,16 @@
         <br>
         <span>Comic Folders</span> <span class="help">one folder per line</span><textarea id="folders" name="folders" >{{formdata['folders']}}</textarea>
         <br>
+        <h2>Pages Cache <input style="display:inline" type="checkbox" name="use_cache" class="formcheck" id="use_cache" value="use" onclick="use_cache_toggle()" {{formdata['use_cache']}} /></h2>
+        <div id="settings_cache">
+        <br>
+        <span>Size</span> <span class="help">(megabytes)</span><input id="cache_size" type="number" name="cache_size" value="{{formdata['cache_size']}}" />
+        <span>Free Space</span> <span class="help">(megabytes)</span><input id="cache_free" type="number" name="cache_free" value="{{formdata['cache_free']}}" />
+        <br>
+        <span>Location Override</span><input id="cache_location" type="text" name="cache_location" value="{{formdata['cache_location']}}" />
+        <br>
+        </div>
+        <br>
         <h2><input style="display:inline" type="radio" id="use_mysql" name="db_engine" class="formcheck" value="mysql"  onclick="use_db_toggle()" {{formdata['use_mysql']}}>MySQL&nbsp;<input style="display:inline" type="radio" id="use_sqlite" name="db_engine" class="formcheck" value="sqlite" onclick="use_db_toggle()" {{formdata['use_sqlite']}}>SQLite</h2>
 
         <p>
@@ -28,48 +38,58 @@
             <span>Username</span><input id="mysql_username" type="text" name="mysql_username" value="{{formdata['mysql_username']}}" />
             <span>Password</span> <span class="help">default: comic</span><input id="mysql_password" type="password" name="mysql_password" value="{{formdata['mysql_password']}}" />
         </div>
-        <br>   
-        <h2>Cache <input style="display:inline" type="checkbox" name="use_cache" class="formcheck" id="use_cache" value="use" onclick="use_cache_toggle()" {{formdata['use_cache']}} /></h2>
-        <div id="settings_cache">
         <br>
-        <span>Size</span> <span class="help">(megabytes)</span><input id="cache_size" type="number" name="cache_size" value="{{formdata['cache_size']}}" />
-        <span>Free Space</span> <span class="help">(megabytes)</span><input id="cache_free" type="number" name="cache_free" value="{{formdata['cache_free']}}" />
-        <br>
-        <span>Location Override</span><input id="cache_location" type="text" name="cache_location" value="{{formdata['cache_location']}}" />
-        </div>
         <br>
         <h2>Formats</h2>
         <br>
-        <span>CBZ</span><input style="display:inline" type="checkbox" disabled name="use_cbz" class="formcheck" id="use_cbz" value="use" checked />
-        <span>CBR</span><input style="display:inline" type="checkbox" disabled name="use_cbr" class="formcheck" id="use_cbr" value="use" checked />
-        <span>CB7</span><input style="display:inline" type="checkbox" disabled name="use_cb7" class="formcheck" id="use_cb7" value="use" checked />
-        <span>CBT</span><input style="display:inline" type="checkbox" disabled name="use_cbt" class="formcheck" id="use_cbt" value="use" checked />
-        <span>PDF</span><input style="display:inline" type="checkbox" name="use_pdf" class="formcheck" id="use_pdf" value="use" onclick="use_pdf_toggle()" {{formdata['use_pdf']}} />
+        <span>cbz</span><input style="display:inline" type="checkbox" disabled name="use_cbz" class="formcheck" id="use_cbz" value="use" checked />
+        <span>cbr</span><input style="display:inline" type="checkbox" disabled name="use_cbr" class="formcheck" id="use_cbr" value="use" checked />
+        <span>cb7</span><input style="display:inline" type="checkbox" disabled name="use_cb7" class="formcheck" id="use_cb7" value="use" checked />
+        <span>cbt</span><input style="display:inline" type="checkbox" disabled name="use_cbt" class="formcheck" id="use_cbt" value="use" checked />
+        <span>pdf</span><input style="display:inline" type="checkbox" name="use_pdf" class="formcheck" id="use_pdf" value="use" onclick="use_pdf_toggle()" {{formdata['use_pdf']}} />
         <span>EBOOK</span><input style="display:inline" type="checkbox" name="use_ebook" class="formcheck" id="use_ebook" value="use" onclick="use_ebook_toggle()" {{formdata['use_ebook']}} />
         <br>
+
+        <div id="settings_convert">
         <br>
+            <br>
+            <h2>Convert Cache</h2>
+            <br>
+            <span>Location Override</span><input id="ebook_cache_location" type="text" name="ebook_cache_location" value="{{formdata['ebook_cache_location']}}" />
+        <br>
+        <br>
+        </div>
+
         <div id="settings_pdf">
             <h2>PDF</h2>
             <br>
             <input type="radio" style="display:inline"  class="formcheck"  name="pdf_engine" id="use_mudraw" value="mudraw" onclick="use_mudraw_toggle()"  {{formdata['use_mudraw']}} />Mudraw
-            <input type="radio" style="display:inline"  class="formcheck" name="pdf_engine" id="use_mutool" value="mutool" onclick="use_mutool_toggle()"  {{formdata['use_mutool']}}/>Mutool
-            <input type="radio" style="display:inline"  class="formcheck" name="pdf_engine" id="use_pdf2png" value="pdf2png" onclick="use_pdf2png_toggle()"  {{formdata['use_pdf2png']}}/>PDF2PNG
+            <input type="radio" style="display:inline"  disabled class="formcheck" name="pdf_engine" id="use_mutool" value="mutool" onclick="use_mutool_toggle()"  {{formdata['use_mutool']}}/>Mutool
+            <input type="radio" style="display:inline" disabled  class="formcheck" name="pdf_engine" id="use_pdf2png" value="pdf2png" onclick="use_pdf2png_toggle()"  {{formdata['use_pdf2png']}}/>PDF2PNG
             
-            <span id="settings_mudraw"><input id="mudraw" type="text" name="mudraw" value="{{formdata['mudraw']}}" /></span>
+            <span id="settings_mudraw"><input id="mudraw" disabled type="text" name="mudraw" value="{{formdata['mudraw']}}" /></span>
             <span id="settings_mutool"><input id="mutool" type="text" name="mutool" value="{{formdata['mutool']}}" /></span>
             <span id="settings_pdf2png"><input id="pdf2png" type="text" name="pdf2png" value="{{formdata['pdf2png']}}" /></span>
             <br>
             <span>Resolution</span><input id="pdf_resolution" type="number" name="pdf_resolution" value="{{formdata['pdf_resolution']}}" />
+            <br>
+            <span id="settings_qpdf"  class="formcheck">qpdf <span class="help">pdf decrypter</span><input id="qpdf" disabled  type="text" name="qpdf" value="./qpdf" /></span>
         </div>
-
+        <br>
         <div id="settings_ebook">
         <br>
             <h2>Ebook</h2>
             <br>
-            <span>Calibre</span><input id="calibre" type="text" name="calibre" value="{{formdata['calibre']}}" />
-
-            <span>Override Cache Location</span><input id="ebook_cache_location" type="text" name="ebook_cache_location" value="{{formdata['ebook_cache_location']}}" />
-
+            <span>epub</span><input style="display:inline" type="checkbox" disabled name="use_epub" class="formcheck" id="use_epub" value="use" checked />
+            <span>mobi</span><input style="display:inline" type="checkbox" disabled name="use_mobi" class="formcheck" id="use_mobi" value="use" checked />
+            <span>lit</span><input style="display:inline" type="checkbox" disabled name="use_lit" class="formcheck" id="use_lit" value="use" checked />
+            <span>azw3</span><input style="display:inline" type="checkbox" disabled name="use_azw3" class="formcheck" id="use_azw3" value="use" checked />
+            <span>fb2</span><input style="display:inline" type="checkbox" disabled name="use_fb2" class="formcheck" id="use_fb2" value="use" checked />
+            <span>djvu</span><input style="display:inline" type="checkbox" disabled name="use_djvu" class="formcheck" id="use_djvu" value="use" checked />
+            <span>chm</span><input style="display:inline" type="checkbox" disabled name="use_chm" class="formcheck" id="use_chm" value="use" checked />
+            <br>
+            <br>
+            <span>Calibre</span> <span class="help">ebook-convert</span><input id="calibre" disabled  type="text" name="calibre" value="{{formdata['calibre']}}" />
             <span>Margin</span><input id="ebook_margin" type="number" name="ebook_margin" value="{{formdata['ebook_margin']}}" />
             <span>Resolution</span><input id="ebook_resolution" type="number" name="ebook_resolution" value="{{formdata['ebook_resolution']}}" />
             <div style="display:none">
@@ -77,27 +97,33 @@
             <span>Cache Size</span> <span class="help">(megabytes)</span><input id="ebook_cache_size" type="number" name="ebook_cache_size" value="{{formdata['ebook_cache_size']}}" />
             <span>Cache Free Space</span> <span class="help">(megabytes)</span><input id="ebook_cache_free" type="number" name="ebook_cache_free" value="{{formdata['ebook_cache_free']}}" />
             </div>
+            <br>
         </div>
     </div>
-    <br><br><br>
+    <br><br>
     <div>
         <h1>Server</h1>
         <br>
         <span>Port</span><input id="port" type="number" name="port" value="{{formdata['port']}}" />
+        <br>
         <br>
         <h2><span>Authenication<input style="display:inline"  type="checkbox" name="use_authentication" class="formcheck" id="use_auth" value="use" onclick="use_auth_toggle()" {{formdata['use_authentication']}}></span></h2>
         <div id="settings_auth">
         <br><span>Name</span><input id="username" type="text" name="username" value="{{formdata['username']}}" />
         <span>Password</span><input id="password" type="password" name="password" value="{{formdata['password']}}" />
         <span>Password</span> <span class="help">re-enter</span><input id="password_confirm" type="password" name="password_confirm" value="{{formdata['password']}}" />
-        </div>
         <br>
+        <br>
+        </div>
+
         <h2><span>API Key<input style="display:inline"  type="checkbox" name="use_api_key" class="formcheck" id="use_key" value="use" onclick="use_api_key_toggle()" {{formdata['use_api_key']}}></span></h2>
         <div id="settings_api">
         <br><input id="api_key" type="text" name="api_key" value="{{formdata['api_key']}}" /><button type="button" class="formbutton" id="key_btn" onclick="create_key()">Generate</button>
         <br>
-        </div>
         <br>
+        <br>
+        </div>
+
         <h2><span>Secure<input style="display:inline"  type="checkbox" name="use_https" class="formcheck" id="use_https" onclick="use_https_toggle()" value="use" {{formdata['use_https']}}></span></h2>
         
         <div id="settings_https">
@@ -106,6 +132,7 @@
         <span>Key File</span><input id="key_file" type="text" name="key_file" value="{{formdata['key_file']}}" />
         <span>Certificate File</span><input id="certificate_file" type="text" name="certificate_file" value="{{formdata['certificate_file']}}" />
         </div>
+        <br>
         <br>
         <span>WebRoot</span><input id="webroot" type="text" name="webroot" value="{{formdata['webroot']}}" />
         <br>

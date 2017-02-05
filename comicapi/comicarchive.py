@@ -663,7 +663,16 @@ class PdfArchiver:
     def readArchiveFile( self, page_num ):
         resolution = config['pdf']['resolution']
         #resolution = 150
-        
+   
+        cache_location = config['ebook.cache']['location']
+        if cache_location == "" or not os.path.exists(cache_location):
+            cache_location = AppFolders.appCacheEbooks()
+        cache = os.path.join(cache_location,os.path.basename(self.path)+u".decrypted.cache.pdf")
+
+        corrected_path_temp = self.path
+        if os.path.isfile(cache):
+            corrected_path_temp = cache
+ 
         page_num_corr = page_num
         cover = os.path.join(os.path.dirname(self.path),'cover.jpg')
         if os.path.isfile(cover):
@@ -682,9 +691,9 @@ class PdfArchiver:
         
         try:
             if platform.system() == "Windows":
-                return subprocess.check_output(['.\mutool.exe', 'draw','-r', str(resolution), '-o','-', self.path, str(int(os.path.basename(page_num_corr)[:-4]))])
+                return subprocess.check_output(['mutool.exe', 'draw','-r', str(resolution), '-o','-', corrected_path_temp, str(int(os.path.basename(page_num_corr)[:-4]))])
             else:
-                return subprocess.check_output(['./mudraw', '-r', str(resolution), '-o','-', self.path, str(int(os.path.basename(page_num_corr)[:-4]))])
+                return subprocess.check_output(['./mudraw', '-r', str(resolution), '-o','-', corrected_path_temp, str(int(os.path.basename(page_num_corr)[:-4]))])
         except:
             pass
 
@@ -697,18 +706,44 @@ class PdfArchiver:
         try:
             if os.path.isfile(os.path.join(os.path.dirname(self.path),'cover.jpg')):
                 out.append("0.png")
-            pdf = PdfFileReader(open(self.path, 'rb'))
+        
+            cache_location = config['ebook.cache']['location']
+            if cache_location == "" or not os.path.exists(cache_location):
+                cache_location = AppFolders.appCacheEbooks()
+
+            cache = os.path.join(cache_location,os.path.basename(self.path)+u".decrypted.cache.pdf")
+            corrected_path_temp = self.path
+            if os.path.isfile(cache):
+                corrected_path_temp = cache
+            
+            pdf = PdfFileReader(open(corrected_path_temp, 'rb'))
             if pdf.isEncrypted:
                 try:
                     pdf.decrypt('')
                     for page in range(1, pdf.getNumPages() + 1):
                         out.append(str(page) + ".png")
                 except Exception as e:
-                    print >> sys.stderr, u"PDF Decrypted Failed [{0}]: {1}".format(str(e),self.path)
+                    # error... decode...
+                    if platform.system() == "Windows":
+                        subprocess.call(["qpdf.exe","--password=","--decrypt",self.path,cache])
+                    else:
+                        subprocess.call(["./qpdf","--password=","--decrypt",self.path,cache])
+                    
+                    # restart process...
+                    if os.path.isfile(os.path.join(os.path.dirname(self.path),'cover.jpg')):
+                        out.append("0.png")
+                        
+                    pdf = PdfFileReader(open(cache, 'rb'))
+                    out = []
+                    try:
+                        for page in range(1, pdf.getNumPages() + 1):
+                            out.append(str(page) + ".png")
+                    except Exception as e:
+                        print >> sys.stderr, u"PDF Unreadble [{0}]: {1}".format(str(e),self.path)
+
             else:
                 for page in range(1, pdf.getNumPages() + 1):
                     out.append(str(page) + ".png")
-                    
         except Exception as e:
             print >> sys.stderr, u"PDF Unreadable [{0}]: {1}".format(str(e),self.path)
         return out
@@ -778,7 +813,7 @@ class EbookArchiver(PdfArchiver):
 
     def convert( self ):
         cache_location = config['ebook.cache']['location']
-        if cache_location == "":
+        if cache_location == "" or not os.path.exists(cache_location):
             cache_location = AppFolders.appCacheEbooks()
         self.cache_file = os.path.join(cache_location,os.path.basename(self.path)+u".cache.pdf")
         corrected_path_temp = self.cache_file + u".tmp.pdf"
@@ -1206,6 +1241,7 @@ class ComicArchive:
         if self.page_list is None:
             # get the list file names in the archive, and sort
             files = self.archiver.getArchiveFilenameList()
+            print files
             # seems like some archive creators are on  Windows, and don't know about case-sensitivity!
             if sort_list:
                 def keyfunc(k):
@@ -1217,8 +1253,12 @@ class ComicArchive:
                 try:
                     files = natsorted(files, key=keyfunc,signed=False)
                 except:
-                    # fix bug with strange encoding... should we check zip/rar/etc files for encoding?
-                    files = natsorted([i.decode('windows-1252') for i in files], key=keyfunc,signed=False)
+                    # "HERE FIX patch ...bug with strange encoding... should we check zip/rar/etc files for encoding?
+                    try:
+                        files = natsorted([i.decode('windows-1252') for i in files], key=keyfunc,signed=False)
+                    except:
+                        print "COMIC ERROR: FILES NOT SORTED"
+                        return files
 
             # make a sub-list of image files
             self.page_list = []
