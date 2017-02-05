@@ -12,6 +12,8 @@
                     <img src="{{handler.webroot}}/comic/{{comic.id}}/thumbnail?api_key={{api_key}}">
                     <span class="comic_caption">{{comic.series}} #{{comic.issue}}</span>
                 </a>
+                <span class="comic_caption"><a href="{{handler.webroot}}/entities/browse/series/{{comic.series}}">{{comic.series}} #{{comic.issue}}</a></span>
+
             </li>
             {% end %}
         {% end %}
@@ -29,8 +31,8 @@
             <li>
                 <a href="{{handler.webroot}}/comic/{{comic.id}}/reader" > <!-- target="_blank" -->
                     <img src="{{handler.webroot}}/comic/{{comic.id}}/thumbnail?api_key={{api_key}}">
-                    <span class="comic_caption">{{comic.series}} #{{comic.issue}}</span>
                 </a>
+                <span class="comic_caption"><a href="{{handler.webroot}}/entities/browse/series/{{comic.series}}">{{comic.series}} #{{comic.issue}}</a></span>
             </li>
             {% end %}
         {% end %}

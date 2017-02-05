@@ -45,12 +45,14 @@ function populateComicDetails(cd, comic)
         $(cd).find(".cd_volume").text(str);
     }
     
-    $(cd).find(".cd_publisher").text(comic.publisher);
+    $(cd).find(".cd_publisher").html('<a href="{{handler.webroot}}/entities/browse/publishers/'+ comic.publisher +'">'+ comic.publisher +'</a>');
+    
+    
     if (comic.language !== "") {
-        $(cd).find(".cd_language").text(comic.language);
+        $(cd).find(".cd_language").text('['+comic.language+']');
     }
     else {
-        $(cd).find(".cd_language").text("Unknown");
+        $(cd).find(".cd_language").text("");
     }
     
     
@@ -173,9 +175,9 @@ function ulWriter(rowIndex, record, columns, cellWriter) {
 
 // Function that creates our records from the DOM when the page is loaded
 function ulReader(index, li, record) {
-  var $li = $(li),
-      $caption = $li.find('.caption');
-  record.id = $caption.html();
+//  var $li = $(li),
+//      $caption = $li.find('.caption');
+//  record.id = $caption.html();
 }
 
 function addToolTips(rows)
@@ -310,14 +312,13 @@ function setupTable()
             totalRecordCount: 'page_count'
         },
         writers: {
-            _rowWriter: ulWriter,
+ //           _rowWriter: ulWriter,
             _attributeWriter: myAttributeWriter2
         },
         readers: {
             _rowReader: ulReader
         },
     }
-
 
     $('#resultset_big').dynatable( table_big_init);
     $('#resultset_big').bind('dynatable:afterUpdate', addToolTips);
