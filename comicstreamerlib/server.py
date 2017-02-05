@@ -1589,12 +1589,23 @@ class APIServer(tornado.web.Application):
     def restart(self):
         self.shutdown()
         executable = sys.executable
-            
+        
+        new_argv.append("-p ");
+        new_argv.append(str(self.port))
         new_argv = ["--nobrowser"]
         if self.opts.quiet:
             new_argv.append("-q")
         if self.opts.debug:
             new_argv.append("-d")
+        if self.opts.no_monitor:
+            new_argv.append("--nomonitor")
+        if self.opts.userdir:
+            new_argv.append("--user-dir")
+            new_argv.append(self.opts.userdir)
+        if self.opts.webroot:
+            new_argv.append("--webroot")
+            new_argv.append(self.opts.webroot)
+        
         if  "--_resetdb_and_run" in sys.argv:
             new_argv.append("--_resetdb_and_run")
 
