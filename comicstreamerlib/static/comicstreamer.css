@@ -200,6 +200,25 @@ a
 }
 
 
+/*----------------------------------------------*
+ *
+ * RANDOM COMIC
+ *
+ *----------------------------------------------*/
+
+
+.random_comic
+{
+      box-shadow: 0 0px 10px rgba(0, 0, 0, 0.4);
+}
+
+
+/*----------------------------------------------*
+ *
+ * RECENT COMIC
+ *
+ *----------------------------------------------*/
+
 .recent
 {
     color:#000; background-color:#f6b946;
@@ -235,6 +254,8 @@ a
     border:0;
     display:block;
     margin:0px auto;
+        box-shadow: 0 0px 10px rgba(0, 0, 0, 0.4);
+
 }
 
 .result_row:hover
