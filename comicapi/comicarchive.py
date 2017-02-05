@@ -1241,7 +1241,6 @@ class ComicArchive:
         if self.page_list is None:
             # get the list file names in the archive, and sort
             files = self.archiver.getArchiveFilenameList()
-            print files
             # seems like some archive creators are on  Windows, and don't know about case-sensitivity!
             if sort_list:
                 def keyfunc(k):
