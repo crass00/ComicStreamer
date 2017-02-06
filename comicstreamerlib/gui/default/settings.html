@@ -73,7 +73,7 @@
             <br>
             <span>Resolution</span><input id="pdf_resolution" type="number" name="pdf_resolution" value="{{formdata['pdf_resolution']}}" />
             <br>
-            <span id="settings_qpdf"  class="formcheck">qpdf <span class="help">pdf decrypter</span><input id="qpdf" disabled  type="text" name="qpdf" value="./qpdf" /></span>
+            <span id="settings_qpdf"  class="formcheck">qpdf <span class="help">pdf decrypter</span><input id="qpdf" disabled  type="text" name="qpdf" value="{{formdata['qpdf']}}" /></span>
         </div>
         <br>
         <div id="settings_ebook">
@@ -134,6 +134,7 @@
         </div>
         <br>
         <br>
+        <span>Bind</span><input id="bind" type="text" name="bind" value="{{formdata['bind']}}" />
         <span>WebRoot</span><input id="webroot" type="text" name="webroot" value="{{formdata['webroot']}}" />
         <br>
         <span><input  style="display:inline" type="checkbox" name="launch_client" class="formcheck" id="launch_client" value="{{formdata['launch_client']}}">Launch Client At Startup</span>

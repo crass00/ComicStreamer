@@ -81,6 +81,8 @@ class Monitor():
             if os.path.exists(path):
                 self.setStatusDetail(u"Watchdog (BUG?)")
                 logging.debug("Monitor: Watchdog Indexing")
+                
+                # if I make this threaded? then it does not wait???
                 self.observer.schedule(self.eventHandler, path, recursive=True)
                 logging.debug("Monitor: Watchdog Indexing Finished")
         self.observer.start()

@@ -20,17 +20,22 @@ A digital comic media server.
 The FOLDER_LIST is a list of folders that will be scanned recursively
 for comics to add to the database (persisted)
 
-  -p, --port                 The port the server should listen on. (persisted)
-      --webroot              Webroot for reverse proxy (persisted)
-  -r, --reset                Purge the existing database and quit
-  -d, --debug                More verbose console output   
-  -q, --quiet                No console output   
-      --nomonitor            Don't start the folder scanner/monitor 
-      --nobrowser            Don't launch a web browser                                            
-      --version              Display version                            
-  -h, --help                 Display this message
-      --user-dir             Set path for user folder
-  
+  -p, --port           [PORT] The port the server should listen on. (persisted)
+  -b, --bind             [IP] Bind server traffic to ip (persisted)
+  -w, --webroot     [WEBROOT] Webroot for reverse proxy (persisted)
+  -c, --config-file    [FILE] Config file
+  -u, --user-dir     [FOLDER] Set path for user folder
+  -r, --reset                 Purge the existing database and quit
+  -d, --debug                 More verbose console output
+  -q, --quiet                 No console output
+      --nomonitor             Don't start the folder scanner/monitor
+      --nobrowser             Don't launch a web browser
+  -v, --version               Display version
+  -h, --help                  Display this message
+
+
+Example:
+    comicstreamer -p 32502 --config-file ~/comcistreamer/comics.conf
     """
 
 
@@ -44,7 +49,8 @@ for comics to add to the database (persisted)
         self.launch_client = True
         self.reset_and_run = False
         self.webroot = None
-        self.user_dir = None;
+        self.user_dir = None
+        self.bind = None
         
     def display_msg_and_quit( self, msg, code, show_help=False ):
         appname = os.path.basename(sys.argv[0])
@@ -65,11 +71,11 @@ for comics to add to the database (persisted)
             input_args = sys.argv[1:]
             
         # parse command line options
-        try:
+        try:  #will never know why the ":" is below... "dp:hrqwuvb"
             opts, args = getopt.getopt( input_args, 
-                       "dp:hrq", 
+                       "hpwvrdqbuc",
                        [ "help", "port=", "webroot=", "version", "reset", "debug", "quiet",
-                    "nomonitor", "nobrowser", "user-dir=",
+                    "nomonitor", "nobrowser", "bind=", "user-dir=","config-file=",
                     "_resetdb_and_run", #private
                     ] )
 
@@ -91,19 +97,23 @@ for comics to add to the database (persisted)
                     self.port = int(a)
                 except:
                     pass
-            if o == "--webroot":
+            if o in ("-w", "--webroot"):
                 self.webroot = a
+            if o in ("-b", "--bind"):
+                self.bind = a
             if o  == "--nomonitor":
                 self.no_monitor = True
             if o  == "--nobrowser":
                 self.launch_client = False                
-            if o  == "--version":
+            if o  in ("-v","--version"):
                 print "ComicStreamer {0}: ".format(csversion.version)
                 sys.exit(0)
             if o == "--_resetdb_and_run":
                 self.reset_and_run = True
-            if o == "--user-dir":
+            if o == ("u","--user-dir"):
                 self.user_dir = a
+            if o == ("c","--config-file"):
+                self.config_file = a
                 
                 
         filename_encoding = sys.getfilesystemencoding()

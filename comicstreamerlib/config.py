@@ -25,10 +25,11 @@ class ComicStreamerConfig(ConfigObj):
             first_run=boolean(default="True")
             [web]
             port=integer(default=32500)
+            bind=string(default="")
             webroot=string(default="")
-            [web.secure]
+            [web.ssl]
             active=boolean(default="False")
-            port=integer(default=32501)
+            port=integer(default=32400)
             certificate_file=string(default="server.crt")
             key_file=string(default="server.key")
             [security]
@@ -57,9 +58,10 @@ class ComicStreamerConfig(ConfigObj):
             [pdf]
             active=boolean(default="False")
             engine=string(default="mudraw")
-            mudraw=string(default="./mudraw")
-            mutool=string(default="./mutool")
-            pdf2png=string(default="./pdf2png")
+            mudraw=string(default="")
+            mutool=string(default="")
+            pdf2png=string(default="")
+            qpdf=string(default="")
             resolution=integer(default=200)
             [ebook]
             margin=integer(default=72)
@@ -142,6 +144,10 @@ class ComicStreamerConfig(ConfigObj):
         if opts.webroot is not None:
             self['web']['webroot'] = opts.webroot
             modified = True
-            
+
+        if opts.bind is not None:
+            self['web']['bind'] = opts.bind
+            modified = True
+
         if modified:
             self.write()

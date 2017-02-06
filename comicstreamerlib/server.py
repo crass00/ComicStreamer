@@ -1033,9 +1033,9 @@ class ConfigPageHandler(BaseHandler):
         formdata['use_pdf'] = "checked" if formdata['use_pdf'] else ""
         formdata['use_ebook'] = "checked" if formdata['use_ebook'] else ""
 
-        formdata['use_pdf2png'] = "checked" if formdata['use_pdf2png'] else ""
         formdata['use_mutool'] = "checked" if formdata['use_mutool'] else ""
         formdata['use_mudraw'] = "checked" if formdata['use_mudraw'] else ""
+        formdata['use_qpd'] = "checked" if formdata['use_qpdf'] else ""
         
 
         formdata['use_https'] = "checked" if formdata['use_https'] else ""
@@ -1069,10 +1069,11 @@ class ConfigPageHandler(BaseHandler):
         formdata['cache_free'] = self.application.config['cache']['free']
         formdata['cache_location'] = self.application.config['cache']['location']
         formdata['port'] = self.application.config['web']['port']
-        formdata['secure_port'] = self.application.config['web.secure']['port']
-        formdata['key_file'] = self.application.config['web.secure']['key_file']
-        formdata['certificate_file'] = self.application.config['web.secure']['certificate_file']
-        formdata['use_https'] = self.application.config['web.secure']['active']
+        formdata['secure_port'] = self.application.config['web.ssl']['port']
+        formdata['key_file'] = self.application.config['web.ssl']['key_file']
+        formdata['certificate_file'] = self.application.config['web.ssl']['certificate_file']
+        formdata['use_https'] = self.application.config['web.ssl']['active']
+        formdata['bind'] = self.application.config['web']['bind']
         formdata['webroot'] = self.application.config['web']['webroot']
         formdata['folders'] = "\n".join(self.application.config['general']['folder_list'])
         formdata['use_authentication'] = self.application.config['security']['use_authentication'] 
@@ -1099,7 +1100,7 @@ class ConfigPageHandler(BaseHandler):
         formdata['use_mudraw'] = formdata['pdf_engine'] == 'mudraw'
         formdata['use_mutool'] = formdata['pdf_engine'] == 'mutool'
         formdata['use_pdf2png'] = formdata['pdf_engine'] == 'pdf2png'
-        
+        formdata['qpdf'] = self.application.config['pdf']['qpdf']
         formdata['mudraw'] = self.application.config['pdf']['mudraw']
         formdata['mutool'] = self.application.config['pdf']['mutool']
         formdata['pdf2png'] = self.application.config['pdf']['pdf2png']
@@ -1118,6 +1119,7 @@ class ConfigPageHandler(BaseHandler):
         formdata = dict()
         formdata['folders'] = self.get_argument(u"folders", default="")
         formdata['webroot'] = self.get_argument(u"webroot", default="")
+        formdata['bind'] = self.get_argument(u"bind", default="")
         formdata['port'] = self.get_argument(u"port", default="")
         formdata['secure_port'] = self.get_argument(u"secure_port", default="")
         formdata['key_file'] = self.get_argument(u"key_file", default="")
@@ -1157,6 +1159,7 @@ class ConfigPageHandler(BaseHandler):
         formdata['mudraw'] = self.get_argument(u"mudraw", default="")
         formdata['mutool'] = self.get_argument(u"mutool", default="")
         formdata['pdf2png'] = self.get_argument(u"pdf2png", default="")
+        formdata['qpdf'] = self.get_argument(u"qpdf", default="")
         formdata['use_pdf'] = (len(self.get_arguments("use_pdf"))!=0)
         formdata['use_ebook'] = (len(self.get_arguments("use_ebook"))!=0)
         formdata['calibre'] = self.get_argument(u"calibre", default="")
@@ -1296,11 +1299,12 @@ class ConfigPageHandler(BaseHandler):
                 password_changed = False
         
             if (new_port != old_port or
+                formdata['bind'] != self.application.config['web']['bind'] or
                 formdata['webroot'] != self.application.config['web']['webroot'] or
-                formdata['secure_port'] != self.application.config['web.secure']['port'] or
-                formdata['key_file'] != self.application.config['web.secure']['key_file'] or
-                formdata['certificate_file'] != self.application.config['web.secure']['certificate_file'] or
-                formdata['use_https'] != self.application.config['web.secure']['active'] or
+                formdata['secure_port'] != self.application.config['web.ssl']['port'] or
+                formdata['key_file'] != self.application.config['web.ssl']['key_file'] or
+                formdata['certificate_file'] != self.application.config['web.ssl']['certificate_file'] or
+                formdata['use_https'] != self.application.config['web.ssl']['active'] or
                 new_folder_list != old_folder_list or
                 formdata['username'] != self.application.config['security']['username'] or
                 password_changed or
@@ -1322,6 +1326,7 @@ class ConfigPageHandler(BaseHandler):
                 formdata['mudraw'] != self.application.config['pdf']['mudraw'] or
                 formdata['mutool'] != self.application.config['pdf']['mutool'] or
                 formdata['pdf2png'] != self.application.config['pdf']['pdf2png'] or
+                formdata['qpdf'] != self.application.config['pdf']['qpdf'] or
                 formdata['use_ebook'] != self.application.config['ebook']['active'] or
                 formdata['calibre'] != self.application.config['ebook']['calibre'] or
                 formdata['ebook_cache_location'] != self.application.config['ebook.cache']['location'] or
@@ -1339,6 +1344,7 @@ class ConfigPageHandler(BaseHandler):
                 self.application.config['general']['folder_list'] = new_folder_list
                 self.application.config['web']['port'] = new_port
                 self.application.config['web']['webroot'] = formdata['webroot']
+                self.application.config['web']['bind'] = formdata['bind']
                 self.application.config['security']['use_authentication'] = formdata['use_authentication']
                 self.application.config['security']['username'] = formdata['username']
                 if formdata['password'] != ConfigPageHandler.fakepass:
@@ -1351,10 +1357,10 @@ class ConfigPageHandler(BaseHandler):
                     formdata['api_key'] = ""
                 self.application.config['general']['launch_client'] = formdata['launch_client']
 
-                self.application.config['web.secure']['port'] = formdata['secure_port']
-                self.application.config['web.secure']['active'] = formdata['use_https']
-                self.application.config['web.secure']['key_file'] = formdata['key_file']
-                self.application.config['web.secure']['certificate_file'] = formdata['certificate_file']
+                self.application.config['web.ssl']['port'] = formdata['secure_port']
+                self.application.config['web.ssl']['active'] = formdata['use_https']
+                self.application.config['web.ssl']['key_file'] = formdata['key_file']
+                self.application.config['web.ssl']['certificate_file'] = formdata['certificate_file']
 
                 self.application.config['cache']['active'] = formdata['use_cache']
                 self.application.config['cache']['size'] = formdata['cache_size']
@@ -1376,6 +1382,7 @@ class ConfigPageHandler(BaseHandler):
                 self.application.config['pdf']['mudraw'] = formdata['mudraw']
                 self.application.config['pdf']['mutool'] = formdata['mutool']
                 self.application.config['pdf']['pdf2png'] = formdata['pdf2png']
+                self.application.config['pdf']['qpdf'] = formdata['qpdf']
           
                 self.application.config['database']['engine'] = formdata['db_engine']
                 
@@ -1426,7 +1433,32 @@ class LoginHandler(BaseHandler):
                 self.set_secure_cookie("user", fix_username(self.application.config['security']['username']))
                 
         self.redirect(next)
-            
+
+class WakeUpDatabase:
+    def __init__(self):
+        pass
+
+    def start(self):
+        self.thread = threading.Thread(target=self.mainLoop)
+        self.thread.daemon = True
+        self.quit = False
+        self.thread.start()
+
+    def stop(self):
+        self.quit = True
+        self.thread.join()
+
+    def mainLoop(self):
+
+        logging.debug("WakeUp: Started")
+        while True:
+            time.sleep(3200)
+            # call mysql.query to keep it alive...
+            if self.quit:
+                break
+        logging.debug("WakeUp: Stopped")
+
+
 class APIServer(tornado.web.Application):
     def __init__(self, config, opts):
         utils.fix_output_encoding()   
@@ -1435,7 +1467,9 @@ class APIServer(tornado.web.Application):
         self.opts = opts
         
         self.port = self.config['web']['port']
+        self.port_secure = self.config['web.ssl']['port']
         self.webroot = self.config['web']['webroot']
+        self.bind = self.config['web']['bind']
         
         self.comicArchiveList = []
         
@@ -1488,7 +1522,32 @@ class APIServer(tornado.web.Application):
             sys.exit(-1)        
         
         try:
-            self.listen(self.port, no_keep_alive = True)
+
+            if self.config['web.ssl']['active']:
+
+                http_server = tornado.httpserver.HTTPServer(self, no_keep_alive = True, ssl_options={
+                    "certfile": self.config['web.ssl']['certificate_file'], # "server.crt",
+                    "keyfile": self.config['web.ssl']['key_file'] # "server.key",
+                })
+                http_server.listen(self.port_secure,address=self.bind)
+                
+                # "HERE fix not finished
+                
+                """
+                redirect_handlers = [
+                    (r'/(.*)', index.RedirectHandler),
+                ]
+      
+                http_settings = {
+                    'host': ServerEnvironment.GetHost(),
+                    'redirect_port': self.port_secure,
+                   # 'xheaders': options.options.xheaders,
+                }
+                """
+
+            else:
+                self.listen(self.port, no_keep_alive = True, address=self.bind)
+        
         except Exception as e:
             logging.error(e)
             msg = "Couldn't open socket on port {0}.  (Maybe ComicStreamer is already running?)  Quitting.".format(self.port)
@@ -1497,13 +1556,8 @@ class APIServer(tornado.web.Application):
             sys.exit(-1)
 
         logging.info( "ComicStreamer server running on port {0}...".format(self.port))
-        
-        if self.config['web.secure']['active']:
-            http_server = tornado.httpserver.HTTPServer(self, no_keep_alive = True, ssl_options={
-                "certfile": self.config['web.secure']['certificate_file'], # "server.crt",
-                "keyfile": self.config['web.secure']['key_file'] # "server.key",
-            })
-            http_server.listen(self.config['web.secure']['port'])
+
+
          
         self.version = csversion.version
 
@@ -1590,7 +1644,7 @@ class APIServer(tornado.web.Application):
         self.shutdown()
         executable = sys.executable
         
-        new_argv.append("-p ");
+        new_argv.append("-p");
         new_argv.append(str(self.port))
         new_argv = ["--nobrowser"]
         if self.opts.quiet:
