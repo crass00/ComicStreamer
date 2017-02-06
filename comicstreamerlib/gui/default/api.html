@@ -28,6 +28,14 @@
         client would fetch this for each page turn
         if {pagenum} is "clear"  clears bookmark for the given book
 
+/comic/{id}/page/{pagenum}/blacklist
+    - blacklist a page read not to be used
+        if {pagenum} is "clear" clears blacklist for the given book
+
+/comic/{id}/page/{pagenum}/cache
+    - cxache a page
+        if {pagenum} is "clear" clears the cache for the given book
+
 /comic/{id}/thumbnail/
     - return specific cover image of specific comic
 

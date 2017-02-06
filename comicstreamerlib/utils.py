@@ -171,9 +171,9 @@ def resize(img, box, out, default=None, fit=False):
     try:
         #Resize the image with best quality algorithm ANTI-ALIAS
         img.thumbnail(box, Image.ANTIALIAS)
-        img = img.convert('RGBA')
+        #img = img.convert('RGBA')
         #save it into a file-like object
-        img.save(out, "PNG", quality=100)
+        img.save(out, "PNG")
     except:
         print >> sys.stderr, u"Error reading in page. Image Corrupted"
         raise IOError;
@@ -183,11 +183,14 @@ def resize(img, box, out, default=None, fit=False):
 def webp_patch_convert(img):
     imtype = imghdr.what(StringIO.StringIO(img))
     if imtype == "webp":
-        if type(img) != Image and type(img) == str:
-            img = Image.open(StringIO.StringIO(img))
-        out = StringIO.StringIO()
-        img = img.convert('RGBA')
-        img.save(out, "PNG", quality=100)
+        try:
+            if type(img) != Image and type(img) == str:
+                img = Image.open(StringIO.StringIO(img))
+            out = StringIO.StringIO()
+        except:
+            return img
+        #img = img.convert('RGBA')
+        img.save(out, "PNG") #, quality=100)
         return out.getvalue()
     else:
         return img

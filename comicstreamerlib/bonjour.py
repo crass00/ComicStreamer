@@ -26,11 +26,15 @@ class BonjourThread(threading.Thread):
          
     def register_callback(self, sdRef, flags, errorCode, name, regtype, domain):
         if errorCode == pybonjour.kDNSServiceErr_NoError:
-            logging.info("Registered bonjour server: {0}:{1}:(port {2})".format(name,regtype,self.port))
-        
+            logging.info("Bonjour: Server Registered: {0}:{1}:(port {2})".format(name,regtype,self.port))
+
+    def stop(self):
+        logging.debug("Bonjour: Stopped")
+    
     def run(self):
+        logging.debug("Bonjour: Started")
         if not have_bonjour:
-            logging.warn("Cannot run bonjour server!  Maybe some packages need to be installed?")
+            logging.warn("Bonjour: Missing Package Please Install")
             return
         
         sdRef = pybonjour.DNSServiceRegister(name = self.name,

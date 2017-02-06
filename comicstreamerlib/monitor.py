@@ -72,6 +72,10 @@ class Monitor():
     def mainLoop(self):
 
         logging.debug("Monitor: Started")
+
+        for l in self.paths:
+            logging.info(u"Monitor: Scanning '"+l+"'")
+
         self.session = self.dm.Session()
         self.library = Library(self.dm.Session)
         self.observer = Observer()
@@ -80,11 +84,11 @@ class Monitor():
         for path in self.paths:
             if os.path.exists(path):
                 self.setStatusDetail(u"Watchdog (BUG?)")
-                logging.debug("Monitor: Watchdog Indexing")
+                logging.info("Monitor: Watchdog: Indexing")
                 
                 # if I make this threaded? then it does not wait???
                 self.observer.schedule(self.eventHandler, path, recursive=True)
-                logging.debug("Monitor: Watchdog Indexing Finished")
+                logging.debug("Monitor: Watchdog: Stopped Indexing")
         self.observer.start()
         while True:
             try:
@@ -234,7 +238,7 @@ class Monitor():
             comic = self.library.createComicFromMetadata(md)
             comics.append(comic)
             if self.quit:
-                self.setStatusDetail(u"Monitor Stopped")
+                self.setStatusDetail(u"Monitor: Stopped")
                 return
         self.library.addComics(comics)
     
@@ -284,10 +288,10 @@ class Monitor():
             try:
                 current_set.add((path, datetime.utcfromtimestamp(os.path.getmtime(path))))
             except:
-                logging.debug(u"Monitor: Failed To Access {0}".format(path))
+                logging.debug(u"Monitor: Failed To Access '{0}'".format(path))
                 filelist.remove(path)
             
-        logging.info(u"Monitor: %d Files Found " % len(current_set))
+        logging.debug(u"Monitor: %d Files Found " % len(current_set))
         try:
             for comic_id, path, md_ts in self.library.getComicPaths():
                 db_set.add((path, md_ts))
@@ -295,11 +299,11 @@ class Monitor():
                 if self.quit:
                     return [],[]
         except:
-            logging.debug(u"Monitor: Failed To Access {0}".format(path))
+            logging.debug(u"Monitor: Failed To Access '{0}'".format(path))
         to_add = current_set - db_set
         to_remove = db_set - current_set
-        logging.info(u"Monitor: %d Files In Library " % len(db_set))
-        logging.info(u"Monitor: %d Files To Remove" % len(to_remove))
+        logging.debug(u"Monitor: %d Files In Library " % len(db_set))
+        logging.debug(u"Monitor: %d Files To Remove" % len(to_remove))
         logging.info(u"Monitor: %d Files To Scan" % len(to_add))
 
 
@@ -309,7 +313,7 @@ class Monitor():
 
         self.status = u"CHECKING"
 
-        self.setStatusDetail(u"Files")
+        self.setStatusDetailOnly(u"Files")
 
         self.add_count = 0      
         self.remove_count = 0
@@ -320,11 +324,11 @@ class Monitor():
             self.setStatusDetailOnly(u"")
             return
 
-        self.setStatusDetail(u"Removing {0} Files".format(len(to_remove)), logging.INFO)
+        self.setStatusDetail(u"Removing {0} Files".format(len(to_remove)))
         if len(to_remove) > 0:
             self.library.deleteComics(to_remove)
 
-        self.setStatusDetail(u"Scanning {0} Files".format(len(filelist)), logging.INFO)
+        self.setStatusDetail(u"Scanning {0} Files".format(len(filelist)))
         self.status = u"SCANNING"
         md_list = []
         self.read_count = 0
@@ -348,7 +352,7 @@ class Monitor():
         if len(md_list) > 0:
             self.commitMetadataList(md_list)
         
-        self.setStatusDetail(u"Metadata {0}/{1} Files".format(self.read_count,len(filelist)), logging.INFO)
+        self.setStatusDetail(u"Metadata {0}/{1} Files".format(self.read_count,len(filelist)))
 
  
         

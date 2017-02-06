@@ -49,7 +49,8 @@ from config import ComicStreamerConfig
 from folders import AppFolders
 from options import Options
 from bonjour import BonjourThread
-from bookmarker import Bookmarker
+from bookmark import Bookmark
+from blacklist import Blacklist
 from library import Library
 
 # add webp test to imghdr in case it isn't there already
@@ -359,16 +360,16 @@ class ServerAPIHandler(GenericAPIHandler):
         self.validateAPIKey()
         cmd = self.get_argument(u"cmd", default=None)
         if cmd == "restart":
-            logging.info("Restart command")
+            logging.info("Server: Restart")
             self.application.restart()
         elif cmd == "reset":
-            logging.info("Rebuild database command")
+            logging.info("Server: Rebuild Database")
             self.application.rebuild()
         elif cmd == "stop":
-            logging.info("Stop command")
+            logging.info("Server: Stop")
             self.application.shutdown()
         elif cmd == "cache":
-            logging.info("Clear cache command")
+            logging.info("Server: Clear Pages Cache")
             self.application.library.cache_clear()
             
 class ImageAPIHandler(GenericAPIHandler):
@@ -394,7 +395,7 @@ class DBInfoAPIHandler(JSONResultAPIHandler):
             s = "MySQL"
         else:
             s = "SQLite"
-        response = { 'id': stats['uuid'],
+        response = {'id'            : stats['uuid'],
                     'last_updated'  : stats['last_updated'].isoformat(),
                     'created'       : stats['created'].isoformat(),
                     'comic_count'   : stats['total'],
@@ -407,8 +408,8 @@ class DBInfoAPIHandler(JSONResultAPIHandler):
                     'cache_hit'     : self.library.cache_hit,
                     'cache_discard' : self.library.cache_discard,
                     'cache_max'     : self.library.cache_maxsize,
-                    'db_engine' : s,
-                    'db_scheme' : SCHEMA_VERSION
+                    'db_engine'     : s,
+                    'db_scheme'     : SCHEMA_VERSION
                     }
         self.setContentType()
         self.write(response)
@@ -533,12 +534,41 @@ class ComicBookmarkAPIHandler(JSONResultAPIHandler):
     def get(self, comic_id, pagenum):
         self.validateAPIKey()
         
-        self.application.bookmarker.setBookmark(comic_id, pagenum)
+        self.application.bookmark.setBookmark(comic_id, pagenum)
     
         self.setContentType()
         response = { 'status': 0 }
         self.write(response)
+
+class ComicBlacklistAPIHandler(JSONResultAPIHandler):
+    def get(self, state, comic_id, pagenum):
+        self.validateAPIKey()
         
+        if state == 'clear':
+            self.application.blacklist.removeBlacklist(comic_id, pagenum)
+        else:
+            self.application.blacklist.setBlacklist(comic_id, pagenum)
+    
+        self.setContentType()
+        response = { 'status': 0 }
+        self.write(response)
+
+
+class ComicCacheAPIHandler(JSONResultAPIHandler):
+    def get(self, state, comic_id, pagenum):
+        self.validateAPIKey()
+        
+        # "HERE FIX: does not work need path...
+        """if state == 'clear':
+            self.application.library.remove(comic_id)
+        else:
+            self.application.library(comic_id, pagenum)
+        """
+        self.setContentType()
+        response = { 'status': 0 }
+        self.write(response)
+
+
 class ComicPageAPIHandler(ImageAPIHandler):
     def get(self, comic_id, pagenum):
         self.validateAPIKey()
@@ -1464,6 +1494,8 @@ class APIServer(tornado.web.Application):
         utils.fix_output_encoding()   
         
         self.config = config
+        logging.debug("Config: " + str(config))
+
         self.opts = opts
         
         self.port = self.config['web']['port']
@@ -1483,23 +1515,23 @@ class APIServer(tornado.web.Application):
     
         if not os.path.exists(AppFolders.appCacheEbooks()):
             os.makedirs(AppFolders.appCacheEbooks())
-                
+        
+        #self.dm = DataManager()
+        self.dm = DataManager(config)
+        self.library = Library(self.dm.Session)
+
+        # "HERE FIX Move to cache.py
         cache_location = self.config['cache']['location']
         cache_active = self.config['cache']['active']
         if cache_location == "": cache_location = AppFolders.appCachePages()
         else:
             if not os.path.isdir(cache_location):
-                cache_active = False
+                active = False
         
-        #self.dm = DataManager()
-        self.dm = DataManager(config)
-        self.library = Library(self.dm.Session)
-        self.library.cache(cache_location,cache_active,self.config['cache']['size'],self.config['cache']['free'],)
+        self.library.cache(cache_location,cache_active,self.config['cache']['size'],self.config['cache']['free'])
 
         if opts.reset or opts.reset_and_run:
-            logging.info( "Wiping database!")
             self.dm.delete()
-            logging.info( "Wiping cache!")
             self.library.cache_clear()
             
         # quit on a standard reset
@@ -1509,13 +1541,14 @@ class APIServer(tornado.web.Application):
         try:
             self.dm.create()
         except SchemaVersionException as e:
-            msg = "Couldn't open database.  Probably the schema has changed."
-            logging.error(msg)
+            # FIX "HERE frmo place error messgaes.
+            msg = "Couldn't open database. Probably the schema has changed."
+            logging.error("Database: " + msg)
             utils.alert("Schema change", msg)
             sys.exit(-1)
         except sqlalchemy.exc.OperationalError as e:
             msg = "Could not open database."
-            logging.error(msg)
+            logging.error("Database: " + msg)
             utils.alert("Database Error", msg)
             
             # "HERE FIX open sqlite temp db so you canfix the problem......
@@ -1550,15 +1583,13 @@ class APIServer(tornado.web.Application):
         
         except Exception as e:
             logging.error(e)
-            msg = "Couldn't open socket on port {0}.  (Maybe ComicStreamer is already running?)  Quitting.".format(self.port)
-            logging.error(msg)
+            msg = "Couldn't open socket on port {0}. (Maybe ComicStreamer is already running?)  Quitting.".format(self.port)
+            logging.error("Server: " + msg)
             utils.alert("Port not available", msg)
             sys.exit(-1)
 
-        logging.info( "ComicStreamer server running on port {0}...".format(self.port))
-
-
-         
+        logging.info( "Server: Bind '{1}', Port {0}, Webroot: '{2}'".format(self.port,self.bind,self.webroot))
+        
         self.version = csversion.version
 
         handlers = [
@@ -1589,6 +1620,8 @@ class APIServer(tornado.web.Application):
             (self.webroot + r"/comics", ComicListAPIHandler),
             (self.webroot + r"/comiclist", ComicListAPIHandler),
             (self.webroot + r"/comic/([0-9]+)/page/([0-9]+|clear)/bookmark", ComicBookmarkAPIHandler ),
+            (self.webroot + r"/comic/([0-9]+)/page/([0-9]+|clear)/blacklist", ComicBlacklistAPIHandler ),
+            (self.webroot + r"/comic/([0-9]+)/page/([0-9]+|clear)/cache", ComicBlacklistAPIHandler ),
             (self.webroot + r"/comic/([0-9]+)/page/([0-9]+)", ComicPageAPIHandler ),
             (self.webroot + r"/comic/([0-9]+)/thumbnail", ThumbnailAPIHandler),
             (self.webroot + r"/comic/([0-9]+)/thumbnail/small", ThumbnailSmallAPIHandler),
@@ -1616,24 +1649,23 @@ class APIServer(tornado.web.Application):
         tornado.web.Application.__init__(self, handlers, **settings)
 
         if not opts.no_monitor:     
-            logging.debug("Going to scan the following folders:")
-            for l in self.config['general']['folder_list']:
-                logging.debug(u"   {0}".format(repr(l)))
-
             self.monitor = Monitor(self.dm, self.config['general']['folder_list'])
             self.monitor.start()
             self.monitor.scan()
             
-        self.bookmarker = Bookmarker(self.dm)
-        self.bookmarker.start()
+        self.bookmark = Bookmark(self.dm)
+        self.bookmark.start()
+
+        self.blacklist = Blacklist(self.dm)
+        self.blacklist.start()
 
         if opts.launch_client and self.config['general']['launch_client']:
             if ((platform.system() == "Linux" and os.environ.has_key('DISPLAY')) or
                 (platform.system() == "Darwin" and not os.environ.has_key('SSH_TTY')) or
                 platform.system() == "Windows"):
                webbrowser.open("http://localhost:{0}".format(self.port), new=0)
-        bonjour = BonjourThread(self.port)
-        bonjour.start()
+        self.bonjour = BonjourThread(self.port)
+        self.bonjour.start()
 
     def rebuild(self):
         # after restart, purge the DB
@@ -1675,12 +1707,14 @@ class APIServer(tornado.web.Application):
         
         MAX_WAIT_SECONDS_BEFORE_SHUTDOWN = 3
 
-        logging.info('Initiating shutdown...')
+        logging.info('Server: Initiating shutdown...')
         if not self.opts.no_monitor:
             self.monitor.stop()
-        self.bookmarker.stop()
-     
-        logging.info('Will shutdown ComicStreamer in maximum %s seconds ...', MAX_WAIT_SECONDS_BEFORE_SHUTDOWN)
+        self.bookmark.stop()
+        self.blacklist.stop()
+        self.bonjour.stop()
+        
+   #     logging.debug('Web: Will shutdown ComicStreamer in maximum %s seconds ...', MAX_WAIT_SECONDS_BEFORE_SHUTDOWN)
         io_loop = tornado.ioloop.IOLoop.instance()
      
         deadline = time.time() + MAX_WAIT_SECONDS_BEFORE_SHUTDOWN
@@ -1693,6 +1727,8 @@ class APIServer(tornado.web.Application):
                 io_loop.stop()
                 logging.info('Bye!')
         stop_loop()
+        logging.debug('Server: Stopped')
+        self.dm.stop()
         
     def log_request(self, handler):
         if handler.get_status() < 300:

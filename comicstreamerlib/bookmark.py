@@ -14,9 +14,9 @@ import datetime
 
 from database import Comic
 
-class Bookmarker(threading.Thread):
+class Bookmark(threading.Thread):
     def __init__(self, dm):
-        super(Bookmarker, self).__init__()
+        super(Bookmark, self).__init__()
 
         self.queue = Queue.Queue(0)
         self.quit = False
@@ -31,8 +31,14 @@ class Bookmarker(threading.Thread):
         self.actualSetBookmark( comic_id, pagenum)
         #self.queue.put((comic_id, pagenum))
         
+    def removeBookmark(self, comic_id, pagenum):
+        pass
+        # for now, don't defer the bookmark setting, maybe it's not needed
+        #self.actualSetBookmark( comic_id, pagenum)
+        #self.queue.put((comic_id, pagenum))
+        
     def run(self):
-        logging.debug("Bookmarker: started main loop.")
+        logging.debug("Bookmark: Started")
         pagenum = 0
         while True:
             try:
@@ -45,7 +51,7 @@ class Bookmarker(threading.Thread):
             if self.quit:
                 break
             
-        logging.debug("Bookmarker: stopped main loop.")
+        logging.debug("Bookmark: Stopped")
 
     def actualSetBookmark(self, comic_id, pagenum):
                 
@@ -61,9 +67,9 @@ class Bookmarker(threading.Thread):
                     elif int(pagenum) < obj.page_count:
                         obj.lastread_ts = datetime.datetime.utcnow()
                         obj.lastread_page = int(pagenum)
-                        #logging.debug("Bookmarker: about to commit boommak ts={0}".format(obj.lastread_ts))
+                        #logging.debug("bookmark: about to commit boommak ts={0}".format(obj.lastread_ts))
                 except Exception:
-                    logging.error("Problem setting bookmark {} on comic {}".format(pagenum, comic_id))
+                    logging.error("Bookmark: Problem marking page {} on comic {}".format(pagenum, comic_id))
                 else:
                     session.commit()
                     

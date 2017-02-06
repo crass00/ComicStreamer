@@ -73,7 +73,7 @@ class Launcher():
             # A frozen app will run a GUI
             self.apiServer.runInThread()
            
-            logging.info("UI Started")
+            logging.debug("UI: Started")
             if platform.system() == "Darwin":
                 from gui_mac import MacGui
                 MacGui(self.apiServer).run()
@@ -89,7 +89,7 @@ class Launcher():
             #self.apiServer.shutdown()
             self.apiServer.run()
             
-        logging.info("Sit you later!")
+        logging.info("UI: Stopped")
 
 def main():
     Launcher().go()
