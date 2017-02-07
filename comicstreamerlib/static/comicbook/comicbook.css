@@ -237,11 +237,12 @@ body:not(.mobile) .navigate:hover {
 
 #cb-status {
 	z-index: 101;
-	font-size: 12px;
+	font-size: 0px;
 	right: 0;
 	bottom: 0;
 	margin: 8px;
-	border-radius: 4px;
+	border-radius: 30px;
+    box-shadow: 0 1px 10px rgba(0, 0, 0, 0.4);
 }
 
 #cb-progress-bar {
@@ -250,13 +251,14 @@ body:not(.mobile) .navigate:hover {
 
 #cb-progress-bar,
 #cb-progress-bar .progressbar-value {
-	height: 3px;
+	height: 10px;
 }
 
 #cb-progress-bar .progressbar-value {
 	width: 0;
 	background: #f6b946;
 	border-color: #3E7600;
+	border-radius: 12px;
 }
 
 * {
@@ -282,6 +284,27 @@ button, input, label {
 
 .pull-right {
 	float: right;
+}
+
+.thumbnails {
+  position: absolute;
+  color: white;
+  background-color: #f6b946;
+/*  background-image: linear-gradient(to bottom, rgb(80, 80, 80), rgb(17, 17, 17));*/
+  padding: 0.5em;
+  border-radius: 0.2em;
+  margin: 5em;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  display: none;
+  overflow: auto;
+}
+
+.thumbnails img {
+  display: inline-block;
+  margin: 0.5em;
 }
 
 .toolbar {
@@ -335,11 +358,11 @@ button, input, label {
 }
 
 .toolbar li > button:hover {
-	color: #8CC746;
+	color: #f6d986;
 }
 
 .toolbar button[data-action=close]:hover {
-	color: #FF6464;
+	color: #f6d986;
 }
 
 .toolbar .dropdown {

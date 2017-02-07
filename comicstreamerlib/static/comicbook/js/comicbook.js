@@ -1541,6 +1541,8 @@ helpers = helpers || Handlebars.helpers; data = data || {};
 
   return "\n<div data-trigger=\"click\" data-action=\"navigation\" data-navigate-side=\"left\" class=\"cb-control navigate navigate-left \">\n	<span class=\"icon-arrow-left\"></span>\n</div>\n";
   });
+  
+
 templates['navigateRight'] = template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [2,'>= 1.0.0-rc.3'];
 helpers = helpers || Handlebars.helpers; data = data || {};
@@ -1563,8 +1565,18 @@ helpers = helpers || Handlebars.helpers; data = data || {};
   
 
 
-  return "\n<div class=\"toolbar\">\n\n	<ul class=\"pull-left\">\n		<li class=\"close\">\n			<button data-trigger=\"click\" data-action=\"close\" title=\"close\" class=\"icon-remove-sign\"></button>\n		</li>\n		<li class=\"close separator\"></li>\n		<li>\n			<button title=\"image settings\" class=\"icon-settings\" data-toggle=\"dropdown\"></button>\n			<div class=\"dropdown\">\n				<form name=\"image-enhancements\" data-trigger=\"reset\" data-action=\"resetEnhancements\">\n					<div class=\"sliders\">\n						<div class=\"control-group\">\n							<label title=\"adjust brightness\" class=\"icon-sun\"></label>\n							<input data-trigger=\"change\" data-action=\"brightness\" type=\"range\" min=\"-100\" max=\"100\" step=\"1\" value=\"0\">\n						</div>\n						<div class=\"control-group\">\n							<label title=\"adjust contrast\" class=\"icon-adjust\"></label>\n							<input data-trigger=\"change\" data-action=\"contrast\" type=\"range\" min=\"-1\" max=\"1\" step=\"0.1\" value=\"0\">\n						</div>\n						<div class=\"control-group\">\n							<label title=\"sharpen\" class=\"icon-droplet\"></label>\n							<input data-trigger=\"change\" data-action=\"sharpen\" type=\"range\" min=\"0\" max=\"1\" step=\"0.1\" value=\"0\">\n						</div>\n					</div>\n					<div class=\"control-group pull-left\">\n						<input id=\"image-desaturate\" type=\"checkbox\" data-trigger=\"change\" data-action=\"desaturate\">\n						<label for=\"image-desaturate\">desaturate</label>\n					</div>\n					<div class=\"control-group pull-right\">\n						<input type=\"reset\" value=\"reset\">\n					</div>\n				</form>\n			</div>\n		</li>\n		<li>\n			<button data-trigger=\"click\" data-action=\"toggleLayout\" title=\"toggle one/two pages at a time\" class=\"icon-file layout layout-single\"></button>\n			<button data-trigger=\"click\" data-action=\"toggleLayout\" title=\"toggle one/two pages at a time\" class=\"icon-copy layout layout-double\"></button>\n		</li>\n		<li>\n			<button data-trigger=\"click\" data-action=\"zoomOut\" title=\"zoom out\" class=\"icon-zoom-out\"></button>\n		</li>\n		<li>\n			<button data-trigger=\"click\" data-action=\"zoomIn\" title=\"zoom in\" class=\"icon-zoom-in\"></button>\n		</li>\n		<li>\n			<button data-trigger=\"click\" data-action=\"fitWidth\" title=\"fit page to window width\" class=\"icon-expand\"></button>\n		</li>\n		<li>\n			<button data-trigger=\"click\" data-action=\"fitWindow\" title=\"fit page to window\" class=\"icon-expand-2\"></button>\n		</li>\n		<li>\n			<button data-trigger=\"click\" data-action=\"toggleReadingMode\" title=\"switch reading direction\" class=\"icon-arrow-right-3 manga-false\"></button>\n			<button data-trigger=\"click\" data-action=\"toggleReadingMode\" title=\"switch reading direction\" class=\"icon-arrow-left-3 manga-true\"></button>\n		</li>\n	</ul>\n\n	<ul class=\"pull-right\">\n		<li><span id=\"current-page\"></span> / <span id=\"page-count\"></span></li>\n	</ul>\n\n</div>\n";
+  return "\n<div class=\"toolbar\">\n\n	<ul class=\"pull-left\">\n		<li class=\"close\">\n			<button data-trigger=\"click\" data-action=\"close\" title=\"close\" class=\"icon-remove-sign\"></button>\n		</li>\n		<li class=\"close separator\"></li>\n		<li>\n			<button title=\"image settings\" class=\"icon-settings\" data-toggle=\"dropdown\"></button>\n			<div class=\"dropdown\">\n				<form name=\"image-enhancements\" data-trigger=\"reset\" data-action=\"resetEnhancements\">\n					<div class=\"sliders\">\n						<div class=\"control-group\">\n							<label title=\"adjust brightness\" class=\"icon-sun\"></label>\n							<input data-trigger=\"change\" data-action=\"brightness\" type=\"range\" min=\"-100\" max=\"100\" step=\"1\" value=\"0\">\n						</div>\n						<div class=\"control-group\">\n							<label title=\"adjust contrast\" class=\"icon-adjust\"></label>\n							<input data-trigger=\"change\" data-action=\"contrast\" type=\"range\" min=\"-1\" max=\"1\" step=\"0.1\" value=\"0\">\n						</div>\n						<div class=\"control-group\">\n							<label title=\"sharpen\" class=\"icon-droplet\"></label>\n							<input data-trigger=\"change\" data-action=\"sharpen\" type=\"range\" min=\"0\" max=\"1\" step=\"0.1\" value=\"0\">\n						</div>\n					</div>\n					<div class=\"control-group pull-left\">\n						<input id=\"image-desaturate\" type=\"checkbox\" data-trigger=\"change\" data-action=\"desaturate\">\n						<label for=\"image-desaturate\">desaturate</label>\n					</div>\n					<div class=\"control-group pull-right\">\n						<input type=\"reset\" value=\"reset\">\n					</div>\n				</form>\n			</div>\n		</li>\n		<li>\n			<button data-trigger=\"click\" data-action=\"toggleLayout\" title=\"toggle one/two pages at a time\" class=\"icon-file layout layout-single\"></button>\n			<button data-trigger=\"click\" data-action=\"toggleLayout\" title=\"toggle one/two pages at a time\" class=\"icon-copy layout layout-double\"></button>\n		</li>\n		<li>\n			<button data-trigger=\"click\" data-action=\"originalSize\" title=\"original size\" class=\"icon-remove\"></button>\n\n		</li>\n		<li>\n			<button data-trigger=\"click\" data-action=\"zoomOut\" title=\"zoom out\" class=\"icon-zoom-out\"></button>\n		</li>\n		<li>\n			<button data-trigger=\"click\" data-action=\"zoomIn\" title=\"zoom in\" class=\"icon-zoom-in\"></button>\n		</li>\n		<li>\n			<button data-trigger=\"click\" data-action=\"fitWidth\" title=\"fit page to window width\" class=\"icon-expand\"></button>\n		</li>\n		<li>\n			<button data-trigger=\"click\" data-action=\"fitWindow\" title=\"fit page to window\" class=\"icon-expand-2\"></button>\n		</li>\n		<li>\n			<button data-trigger=\"click\" data-action=\"toggleReadingMode\" title=\"switch reading direction\" class=\"icon-arrow-right-3 manga-false\"></button>\n			<button data-trigger=\"click\" data-action=\"toggleReadingMode\" title=\"switch reading direction\" class=\"icon-arrow-left-3 manga-true\"></button>\n\n		</li>\n		<li>\n			<button data-trigger=\"click\" data-action=\"exit\" title=\"exit\" class=\"icon-remove\"></button>\n\n		</li>\n		<li>\n			<button data-trigger=\"click\" data-action=\"smart\" title=\"smart\" class=\"icon-remove\"></button>\n\n		</li>\n		<li>\n			<button data-trigger=\"click\" data-action=\"favorite\" title=\"add to favorite\" class=\"icon-remove\"></button>\n\n		</li>\n		<li>\n			<button data-trigger=\"click\" data-action=\"blacklist\" title=\"add to blacklist\" class=\"icon-remove\"></button>\n\n		</li>\n		<li>\n			<button data-trigger=\"click\" data-action=\"toggleThumbnails\" title=\"thumbnails\" class=\"icon-zoom-out\"></button>\n		</li>\n	</ul>\n\n	<ul class=\"pull-right\">\n		<li><span id=\"current-page\"></span> / <span id=\"page-count\"></span></li>\n	</ul>\n\n</div>\n";
   });
+  
+templates['thumbnails'] = template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [2,'>= 1.0.0-rc.3'];
+helpers = helpers || Handlebars.helpers; data = data || {};
+  
+
+
+  return "\n<div class=\"cb-control thumbnails\"></div>\n";
+  });
+  
 })();/* exported ComicBook */
 
 var ComicBook = (function ($) {
@@ -1610,11 +1622,12 @@ var ComicBook = (function ($) {
     INVALID_NAVIGATION_EVENT: 'invalid navigation event'
   };
 
-  function ComicBook(id, srcs, opts) {
+  function ComicBook(id, srcs, exit, opts) {
 
     var self = this;
     var canvas_id = id;   // canvas element id
     this.srcs = srcs; // array of image srcs for pages
+    this.exit_point = exit;
 
     var defaults = {
       displayMode: 'double',  // single / double
@@ -1622,14 +1635,18 @@ var ComicBook = (function ($) {
       manga: false,     // true / false
       enhance: {},
       keyboard: {
-        next: 78,
-        previous: 80,
+        next: 39,
+        previous: 37,
         toolbar: 84,
-        toggleLayout: 76
+        toggleLayout: 76,
+        thumbnails: 80
       },
       libPath: '/lib/',
       forward_buffer: 3,
       pageTurnCallback: false,
+      favoritesCallback: false,
+      blacklistCallback: false,
+      returnCallback: false,
     };
 
     this.isMobile = false;
@@ -1651,6 +1668,7 @@ var ComicBook = (function ($) {
 
     var no_pages = srcs.length;
     var pages = [];   // array of preloaded Image objects
+    var pages_thumbs = [];   // array of preloaded Image objects
     var canvas;     // the HTML5 canvas object
     var context;    // the 2d drawing context
     var loaded = [];  // the images that have been loaded so far
@@ -1659,6 +1677,7 @@ var ComicBook = (function ($) {
     var controlsRendered = false; // have the user controls been inserted into the dom yet?
     var page_requested = false; // used to request non preloaded pages
     var shiv = false;
+    var smartActualSize = false;
 
     /**
      * Gets the window.innerWidth - scrollbars
@@ -1882,6 +1901,28 @@ var ComicBook = (function ($) {
       self.zoom(scale - 0.1);
     };
 
+    ComicBook.prototype.originalSize = function () {
+        options.zoomMode = 'originalSize';
+        self.drawPage();
+    };
+
+    ComicBook.prototype.smart = function () {
+        options.zoomMode = 'smart';
+        self.drawPage();
+    };
+
+    ComicBook.prototype.blacklist = function () {
+        self.blacklist();
+    };
+
+    ComicBook.prototype.blacklist = function () {
+        self.favorite();
+    };
+
+    ComicBook.prototype.exit = function () {
+        window.location.href = self.exit_point;
+    };
+                 
     ComicBook.prototype.fitWidth = function () {
       options.zoomMode = 'fitWidth';
       self.drawPage();
@@ -1913,10 +1954,17 @@ var ComicBook = (function ($) {
         page.onload = function () {
 
           pages[i] = this;
+          
+          var page_thumb = new Image();
+          page_thumb.src = srcs[i];
+          pages_thumbs[i] = page_thumb;
+          pages_thumbs[i].height = 150;
           loaded.push(i);
 
-          $('#cb-progress-bar .progressbar-value').css('width', Math.floor((loaded.length / no_pages) * 100) + '%');
-
+          // BUG FIXED -1
+          // There is a  wierd bug here where loaded has two "0" elements at the beginning of the array,
+          $('#cb-progress-bar .progressbar-value').css('width', Math.floor(((loaded.length-1) / no_pages) * 100) + '%');
+     // we could add this?     $('.progressbar-text').text('Loaded ' + String(loaded.length-1) + ' of ' + String(no_pages));
           // double page mode needs an extra page added
           var buffer = (options.displayMode === 'double' && pointer < srcs.length-1) ? 1 : 0;
 
@@ -1980,6 +2028,9 @@ var ComicBook = (function ($) {
     ComicBook.prototype.pageLoaded = function (page_no) {
       return (typeof loaded[page_no-1] !== 'undefined');
     };
+    
+    
+    
 
     /**
      * Draw the current page in the canvas
@@ -2007,7 +2058,10 @@ var ComicBook = (function ($) {
 
       var page = self.getPage(pointer);
       var page2 = false;
-
+      
+      var width_scale;
+      var windowHeight;
+      var height_scale;
       if (options.displayMode === 'double' && pointer < srcs.length-1) {
         page2 = self.getPage(pointer + 1);
       }
@@ -2047,6 +2101,47 @@ var ComicBook = (function ($) {
         zoom_scale = (options.displayMode === 'double') ? scale * 2 : scale;
         break;
 
+      case 'originalSize':
+         document.body.style.overflowX = 'auto';
+         zoom_scale = 1;
+         scale = zoom_scale;
+         break;
+ 
+      case 'smart':
+
+        // Fit to window if page has an aspect ratio smaller then 2.5.
+        // Otherwise, show original size.
+        
+        // DOES NOT WORK I THINK, NOT MY CODE...
+
+        if ((height / width) > 2.5 )
+        {
+            smartActualSize = true;
+        }
+        if (smartActualSize)
+        {
+            document.body.style.overflowX = 'auto';
+            zoom_scale = 1;
+            scale = zoom_scale;
+        }
+        else
+        {
+            document.body.style.overflowX = 'hidden';
+
+            width_scale = (windowWidth() > width) ?
+                ((windowWidth() - width) / windowWidth()) + 1 // scale up if the window is wider than the page
+                : windowWidth() / width; // scale down if the window is narrower than the page
+            windowHeight = window.innerHeight;
+            height_scale = (windowHeight > height) ?
+                ((windowHeight - height) / windowHeight) + 1 // scale up if the window is wider than the page
+                : windowHeight / height; // scale down if the window is narrower than the page
+
+            zoom_scale = (width_scale > height_scale) ? height_scale : width_scale;
+            scale = zoom_scale;
+        }
+        break;
+
+ 
       case 'fitWidth':
         document.body.style.overflowX = 'hidden';
 
@@ -2061,11 +2156,11 @@ var ComicBook = (function ($) {
       case 'fitWindow':
         document.body.style.overflowX = 'hidden';
 
-        var width_scale = (windowWidth() > width) ?
+        width_scale = (windowWidth() > width) ?
           ((windowWidth() - width) / windowWidth()) + 1 // scale up if the window is wider than the page
           : windowWidth() / width; // scale down if the window is narrower than the page
-        var windowHeight = window.innerHeight;
-        var height_scale = (windowHeight > height) ?
+        windowHeight = window.innerHeight;
+        height_scale = (windowHeight > height) ?
           ((windowHeight - height) / windowHeight) + 1 // scale up if the window is wider than the page
           : windowHeight / height; // scale down if the window is narrower than the page
 
@@ -2173,6 +2268,63 @@ var ComicBook = (function ($) {
       }
     };
 
+
+    /**
+     * xxx
+    *
+     * @see #xxx
+     */
+    ComicBook.prototype.blacklist = function () {
+     var page;
+
+      try {
+        page = self.getPage(pointer+1);
+      } catch (e) {}
+
+      if (!page) { return false; }
+
+      if (pointer + 1 < pages.length) {
+        pointer += (options.displayMode === 'single' || is_double_page_spread) ? 1 : 2;
+        try {
+          if (options.pageTurnCallback) {
+            options.blacklistCallback(pointer)
+            if (options.displayMode === 'single' || is_double_page_spread)
+                options.blacklistCallback(pointer+1);
+
+          }            
+        } catch (e) {}
+      }
+    
+    }
+
+    /**
+     * xxx
+    *
+     * @see #xxx
+     */
+    ComicBook.prototype.favorite = function () {
+     var page;
+
+      try {
+        page = self.getPage(pointer+1);
+      } catch (e) {}
+
+      if (!page) { return false; }
+
+      if (pointer + 1 < pages.length) {
+        pointer += (options.displayMode === 'single' || is_double_page_spread) ? 1 : 2;
+        try {
+          if (options.pageTurnCallback) {
+            options.favoriteCallback(pointer)
+            if (options.displayMode === 'single' || is_double_page_spread)
+                options.favoriteCallback(pointer+1);
+
+          }            
+        } catch (e) {}
+      }
+    
+    }
+    
     /**
      * Increment the counter and draw the page in the canvas
      *
@@ -2393,6 +2545,10 @@ var ComicBook = (function ($) {
         if (e.keyCode === options.keyboard.toggleLayout) {
           self.toggleLayout();
         }
+        // display thumbnail browser
+        if (e.keyCode === options.keyboard.thumbnails) {
+          self.toggleThumbnails();
+        }
         break;
 
       default:
@@ -2424,6 +2580,28 @@ var ComicBook = (function ($) {
         .find('.manga-' + options.manga).show().end()
         .find('.manga-' + !options.manga).hide();
     };
+
+ ComicBook.prototype.toggleThumbnails = function () {
+       // TODO: show page numbers
+       // TODO: in double page mode merge both pages into a single link
+       // TODO: only load thumbnails when they are in view
+       // TODO: keyboard navigation (left / right / up / down / enter)
+       // TODO: highlight currently selected thumbnail
+       // TODO: focus on current page
+       // TODO: toolbar button
+       var $thumbnails = self.getControl('thumbnails');
+       $thumbnails.html('');
+       self.toggleControl('thumbnails');
+       $.each(pages_thumbs, function (i, img) {
+         var $img = $(img);
+         var $link = $('<a>').attr('href', '#' + i).append($img);
+ //        $img.attr('height', 150);
+         $link.on('click', function () {
+           self.hideControl('thumbnails');
+         });
+         $thumbnails.append($link);
+      });
+     };
 
     ComicBook.prototype.toggleToolbar = function () {
       self.toggleControl('toolbar');
