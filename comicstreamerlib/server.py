@@ -8,6 +8,7 @@ import tornado.web
 import urllib
 import mimetypes
 import re
+import threading
 
 from urllib2 import quote
 
@@ -1464,8 +1465,9 @@ class LoginHandler(BaseHandler):
                 
         self.redirect(next)
 
-class WakeUpDatabase:
-    def __init__(self):
+class WakeUp:
+    def __init__(self, dm):
+        self.dm = dm
         pass
 
     def start(self):
@@ -1481,11 +1483,20 @@ class WakeUpDatabase:
     def mainLoop(self):
 
         logging.debug("WakeUp: Started")
-        while True:
-            time.sleep(3200)
-            # call mysql.query to keep it alive...
-            if self.quit:
-                break
+        i = 0
+        while not self.quit:
+            try:
+                time.sleep(1)
+                i += 1
+                # call mysql.query to keep it alive...
+                if i == 3600:
+                    logging.debug("WakeUp: Database")
+                    session = self.dm.Session()
+                    obj = session.query(SchemaInfo).first()
+                    print obj
+                    i = 0
+            except:
+                break;
         logging.debug("WakeUp: Stopped")
 
 
@@ -1659,6 +1670,9 @@ class APIServer(tornado.web.Application):
         self.blacklist = Blacklist(self.dm)
         self.blacklist.start()
 
+        self.wakeup = WakeUp(self.dm)
+        self.wakeup.start()
+        
         if opts.launch_client and self.config['general']['launch_client']:
             if ((platform.system() == "Linux" and os.environ.has_key('DISPLAY')) or
                 (platform.system() == "Darwin" and not os.environ.has_key('SSH_TTY')) or
@@ -1711,6 +1725,7 @@ class APIServer(tornado.web.Application):
         if not self.opts.no_monitor:
             self.monitor.stop()
         self.bookmark.stop()
+        self.wakeup.stop()
         self.blacklist.stop()
         self.bonjour.stop()
         
