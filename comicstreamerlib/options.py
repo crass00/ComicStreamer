@@ -73,7 +73,7 @@ Example:
         # parse command line options
         try:  #will never know why the ":" is below... "dp:hrqwuvb"
             opts, args = getopt.getopt( input_args, 
-                       "hp:wvrdqbuc",
+                       "hpwvrdqbuc:",
                        [ "help", "port=", "webroot=", "version", "reset", "debug", "quiet",
                     "nomonitor", "nobrowser", "bind=", "user-dir=","config-file=",
                     "_resetdb_and_run", #private
