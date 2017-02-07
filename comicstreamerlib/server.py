@@ -1066,7 +1066,6 @@ class ConfigPageHandler(BaseHandler):
 
         formdata['use_mutool'] = "checked" if formdata['use_mutool'] else ""
         formdata['use_mudraw'] = "checked" if formdata['use_mudraw'] else ""
-        formdata['use_qpd'] = "checked" if formdata['use_qpdf'] else ""
         
 
         formdata['use_https'] = "checked" if formdata['use_https'] else ""

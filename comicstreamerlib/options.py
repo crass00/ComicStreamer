@@ -83,7 +83,6 @@ Example:
             self.display_msg_and_quit( str(err), 2 )
         
         # process options
-        print opts
         for o, a in opts:
             if o in ("-r", "--reset"):
                 self.reset = True
