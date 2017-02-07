@@ -73,7 +73,7 @@ Example:
         # parse command line options
         try:  #will never know why the ":" is below... "dp:hrqwuvb"
             opts, args = getopt.getopt( input_args, 
-                       "hpwvrdqbuc:",
+                       "hp:w:vrdqb:u:c:",
                        [ "help", "port=", "webroot=", "version", "reset", "debug", "quiet",
                     "nomonitor", "nobrowser", "bind=", "user-dir=","config-file=",
                     "_resetdb_and_run", #private
@@ -83,6 +83,7 @@ Example:
             self.display_msg_and_quit( str(err), 2 )
         
         # process options
+        print opts
         for o, a in opts:
             if o in ("-r", "--reset"):
                 self.reset = True
@@ -110,12 +111,11 @@ Example:
                 sys.exit(0)
             if o == "--_resetdb_and_run":
                 self.reset_and_run = True
-            if o == ("u","--user-dir"):
+            if o in ("-u","--user-dir"):
                 self.user_dir = a
-            if o == ("c","--config-file"):
+            if o in ("-c","--config-file"):
                 self.config_file = a
-                
-                
+
         filename_encoding = sys.getfilesystemencoding()
         if len(args) > 0:
             #self.folder_list = [os.path.normpath(a.decode(filename_encoding)) for a in args]
