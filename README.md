@@ -20,14 +20,12 @@ There is something missing... yes!
 
 _Are you are a database wizard..._
 
--  __MySQL support__ it drops the connection after some time :-/
+-  __MySQL support__ it drops the connection after some time (FIXED with patch) :-/
 -  __MySQL support__ you can not delete commics... (good for static libs if not for the previous point)
 
 _... or are you a web magician and able to fix the build in html webcomicbooks reader..._
 
 - webp support
-- back arrow missing...
-- go back to navigation missing...
 - page chooser (slider and/or page number selection?)
 
 _...Or general web page_
@@ -42,15 +40,24 @@ Please help!
    
 ## Work done
 
-Tristan79 Work on this fork (januari 31 2017)
+Tristan79 Work on this fork (januari 31 -february 7 2017)
 
 - EBook support (except metadata)
 - Much better (faster) random comic query
-- MySQL support (experimental) 
+- MySQL support (experimental, no modify!) 
 - Fixed bug (appartently source didn't work for months)
-- Added cbt/tar support
+- Added cbt/tar/webp support
 - Patched webp (it does not load in web comic book, haven't tested chunky so converted to jpeg :/)
 - Experimental Cache System (since remote storage could be slow, even usb2 vs ssd :-)
+- Fixed a lot of gui bugs.
+- Fixed pdf
+- Fixed command line
+
+pre alpha support for
+- blacklisting
+- favorites
+- multiuser
+- wake up media already when server comes out of idle to minimize wait time
 
 Tristan79 Work on this fork (may 15 2016)
 
@@ -67,7 +74,6 @@ Web Page
 - search result not limited to 10/20../100 
 - publisher with special chars in name not recognized in entity browser
 - Remove showing null comics in table
-- Add popup to table make the thumb open the comic instead of the comic!
 - Log should be automaticlly updated
 - setup redirect with first run
 
@@ -84,14 +90,13 @@ General
 - Folder with images add as comic
 - Create Windows & Mac packages
 - Fix Cache did not work on xp :-/ (missing webp?)
-- Command Line options
 - Broke monitor (check!)
 - Show unscanned/error files!
 - Server won't shutdown if monitor is still checking files...
 - SWF support??
-- user dir/port (command line arguments) are not passed when restarted
 - PDF and Calibre converters location not working (hardcoded)
 - Better cache system with preloading
+- Folder list will disappear after error reading it...
 
 # OLD README.md
 
