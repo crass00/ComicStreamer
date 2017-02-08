@@ -499,7 +499,7 @@ class Blacklist(Base):
     page = Column(Integer, primary_key=True)
     ts = Column(DateTime, default=datetime.utcnow)
     if mysql_active:
-        hash = Column(String(16))
+        hash = Column(String(72))
     else:
         hash = Column(String)
 
