@@ -48,7 +48,7 @@ class Library:
             else:
                 file = open(os.path.join(x,str(hash)), "w")
                 #file.write("1")
-                file.write(ximage_data)
+                file.write(image_data)
             file.close()
 
     def createBlacklist(self,file):
