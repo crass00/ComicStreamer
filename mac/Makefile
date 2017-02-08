@@ -33,7 +33,8 @@ dist:
 	cp $(MAC_BASE)/libs/libunrar.so $(APP_BUNDLE)/Contents/MacOS
 	cp $(MAC_BASE)/libs/mudraw $(APP_BUNDLE)/Contents/MacOS
 	cp $(MAC_BASE)/libs/qpdf $(APP_BUNDLE)/Contents/MacOS
-	cp $(MAC_BASE)/libs/pdf2png $(APP_BUNDLE)/Contents/MacOS
+	cp $(MAC_BASE)/libs/pdftopng $(APP_BUNDLE)/Contents/MacOS
+	cp $(MAC_BASE)/Info.plist $(APP_BUNDLE)/Contents
 	
 	# fix the version string in the Info.plist
 	sed -i -e 's/0\.0\.0/$(VERSION_STR)/' $(MAC_BASE)/dist/$(APP_NAME).app/Contents/Info.plist
