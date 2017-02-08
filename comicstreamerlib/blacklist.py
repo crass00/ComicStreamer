@@ -11,7 +11,8 @@ import logging
 import platform
 import Queue
 import datetime
-import hashlib
+
+import utils
 import os
 
 from folders import AppFolders
@@ -31,12 +32,6 @@ class Blacklist(threading.Thread):
         self.quit = True
         self.join()
 
-    def hash(self, image):
-        hashersha1 = hashlib.sha1()
-        hashersha1.update(image)
-        hashermd5 = hashlib.md5()
-        hashermd5.update(image)
-        return str(hashersha1.hexdigest()+hashermd5.hexdigest())
 
     def setBlacklist(self, comic_id, pagenum):
         # for now, don't defer the blacklist setting, maybe it's not needed
@@ -71,7 +66,7 @@ class Blacklist(threading.Thread):
                     try:
                         blacklist = database.Blacklist()
                         image_data = self.library.getComicPage(comic_id, pagenum, False)
-                        blacklist.hash = self.hash(image_data)
+                        blacklist.hash = utils.hash(image_data)
                         file = open(os.path.join(AppFolders.appBlacklistPages(),str(blacklist.hash)), "w")
                         file.write(image_data)
                         file.close()

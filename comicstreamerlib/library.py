@@ -18,6 +18,8 @@ from comicapi.comicarchive import ComicArchive
 
 from comicapi.issuestring import IssueString
 
+#from blacklist import Blacklist
+
 
 class Library:
 
@@ -26,6 +28,20 @@ class Library:
         self.comicArchiveList = []
         self.namedEntities = {}
         self.cache_active = False
+
+    def isBlacklist(self,image, hash=None):
+        if hash is None:
+            hash = utils.hash(image)
+        
+        # should be replaced with database query...
+        
+        if os.path.isfile(os.path.join(AppFolders.appBlacklistPages(),str(hash))):
+            #image_data = None
+            with open(AppFolders.missingPath("blacklist.png"), 'rb') as fd:
+                image_data = fd.read()
+            return image_data
+        else:
+            return image
 
     def cache_clear(self):
         if os.path.exists(self.cache_location) and os.path.isdir(self.cache_location):
@@ -116,7 +132,7 @@ class Library:
                 os.makedirs(cachepath)
             if not os.path.isfile(cachefile):
                 ca = self.getComicArchive(comic_id,path)
-                image = ca.getPage(int(page_number))
+                image = self.isBlacklist(ca.getPage(int(page_number)))
                 
                 # auto convert webp (disable for chunky or fix web book reader)
                 image = utils.webp_patch_convert(image)
@@ -178,7 +194,7 @@ class Library:
         else:
             ca = self.getComicArchive(comic_id,path)
             # auto convert webp (disable for chunky or fix web book reader)
-            image = utils.webp_patch_convert(ca.getPage(int(page_number)))
+            image = utils.webp_patch_convert(self.isBlacklist(ca.getPage(int(page_number))))
 
         return image
 
@@ -209,7 +225,7 @@ class Library:
                 else:
                     ca = self.getComicArchive(comic_id,path)
                     # auto convert webp (disable for chunky or fix web book reader)
-                    image_data = utils.webp_patch_convert(ca.getPage(int(page_number)))
+                    image_data = utils.webp_patch_convert(self.isBlacklist(ca.getPage(int(page_number))))
                     
         if image_data is None:
             with open(default_img_file, 'rb') as fd:

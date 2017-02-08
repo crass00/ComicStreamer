@@ -12,6 +12,7 @@ import time
 import base64
 import ctypes
 import socket
+import hashlib
 
 import logging
 
@@ -255,5 +256,13 @@ def is_valid_ipv6_address(address):
     except socket.error:  # not a valid address
         return False
     return True
+
+def hash(image):
+    hashersha1 = hashlib.sha1()
+    hashersha1.update(image)
+    hashermd5 = hashlib.md5()
+    hashermd5.update(image)
+    return str(hashersha1.hexdigest()+hashermd5.hexdigest())
+
 
 
