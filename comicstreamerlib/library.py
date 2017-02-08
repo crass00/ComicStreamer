@@ -43,7 +43,7 @@ class Library:
                 file = open(os.path.join(AppFolders.appBlacklistPages(),str(hash)), "w")
                 file.write(image_data)
             else:
-                file = open(os.path.join(x,str(hash)+".jpg"), "w")
+                file = open(os.path.join(x,str(hash)), "w")
                 file.write(image_data)
             file.close()
 
