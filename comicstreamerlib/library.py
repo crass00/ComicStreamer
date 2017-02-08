@@ -44,7 +44,7 @@ class Library:
                 file.write(image_data)
             else:
                 file = open(os.path.join(x,str(hash)), "w")
-                file.write(image_data)
+                file.write("1") #ximage_data)
             file.close()
 
 
