@@ -12,7 +12,7 @@ PDF, EPUB, MOBI, AZW3, FB2, LIT, DJVU, CHM Support through calibre's ebook-conve
 
 __Experimental Packages__
 
-[MacOS](https://dl.dropboxusercontent.com/u/12474226/ToiletStreamer-0.9.5.dmg)
+[MacOS](https://dl.dropboxusercontent.com/u/12474226/ComicStreamer-0.9.51.dmg)
 [Windows](https://dl.dropboxusercontent.com/u/12474226/32/ToiletStreamer-0.9.5.exe)
 
 ## Help wanted
