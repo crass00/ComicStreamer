@@ -36,8 +36,10 @@ class Library:
             os.makedirs(x)
         if not os.path.isdir(y):
             os.makedirs(y)
+        c = 0
         for row in query:
-            print('Extracting last page from ' + row.path)
+            print('Extracting last page from ' + str(c) + ' '  + row.path)
+            c += 1
             ca = self.getComicArchive(row.id,row.path)
             # auto convert webp (disable for chunky or fix web book reader)
             image_data = ca.getPage(row.page_count-1)
