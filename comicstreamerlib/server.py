@@ -542,21 +542,33 @@ class ComicBookmarkAPIHandler(JSONResultAPIHandler):
         self.write(response)
 
 class ComicBlacklistAPIHandler(JSONResultAPIHandler):
-    def get(self, state, comic_id, pagenum):
+    def get(self, comic_id, pagenum):
         self.validateAPIKey()
         
-        if state == 'clear':
-            self.application.blacklist.removeBlacklist(comic_id, pagenum)
-        else:
-            self.application.blacklist.setBlacklist(comic_id, pagenum)
+        self.application.blacklist.setBlacklist(comic_id, pagenum)
     
         self.setContentType()
         response = { 'status': 0 }
         self.write(response)
 
 
+class ComicFavoritesAPIHandler(JSONResultAPIHandler):
+    def get(self, comic_id, pagenum):
+        self.validateAPIKey()
+        
+        # "HERE FIX: does not work need path...
+        """if state == 'clear':
+            self.application.library.remove(comic_id)
+        else:
+            self.application.library(comic_id, pagenum)
+        """
+        self.setContentType()
+        response = { 'status': 0 }
+        self.write(response)
+
+
 class ComicCacheAPIHandler(JSONResultAPIHandler):
-    def get(self, state, comic_id, pagenum):
+    def get(self, comic_id, pagenum):
         self.validateAPIKey()
         
         # "HERE FIX: does not work need path...
@@ -576,7 +588,7 @@ class ComicPageAPIHandler(ImageAPIHandler):
 
         max_height = self.get_argument(u"max_height", default=None)
 
-        image_data = self.library.getComicPage(comic_id, pagenum, max_height)
+        image_data = self.library.getComicPage(comic_id, pagenum, True, max_height)
 
 
         self.setContentType(image_data)
@@ -1492,7 +1504,6 @@ class WakeUp:
                     logging.debug("WakeUp: Database")
                     session = self.dm.Session()
                     obj = session.query(SchemaInfo).first()
-                    print obj
                     i = 0
             except:
                 break;
@@ -1525,6 +1536,9 @@ class APIServer(tornado.web.Application):
     
         if not os.path.exists(AppFolders.appCacheEbooks()):
             os.makedirs(AppFolders.appCacheEbooks())
+
+        if not os.path.exists(AppFolders.appBlacklistPages()):
+            os.makedirs(AppFolders.appBlacklistPages())
         
         #self.dm = DataManager()
         self.dm = DataManager(config)
@@ -1631,6 +1645,7 @@ class APIServer(tornado.web.Application):
             (self.webroot + r"/comiclist", ComicListAPIHandler),
             (self.webroot + r"/comic/([0-9]+)/page/([0-9]+|clear)/bookmark", ComicBookmarkAPIHandler ),
             (self.webroot + r"/comic/([0-9]+)/page/([0-9]+|clear)/blacklist", ComicBlacklistAPIHandler ),
+            (self.webroot + r"/comic/([0-9]+)/page/([0-9]+|clear)/like", ComicFavoritesAPIHandler ),
             (self.webroot + r"/comic/([0-9]+)/page/([0-9]+|clear)/cache", ComicBlacklistAPIHandler ),
             (self.webroot + r"/comic/([0-9]+)/page/([0-9]+)", ComicPageAPIHandler ),
             (self.webroot + r"/comic/([0-9]+)/thumbnail", ThumbnailAPIHandler),

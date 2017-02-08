@@ -18,6 +18,7 @@ class AppFolders():
         make(AppFolders.settings())
         make(AppFolders.appData())
         make(AppFolders.appCachePages())
+        make(AppFolders.appBlacklistPages())
         make(AppFolders.appCacheEbooks())
 
     @staticmethod
@@ -105,6 +106,10 @@ class AppFolders():
     @staticmethod
     def appCacheEbooks():
         return os.path.join(AppFolders.appData(), "cache", "ebooks")
+
+    @staticmethod
+    def appBlacklistPages():
+        return os.path.join(AppFolders.appData(), "blacklist")
 
     @staticmethod
     def missingPath(filename):

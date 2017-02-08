@@ -195,7 +195,7 @@ class Library:
     def getComic(self, comic_id):
         return self.getSession().query(Comic).get(int(comic_id))
     
-    def getComicPage(self, comic_id, page_number, max_height = None):
+    def getComicPage(self, comic_id, page_number, cache = True, max_height = None):
         (path, page_count) = self.getSession().query(Comic.path, Comic.page_count) \
                                  .filter(Comic.id == int(comic_id)).first()
 
@@ -204,8 +204,13 @@ class Library:
         
         if path is not None:
             if int(page_number) < page_count:
-                image_data = self.cache_load(comic_id,page_number,path)
-        
+                if cache:
+                    image_data = self.cache_load(comic_id,page_number,path)
+                else:
+                    ca = self.getComicArchive(comic_id,path)
+                    # auto convert webp (disable for chunky or fix web book reader)
+                    image_data = utils.webp_patch_convert(ca.getPage(int(page_number)))
+                    
         if image_data is None:
             with open(default_img_file, 'rb') as fd:
                 image_data = fd.read()

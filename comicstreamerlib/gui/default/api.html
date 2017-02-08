@@ -32,6 +32,10 @@
     - blacklist a page read not to be used
         if {pagenum} is "clear" clears blacklist for the given book
 
+/comic/{id}/page/{pagenum}/like
+    - like a page and add it to favorites
+        if {pagenum} is "clear" clears the favroites for the given book
+        
 /comic/{id}/page/{pagenum}/cache
     - cxache a page
         if {pagenum} is "clear" clears the cache for the given book

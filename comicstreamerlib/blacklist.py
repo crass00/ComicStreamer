@@ -11,8 +11,12 @@ import logging
 import platform
 import Queue
 import datetime
+import hashlib
+import os
 
-from database import Comic
+from folders import AppFolders
+import database
+from library import Library
 
 class Blacklist(threading.Thread):
     def __init__(self, dm):
@@ -21,22 +25,18 @@ class Blacklist(threading.Thread):
         self.queue = Queue.Queue(0)
         self.quit = False
         self.dm = dm
+        self.library = Library(self.dm.Session)
         
     def stop(self):
         self.quit = True
         self.join()
 
-    def blacklister(self, file):
-        import hashlib
-        BLOCKSIZE = 65536
-        hasher = hashlib.sha1()
-        with open(file, 'rb') as afile:
-            buf = afile.read(BLOCKSIZE)
-            while len(buf) > 0:
-                hasher.update(buf)
-                buf = afile.read(BLOCKSIZE)
-        print(hasher.hexdigest())
-        return hasher.hexdigest()
+    def hash(self, image):
+        hashersha1 = hashlib.sha1()
+        hashersha1.update(image)
+        hashermd5 = hashlib.md5()
+        hashermd5.update(image)
+        return str(hashersha1.hexdigest()+hashermd5.hexdigest())
 
     def setBlacklist(self, comic_id, pagenum):
         # for now, don't defer the blacklist setting, maybe it's not needed
@@ -63,22 +63,27 @@ class Blacklist(threading.Thread):
                 
         if comic_id is not None:
             session = self.dm.Session()
-    
-            obj = session.query(Comic).filter(Comic.id == int(comic_id)).first()
-            if obj is not None:
-                try:
-                    if pagenum.lower() == "remove":
-                        obj.lastread_ts =  None
-                        obj.lastread_page = None
-                    elif int(pagenum) < obj.page_count:
-                        obj.lastread_ts = datetime.datetime.utcnow()
-                        obj.lastread_page = int(pagenum)
-                        #logging.debug("blacklist: about to commit boommak ts={0}".format(obj.lastread_ts))
-                except Exception:
-                    logging.error("Blacklist: Problem blocking page {} on comic {}".format(pagenum, comic_id))
-                else:
-                    session.commit()
-                    
+            if pagenum == 'clear':
+                session.delete(Blacklist).filter(database.Blacklist.comic_id == int(comic_id),database.Blacklist.page == int(pagenum))
+            else:
+                obj = session.query(database.Blacklist).filter(database.Blacklist.comic_id == int(comic_id),database.Blacklist.page == int(pagenum)).first()
+                if obj is None:
+                    try:
+                        blacklist = database.Blacklist()
+                        image_data = self.library.getComicPage(comic_id, pagenum, False)
+                        blacklist.hash = self.hash(image_data)
+                        file = open(os.path.join(AppFolders.appBlacklistPages(),str(blacklist.hash)), "w")
+                        file.write(image_data)
+                        file.close()
+                        blacklist.comic_id = int(comic_id)
+                        blacklist.page = int(pagenum)
+                        blacklist.ts = datetime.datetime.utcnow()
+                        session.add(blacklist)
+                    except Exception, e:
+                        print str(e)
+                        logging.error("Blacklist: Problem blocking page {} on comic {}".format(pagenum, comic_id))
+
+            session.commit()
             session.close()
 
 #-------------------------------------------------

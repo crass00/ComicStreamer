@@ -24,7 +24,7 @@
                 keyboard: { next: 39, previous: 37, toolbar: 80, toggleLayout: 76, thumbnails: 84 },
                 pageTurnCallback: function(page){$.getJSON( 'page/'+(page-1)+'/bookmark?api_key={{api_key}}')},
                 blacklistCallback: function(page){$.getJSON( 'page/'+(page-1)+'/blacklist?api_key={{api_key}}')},
-                favoritesCallback: function(page){$.getJSON( 'page/'+(page-1)+'/favorites?api_key={{api_key}}')}
+                favoriteCallback: function(page){$.getJSON( 'page/'+(page-1)+'/like?api_key={{api_key}}')}
             }
         );
         book.draw();

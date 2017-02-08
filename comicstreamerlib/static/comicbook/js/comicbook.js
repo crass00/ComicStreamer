@@ -1644,7 +1644,7 @@ var ComicBook = (function ($) {
       libPath: '/lib/',
       forward_buffer: 3,
       pageTurnCallback: false,
-      favoritesCallback: false,
+      favoriteCallback: false,
       blacklistCallback: false,
       returnCallback: false,
     };
@@ -1915,7 +1915,7 @@ var ComicBook = (function ($) {
         self.blacklist();
     };
 
-    ComicBook.prototype.blacklist = function () {
+    ComicBook.prototype.favorite = function () {
         self.favorite();
     };
 
@@ -2275,51 +2275,32 @@ var ComicBook = (function ($) {
      * @see #xxx
      */
     ComicBook.prototype.blacklist = function () {
-     var page;
-
-      try {
-        page = self.getPage(pointer+1);
-      } catch (e) {}
-
-      if (!page) { return false; }
-
-      if (pointer + 1 < pages.length) {
-        pointer += (options.displayMode === 'single' || is_double_page_spread) ? 1 : 2;
+      if (pointer < pages.length) {
         try {
-          if (options.pageTurnCallback) {
-            options.blacklistCallback(pointer)
-            if (options.displayMode === 'single' || is_double_page_spread)
-                options.blacklistCallback(pointer+1);
-
-          }            
+          if (options.blacklistCallback) {
+            options.blacklistCallback(pointer+1)
+            if (options.displayMode === 'double') {
+                options.blacklistCallback(pointer+2);
+            }
+          }
         } catch (e) {}
       }
     
     }
 
     /**
-     * xxx
+     * xxx still check reverse reading...
     *
      * @see #xxx
      */
     ComicBook.prototype.favorite = function () {
-     var page;
-
-      try {
-        page = self.getPage(pointer+1);
-      } catch (e) {}
-
-      if (!page) { return false; }
-
-      if (pointer + 1 < pages.length) {
-        pointer += (options.displayMode === 'single' || is_double_page_spread) ? 1 : 2;
+      if (pointer < pages.length) {
         try {
-          if (options.pageTurnCallback) {
-            options.favoriteCallback(pointer)
-            if (options.displayMode === 'single' || is_double_page_spread)
-                options.favoriteCallback(pointer+1);
-
-          }            
+          if (options.favoriteCallback) {
+            options.favoriteCallback(pointer+1)
+            if (options.displayMode === 'double') {
+                options.favoriteCallback(pointer+2);
+            }          }
         } catch (e) {}
       }
     

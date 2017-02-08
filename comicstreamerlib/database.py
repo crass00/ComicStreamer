@@ -32,7 +32,7 @@ from sqlalchemy.dialects import mysql
 
 mysql_active = ComicStreamerConfig()['database']['engine'].lower() == "mysql"
 
-SCHEMA_VERSION=4
+SCHEMA_VERSION=5
 
 Base = declarative_base()
 Session = sessionmaker()
@@ -288,7 +288,7 @@ class Comic(Base):
     roles = association_proxy('roles_raw', 'name')
     genres = association_proxy('genres_raw', 'name')
      
-    #bookmark = relationship("Bookmark",  backref="comic", lazy="dynamic")  #uselist=False,    
+    blacklist = relationship("Blacklist", cascade="save-update,delete")  #uselist=False,
      
     def __repr__(self):
         out = u"<Comic(id={0}, path={1},\n series={2}, issue={3}, year={4} pages={5}\n{6}".format(
@@ -487,39 +487,83 @@ class DeletedComic(Base):
     def __unicode__(self):
         out = u"DeletedComic: {0}:{1}".format(self.id, self.comic_id)
         return out
-"""
-class User(Base):
-    __tablename__ = "users"
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
-    password_digest = Column(String)
 
-class Bookmark(Base):
-    __tablename__ = "bookmarks"
-    __table_args__ = {'sqlite_autoincrement': True}
+
+class Blacklist(Base):
+    __tablename__ = "blacklists"
+    __table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8'}
     
     #id = Column(Integer, primary_key=True)
     comic_id = Column(Integer, ForeignKey('comics.id'), primary_key=True)
-    user_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
-    page = Column(Integer)
-    updated = Column(DateTime)
+    #user_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
+    page = Column(Integer, primary_key=True)
+    ts = Column(DateTime, default=datetime.utcnow)
+    if mysql_active:
+        hash = Column(String(16))
+    else:
+        hash = Column(String)
 
 class Favorite(Base):
     __tablename__ = "favorites"
-    id = Column(Integer, primary_key=True)
+    __table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8'}
+    #id = Column(Integer, primary_key=True)
     comic_id = Column(Integer, ForeignKey('comics.id'), primary_key=True)
-    user_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
+    page = Column(Integer, primary_key=True)
+    ts = Column(DateTime, default=datetime.utcnow)
+    #user_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
+
+"""
+class User(Base):
+    __tablename__ = "users"
+    __table_args__ = {'sqlite_autoincrement': True,'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8'}
+    id = Column(Integer, primary_key=True)
+    if mysql_active:
+        name = Column(String(256))
+        password_digest = Column(String(16))
+    else:
+        name = Column(String)
+        password_digest = Column(String)
+
+
+class Bookmark(Base):
+    __tablename__ = "bookmarks"
+    __table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8'}
+    
+    #id = Column(Integer, primary_key=True)
+    comic_id = Column(Integer, ForeignKey('comics.id'), primary_key=True)
+#    user_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
+    page = Column(Integer)
+    updated = Column(DateTime)
+
+
+class Read(Base):
+    __tablename__ = "read"
+    __table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8'}
+
+#    id = Column(Integer, primary_key=True)
+    comic_id = Column(Integer, ForeignKey('comics.id'), primary_key=True)
+#    user_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
+    updated = Column(DateTime)
+    #comics = relationship('Comic', secondary=readinglists_comics_table,
+                                #cascade="delete", #, backref='comics')
+                      #   )
+
 
 class ReadingList(Base):
     __tablename__ = "readinglists"
-    id = Column(Integer, primary_key=True)
+    __table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8'}
+#    id = Column(Integer, primary_key=True)
+    comic_id = Column(Integer, ForeignKey('comics.id'), primary_key=True)
     user_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
-    name = Column(String)
-    comics = relationship('Comic', secondary=readinglists_comics_table,
+    if mysql_active:
+        name = Column(String(256))
+    else:
+        name = Column(String)
+    updated = Column(DateTime)
+    #comics = relationship('Comic', secondary=readinglists_comics_table,
                                 #cascade="delete", #, backref='comics')
-                         )
+                #         )
 """
-
 class SchemaInfo(Base):
     __tablename__ = "schemainfo"
     __table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8'}
