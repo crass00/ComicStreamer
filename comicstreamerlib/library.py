@@ -25,7 +25,7 @@ class Library:
         self.comicArchiveList = []
         self.namedEntities = {}
         self.cache_active = False
-        self.internalBlacklist = self.loadBlacklist(os.path.join(AppFolders.static(),'hash'))
+        self.internalBlacklist = self.loadBlacklist(os.path.join(AppFolders.static(),'comicstreamer'))
 
     def lastpage_extractor_for_blacklist(self):
         print "Extract Last Pages"
@@ -51,7 +51,15 @@ class Library:
                 file.write(ximage_data)
             file.close()
 
-
+    def createBlacklist(self,file):
+        # loop over files in blacklist folder
+        # and save them to a file with \n seperated
+        # untested
+        for root, dirs, filenames in os.walk(AppFolders.appBlacklistPages()):
+            for f in filenames:
+                with open(file) as f:
+                    f.write(str(f)+'\n')
+    
     def loadBlacklist(self,file):
         with open(file) as f:
             return f.readlines()
