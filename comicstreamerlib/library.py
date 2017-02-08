@@ -31,8 +31,11 @@ class Library:
         print "Extract Last Pages"
         query = self.getSession.query(Comic)
         x = os.path.join(AppFolders.appBlacklistPages(),"lastpage")
+        y = os.path.join(AppFolders.appBlacklistPages(),"lastpage_double")
         if not os.path.isdir(x):
             os.makedirs(x)
+        if not os.path.isdir(y):
+            os.makedirs(y)
         for row in query:
             print('Extracting last page from ' + row.path)
             ca = self.getComicArchive(row.id,row.path)
@@ -43,8 +46,11 @@ class Library:
             if hash+'\n' in self.internalBlacklist:
                 continue
             if os.path.isfile(os.path.join(x,str(hash))):
-                file = open(os.path.join(AppFolders.appBlacklistPages(),str(hash)), "w")
-                file.write(image_data)
+                if os.path.isfile(os.path.join(y,str(hash))):
+                    continue
+                else:
+                    file = open(os.path.join(y,str(hash)), "w")
+                    file.write(image_data)
             else:
                 file = open(os.path.join(x,str(hash)), "w")
                 #file.write("1")
