@@ -49,11 +49,14 @@ class Library:
                 continue
             if os.path.isfile(os.path.join(x,str(hash))):
                 if os.path.isfile(os.path.join(y,str(hash))):
+                    print "Double Already Exists"
                     continue
                 else:
+                    print "Adding Double"
                     file = open(os.path.join(y,str(hash)), "w")
                     file.write(image_data)
             else:
+                print "Adding Lastpage"
                 file = open(os.path.join(x,str(hash)), "w")
                 #file.write("1")
                 file.write(image_data)
