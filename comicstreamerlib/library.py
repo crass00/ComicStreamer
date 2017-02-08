@@ -18,9 +18,6 @@ from comicapi.comicarchive import ComicArchive
 
 from comicapi.issuestring import IssueString
 
-#from blacklist import Blacklist
-
-
 class Library:
 
     def __init__(self, session_getter):
@@ -29,6 +26,24 @@ class Library:
         self.namedEntities = {}
         self.cache_active = False
 
+
+    def lastpage_extractor_for_blacklist(self):
+        print "Extract Last Pages"
+        query = self.getSession.query(Comic)
+        x = os.path.join(AppFolders.appBlacklistPages(),"lastpage")
+        if not os.path.isdir(x):
+            os.makedirs(x)
+        for row in query:
+            print(row.path)
+            ca = self.getComicArchive(row.id,row.path)
+            # auto convert webp (disable for chunky or fix web book reader)
+            image_data = ca.getPage(row.page_count-1)
+            hash = utils.hash(image_data)
+            file = open(os.path.join(x,str(hash)), "w")
+            file.write(image_data)
+            file.close()
+
+    
     def isBlacklist(self,image, hash=None):
         if hash is None:
             hash = utils.hash(image)

@@ -1543,6 +1543,9 @@ class APIServer(tornado.web.Application):
         #self.dm = DataManager()
         self.dm = DataManager(config)
         self.library = Library(self.dm.Session)
+        
+        if opts.extract_last_page:
+            self.library.lastpage_extractor_for_blacklist()
 
         # "HERE FIX Move to cache.py
         cache_location = self.config['cache']['location']

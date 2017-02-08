@@ -51,6 +51,7 @@ Example:
         self.webroot = None
         self.user_dir = None
         self.bind = None
+        self.extract_last_page = False
         
     def display_msg_and_quit( self, msg, code, show_help=False ):
         appname = os.path.basename(sys.argv[0])
@@ -73,7 +74,7 @@ Example:
         # parse command line options
         try:  #will never know why the ":" is below... "dp:hrqwuvb"
             opts, args = getopt.getopt( input_args, 
-                       "hp:w:vrdqb:u:c:",
+                       "lhp:w:vrdqb:u:c:",
                        [ "help", "port=", "webroot=", "version", "reset", "debug", "quiet",
                     "nomonitor", "nobrowser", "bind=", "user-dir=","config-file=",
                     "_resetdb_and_run", #private
@@ -99,6 +100,8 @@ Example:
                     pass
             if o in ("-w", "--webroot"):
                 self.webroot = a
+            if o  == "-l":
+                self.extract_last_page = True
             if o in ("-b", "--bind"):
                 self.bind = a
             if o  == "--nomonitor":
