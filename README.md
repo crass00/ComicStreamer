@@ -55,6 +55,7 @@ Tristan79 Work on this fork (januari 31 -february 7 2017)
 
 pre alpha support for
 - blacklisting
+- comic identification (for finding doubles)
 - favorites
 - multiuser
 - wake up media already when server comes out of idle to minimize wait time

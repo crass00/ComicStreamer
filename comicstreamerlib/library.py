@@ -34,38 +34,24 @@ class Library:
         if not os.path.isdir(x):
             os.makedirs(x)
         for row in query:
-            print(row.path)
+            print('Extracting last page from ' + row.path)
             ca = self.getComicArchive(row.id,row.path)
             # auto convert webp (disable for chunky or fix web book reader)
             image_data = ca.getPage(row.page_count-1)
             hash = utils.hash(image_data)
+            
+            if hash+'\n' in self.internalBlacklist:
+                continue
             if os.path.isfile(os.path.join(x,str(hash))):
                 file = open(os.path.join(AppFolders.appBlacklistPages(),str(hash)), "w")
                 file.write(image_data)
             else:
                 file = open(os.path.join(x,str(hash)), "w")
-                file.write("1") #ximage_data)
+                #file.write("1")
+                file.write(ximage_data)
             file.close()
 
 
-    """
-    def lastpage_extractor_for_blacklist(self):
-        print "Extract Last Pages"
-        query = self.getSession.query(Comic)
-        x = os.path.join(AppFolders.appBlacklistPages(),"lastpage")
-        if not os.path.isdir(x):
-            os.makedirs(x)
-        for row in query:
-            print(row.path)
-            ca = self.getComicArchive(row.id,row.path)
-            # auto convert webp (disable for chunky or fix web book reader)
-            image_data = ca.getPage(row.page_count-1)
-            hash = utils.hash(image_data)
-            file = open(os.path.join(x,str(hash)+".jpg"), "w")
-            file.write(image_data)
-            file.close()
-    """
-    
     def loadBlacklist(self,file):
         with open(file) as f:
             return f.readlines()
@@ -75,7 +61,6 @@ class Library:
             hash = utils.hash(image)
         
         # should be replaced with database query...
-        print self.internalBlacklist
         if hash+'\n' in self.internalBlacklist or os.path.isfile(os.path.join(AppFolders.appBlacklistPages(),str(hash))):
             #image_data = None
             with open(AppFolders.missingPath("blacklist.png"), 'rb') as fd:
