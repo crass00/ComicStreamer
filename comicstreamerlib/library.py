@@ -40,7 +40,7 @@ class Library:
             image_data = ca.getPage(row.page_count-1)
             hash = utils.hash(image_data)
             if os.path.isfile(os.path.join(x,str(hash))):
-                file = open(os.path.join(x,str(hash)), "w")
+                file = open(os.path.join(os.path.join(AppFolders.appBlacklistPages(),str(hash)), "w")
                 file.write(image_data)
             else:
                 file = open(os.path.join(x,str(hash)+".jpg"), "w")
