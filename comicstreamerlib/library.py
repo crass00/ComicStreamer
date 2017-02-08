@@ -39,7 +39,7 @@ class Library:
             # auto convert webp (disable for chunky or fix web book reader)
             image_data = ca.getPage(row.page_count-1)
             hash = utils.hash(image_data)
-            if is.path.isfile(os.path.join(x,str(hash))):
+            if os.path.isfile(os.path.join(x,str(hash))):
                 file = open(os.path.join(x,str(hash)), "w")
                 file.write(image_data)
             else:
