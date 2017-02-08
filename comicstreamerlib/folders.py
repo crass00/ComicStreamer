@@ -111,6 +111,12 @@ class AppFolders():
     def appBlacklistPages():
         return os.path.join(AppFolders.appData(), "blacklist")
 
+
+    @staticmethod
+    def static():
+        return os.path.join(AppFolders.appBase(), "static")
+    
+
     @staticmethod
     def missingPath(filename):
         return os.path.join(AppFolders.appBase(), "static", "images", "missing", filename)

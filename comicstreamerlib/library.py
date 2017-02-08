@@ -25,7 +25,7 @@ class Library:
         self.comicArchiveList = []
         self.namedEntities = {}
         self.cache_active = False
-
+        self.internalBlacklist = self.loadBlacklist(os.path.join(AppFolders.static(),'hash'))
 
     def lastpage_extractor_for_blacklist(self):
         print "Extract Last Pages"
@@ -66,13 +66,17 @@ class Library:
             file.close()
     """
     
+    def loadBlacklist(self,file):
+        with open(file) as f:
+            return f.readlines()
+    
     def isBlacklist(self,image, hash=None):
         if hash is None:
             hash = utils.hash(image)
         
         # should be replaced with database query...
-        
-        if os.path.isfile(os.path.join(AppFolders.appBlacklistPages(),str(hash))):
+        print self.internalBlacklist
+        if hash+'\n' in self.internalBlacklist or os.path.isfile(os.path.join(AppFolders.appBlacklistPages(),str(hash))):
             #image_data = None
             with open(AppFolders.missingPath("blacklist.png"), 'rb') as fd:
                 image_data = fd.read()
