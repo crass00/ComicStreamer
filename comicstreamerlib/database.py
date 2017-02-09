@@ -497,9 +497,11 @@ class Blacklist(Base):
     comic_id = Column(Integer, ForeignKey('comics.id'), primary_key=True)
     #user_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
     page = Column(Integer, primary_key=True)
+    filesize = Column(BigInteger)
     ts = Column(DateTime, default=datetime.utcnow)
     if mysql_active:
         hash = Column(String(72))
+    
     else:
         hash = Column(String)
 

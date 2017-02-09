@@ -9,6 +9,7 @@ import locale
 import shutil
 import tarfile
 
+
 from natsort import natsorted
 from unrar import rarfile
 from unrar import unrarlib
@@ -167,6 +168,21 @@ class ZipArchiver:
             print >> sys.stderr, u"Unable to get zipfile list [{0}]: {1}".format(e, self.path)
             return []
 
+
+    def getArchiveFilesizeList( self ):
+        try:
+            zf = zipfile.ZipFile( self.path, 'r' )
+            namelist = zf.namelist()
+            sizelist = []
+            for i in namelist:
+                sizelist += [(i,zf.getinfo(i).file_size)]
+            zf.close()
+            return sizelist
+        except Exception as e:
+            print >> sys.stderr, u"Unable to get zipfile list [{0}]: {1}".format(e, self.path)
+            return []
+
+
     # zip helper func
     def rebuildZipFile( self, exclude_list ):
 
@@ -290,19 +306,22 @@ class SevenZipArchiver:
         #comment = szf.comment
 	#fp.close()
         #return comment
-	return ""
+        return ""
 
     def setArchiveComment( self, comment ):
-	return False
+        return False
 
     def readArchiveFile( self, archive_file ):
         data = ""
-	fp = open( self.path, 'r' )
+        fp = open( self.path, 'r' )
 
         try:
-	    szf = Archive7z( fp )
-	    data = szf.getmember( archive_file ).read()
+            szf = Archive7z( fp )
+            data = szf.getmember( archive_file ).read()
         except Exception as e:
+            #import traceback
+            #traceback.print_exc(file=sys.stdout)
+            #UnsupportedCompressionMethodError: '!'
             fp.close()
             print >> sys.stderr, u"bad 7zip file [{0}]: {1} :: {2}".format(e, self.path, archive_file)
             raise IOError
@@ -311,18 +330,34 @@ class SevenZipArchiver:
         return data
 
     def removeArchiveFile( self, archive_file ):
-	return False
+        return False
         
     def writeArchiveFile( self, archive_file, data ):
-	return False
+        return False
 
     def getArchiveFilenameList( self ):
         try:
             fp = open( self.path, 'r' )
-	    szf = Archive7z( fp )
+            szf = Archive7z( fp )
             namelist = list(szf.getnames())
             fp.close()
             return namelist
+        except Exception as e:
+            print >> sys.stderr, u"Unable to get 7zipfile list [{0}]: {1}".format(e, self.path)
+            return []
+
+    def getArchiveFilesizeList( self ):
+        try:
+            fp = open( self.path, 'r' )
+            szf = Archive7z( fp )
+            t = szf.getmembers()
+            n = list(szf.getnames())
+            
+            sizelist = []
+            for i in range(len(t)):
+                sizelist += [(n[i],t[i].size)]
+            fp.close()
+            return sizelist
         except Exception as e:
             print >> sys.stderr, u"Unable to get 7zipfile list [{0}]: {1}".format(e, self.path)
             return []
@@ -359,10 +394,23 @@ class TarArchiver:
 
     def getArchiveFilenameList( self ):
         try:
-            zf = tarfile.TarFile( self.path, 'r' )
+            zf = tarfile.TarFile( self.path, 'r')
             namelist = zf.getnames()
             zf.close()
             return namelist
+        except Exception as e:
+            print >> sys.stderr, u"Unable to get tarfile list [{0}]: {1}".format(e, self.path)
+            return []
+
+    def getArchiveFilesizeList( self ):
+        try:
+            zf = tarfile.TarFile( self.path, 'r')
+            t = zf.getmembers()
+            sizelist = []
+            for i in t:
+                sizelist += [(i.name,i.size)]
+            zf.close()
+            return sizelist
         except Exception as e:
             print >> sys.stderr, u"Unable to get tarfile list [{0}]: {1}".format(e, self.path)
             return []
@@ -551,6 +599,33 @@ class RarArchiver:
         raise e
 
 
+    def getArchiveFilesizeList( self ):
+
+        rarc = self.getRARObj()
+        #namelist = [ item.filename for item in rarc.infolist() ]
+        #return namelist
+
+        tries = 0
+        while tries < 7:
+            try:
+                tries = tries+1
+                #namelist = [ item.filename for item in rarc.infolist() ]
+                namelist = []
+                for item in rarc.infolist():
+                    if item.file_size != 0:
+                        namelist += [(item.filename,item.file_size)]
+
+            except (OSError, IOError) as e:
+                print >> sys.stderr, u"getArchiveFilenameList(): [{0}] {1} attempt#{2}".format(str(e), self.path, tries)
+                time.sleep(1)
+
+            else:
+                #Success"
+                return namelist
+
+        raise e
+
+
     def getRARObj( self ):
         tries = 0
         while tries < 7:
@@ -651,6 +726,8 @@ class UnknownArchiver:
         return False
     def getArchiveFilenameList( self ):
         return []
+    def getArchiveFilesizeList( self ):
+        return []
 
 class PdfArchiver:
     def __init__( self, path ):
@@ -701,6 +778,14 @@ class PdfArchiver:
         return False
     def removeArchiveFile( self, archive_file ):
         return False
+    
+    def getArchiveFilesizeList( self ):
+        sizelist = []
+        for i in self.getArchiveFilenameList()
+            sizelist += [(i,-1)]
+        return sizelist
+   
+   
     def getArchiveFilenameList( self ):
         out = []
         try:
@@ -834,6 +919,13 @@ class EbookArchiver(PdfArchiver):
         else:
             return True
 
+    def getArchiveFilesizeList( self ):
+        sizelist = []
+        for i in self.getArchiveFilenameList()
+            sizelist += [(i,-1)]
+        return sizelist
+    
+    
     def getArchiveFilenameList( self ):
         out = []
         try:
@@ -882,7 +974,7 @@ class ComicArchive:
 
         self.archive_type =  self.ArchiveType.Unknown
         self.archiver = UnknownArchiver( self.path )
-        
+
         # test all known types even if they have the wrong extension
         if ext == ".cbr" or ext == ".rar":
             if self.rarTest():
@@ -970,6 +1062,7 @@ class ComicArchive:
                 self.archiver = RarArchiver( self.path, rar_exe_path=self.rar_exe_path )
 
             elif self.sevenZipTest():
+                
                 self.archive_type = self.ArchiveType.SevenZip
                 self.archiver = SevenZipArchiver( self.path )
 
@@ -1009,21 +1102,21 @@ class ComicArchive:
 
 
     def sevenZipTest( self ):
-	try: 
-	    Archive7z(open(self.path)).getnames()
-	except:
-	    return False
-	else: 
-	    return True
+        try:
+            Archive7z(open(self.path)).getnames()
+        except:
+            return False
+        else: 
+            return True
 
 
     def tarTest( self ):
-	try: 
-	    return tarfile.is_tarfile( self.path )
-	except:
-	    return False
-	else: 
-	    return True
+        try:
+            return tarfile.is_tarfile( self.path )
+        except:
+            return False
+        else: 
+            return True
 
 
     def rarTest( self ):

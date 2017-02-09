@@ -92,6 +92,7 @@ General
 - Create Windows & Mac packages
 - Fix Cache did not work on xp :-/ (missing webp?)
 - Broke monitor (check!)
+- seven zip does not work on newer files not even with the github bug fixed version
 - Show unscanned/error files!
 - Server won't shutdown if monitor is still checking files...
 - SWF support??
