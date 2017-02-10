@@ -32,7 +32,7 @@ from sqlalchemy.dialects import mysql
 
 mysql_active = ComicStreamerConfig()['database']['engine'].lower() == "mysql"
 
-SCHEMA_VERSION=5
+SCHEMA_VERSION=6
 
 Base = declarative_base()
 Session = sessionmaker()
@@ -142,6 +142,13 @@ comics_genres_table = Table('comics_genres', Base.metadata,
      Column('genre_id', Integer, ForeignKey('genres.id'))
 )
 
+# Junction table
+comics_blacklist_table = Table('comics_blacklist', Base.metadata,
+    Column('comic_id', Integer, ForeignKey('comics.id')),
+    Column('blacklist_id', Integer, ForeignKey('blacklist.id')),
+    Column('page', Integer, primary_key=True),
+    Column('ts',DateTime, default=datetime.utcnow)
+)
 """
 # Junction table
 readinglists_comics_table = Table('readinglists_comics', Base.metadata,
@@ -199,6 +206,8 @@ class Comic(Base):
         genres_raw = relationship('Genre', secondary=comics_genres_table,
                                     cascade="save-update,delete") #, backref='comics')
       
+        blacklist_raw = relationship('Blacklist', secondary=comics_blacklist_table,
+                                    cascade="save-update,delete") #, backref='comics')
 
 
     else:
@@ -232,6 +241,8 @@ class Comic(Base):
         generictags_raw = relationship('GenericTag', secondary=comics_generictags_table,
                                     cascade="save-update,delete") #, backref='comics')
         genres_raw = relationship('Genre', secondary=comics_genres_table,
+                                    cascade="save-update,delete") #, backref='comics')
+        blacklist_raw = relationship('Blacklist', secondary=comics_blacklist_table,
                                     cascade="save-update,delete") #, backref='comics')
   
 
@@ -287,8 +298,9 @@ class Comic(Base):
     persons = association_proxy('persons_raw', 'name')
     roles = association_proxy('roles_raw', 'name')
     genres = association_proxy('genres_raw', 'name')
-     
-    blacklist = relationship("Blacklist", cascade="save-update,delete")  #uselist=False,
+    blacklist = association_proxy('blacklist_raw', 'hash')
+    
+    #blacklist = relationship("Blacklist", cascade="save-update,delete")  #uselist=False,
      
     def __repr__(self):
         out = u"<Comic(id={0}, path={1},\n series={2}, issue={3}, year={4} pages={5}\n{6}".format(
@@ -488,22 +500,20 @@ class DeletedComic(Base):
         out = u"DeletedComic: {0}:{1}".format(self.id, self.comic_id)
         return out
 
-
 class Blacklist(Base):
-    __tablename__ = "blacklists"
+    __tablename__ = "blacklist"
     __table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8'}
-    
-    #id = Column(Integer, primary_key=True)
-    comic_id = Column(Integer, ForeignKey('comics.id'), primary_key=True)
-    #user_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
-    page = Column(Integer, primary_key=True)
-    filesize = Column(BigInteger)
-    ts = Column(DateTime, default=datetime.utcnow)
+
+    id = Column(Integer, primary_key=True)
     if mysql_active:
         hash = Column(String(72))
-    
     else:
         hash = Column(String)
+
+    #user_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
+    # it's the file size of the page detect more file size...
+    detect = Column(BigInteger)
+    ts = Column(DateTime, default=datetime.utcnow)
 
 class Favorite(Base):
     __tablename__ = "favorites"

@@ -19,7 +19,6 @@ There is something missing... yes!
 
 _Are you are a database wizard..._
 
--  __MySQL support__ it drops the connection after some time (FIXED with patch) :-/
 -  __MySQL support__ you can not delete commics... (good for static libs if not for the previous point)
 
 _... or are you a web magician and able to fix the build in html webcomicbooks reader..._

@@ -240,6 +240,11 @@ class Monitor():
             if self.quit:
                 self.setStatusDetail(u"Monitor: Stopped")
                 return
+        for i in comics:
+            self.library.checkBlacklist(i)
+            if self.quit:
+                self.setStatusDetail(u"Monitor: Stopped")
+                return
         self.library.addComics(comics)
     
     def getRecursiveFilelist(self, dirs):

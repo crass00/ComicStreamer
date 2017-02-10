@@ -4,11 +4,13 @@ import dateutil
 import os
 import random
 
+import logging
+
 from sqlalchemy import func, distinct
 from sqlalchemy.orm import subqueryload
 import shutil
 import utils
-from database import Comic, DatabaseInfo, Person, Role, Credit, Character, GenericTag, Team, Location, \
+from database import Comic, Blacklist, DatabaseInfo, Person, Role, Credit, Character, GenericTag, Team, Location, \
     StoryArc, Genre, DeletedComic,AlternateSeries
 from folders import AppFolders
 from sqlalchemy.orm import load_only
@@ -24,8 +26,10 @@ class Library:
         self.getSession = session_getter
         self.comicArchiveList = []
         self.namedEntities = {}
+        self.hashEntities = {}
         self.cache_active = False
-        self.internalBlacklist = self.loadBlacklist(os.path.join(AppFolders.static(),'comicstreamer'))
+        
+
 
     def lastpage_extractor_for_blacklist(self):
         print "Extract Last Pages"
@@ -62,31 +66,125 @@ class Library:
                 file.write(image_data)
             file.close()
 
-    def createBlacklist(self,file):
+    def createBlacklistFromFolder(self,file):
         # loop over files in blacklist folder
         # and save them to a file with \n seperated
         # untested
         for root, dirs, filenames in os.walk(AppFolders.appBlacklistPages()):
             for f in filenames:
                 with open(file) as f:
-                    f.write(str(f)+'\n')
+                    f.write(str(f)+str(os.stat(file).st_size)+'\n')
+
+
+    def comicUnBlacklist(self,comic_id):
+        pass
+ 
+    def checkBlacklist(self,comic):
+        pass
     
-    def loadBlacklist(self,file):
+
+    def getHashEntity(self, cls, hash):
+        """Gets related entities such as Characters, Persons etc by name"""
+        # this is a bit hackish, we need unique instances between successive
+        # calls for newly created entities, to avoid unique violations at flush time
+        key = (cls, hash)
+        if key not in self.hashEntities.keys():
+            obj = self.getSession().query(cls).filter(cls.hash == hash).first()
+            self.hashEntities[key] = obj
+            if obj is None:
+                self.hashEntities[key] = cls(hash=hash)
+        return self.hashEntities[key]
+
+
+    
+    
+    def comicBlacklist(self,comic_id, pagenum):
+        #obj = session.query(database.Blacklist).filter(database.Blacklist.comic_id == int(comic_id),database.Blacklist.page == int(pagenum)).first()
+         #       if obj is None:
+        
+        session = self.getSession()
+        
+        #self.getComic()
+        #x = self.getSession().query(Comic.id, Comic.path, Comic.mod_ts)
+
+        image_data = self.getComicPage(comic_id, pagenum, False)
+        hash = utils.hash(image_data)
+
+        #comichash = self.getHashEntity(Blacklist, hash)
+        #self.getComic(comic_id).blacklist(comichash)
+        
+        obj = self.getSession().query(Blacklist.hash).filter(Blacklist.hash == hash).first()
+        if obj is None:
+            try:
+                blacklist = Blacklist()
+                blacklist.hash = hash
+                blacklist.detect = len(image_data)
+                
+                file = open(os.path.join(AppFolders.appBlacklistPages(),str(blacklist.hash)), "w")
+                file.write(image_data)
+                file.close()
+                
+                #blacklist.comic_id = int(comic_id)
+                #blacklist.page = int(pagenum)
+                blacklist.ts = datetime.datetime.utcnow()
+                session.add(blacklist)
+            except Exception, e:
+                print str(e)
+                logging.error("Blacklist: Problem blocking page {} on comic {}".format(pagenum, comic_id))
+
+
+        session.commit()
+        session.close()
+        self.cache_delete_page(comic_id, pagenum)
+
+    def loadBlacklistFromFile(self,file):
         with open(file) as f:
-            return f.readlines()
+            lines = f.readlines()
+        blacklist = []
+        blfile = []
+        detectlist = []
+        for line in lines:
+            blacklist += [line[:72]]
+            try:
+                detectlist += [int(line[72:])]
+            except:
+                detectlist += [-1]
+            blfile += [(blacklist[-1],detectlist[-1])]
+        session = self.getSession()
+        obj = session.query(Blacklist.hash).all()
+        if obj is not None:
+            l = []
+            for i in obj:
+                l += [i[0]]
+
+        for i in blfile:
+            if i[0] not in l:
+                bl = Blacklist()
+                bl.hash = i[0]
+                bl.detect = i[1]
+                bl.ts = datetime.utcnow()
+                session.add(bl)
+        
+        session.commit()
+        session.close()
+        logging.info("Blacklist: Loaded " + file)
     
     def isBlacklist(self,image, hash=None):
         if hash is None:
             hash = utils.hash(image)
         
         # should be replaced with database query...
-        if hash+'\n' in self.internalBlacklist or os.path.isfile(os.path.join(AppFolders.appBlacklistPages(),str(hash))):
-            #image_data = None
+        
+        obj = self.getSession().query(Blacklist.hash).filter(Blacklist.hash == hash).first()
+        if obj is not None:
             with open(AppFolders.missingPath("blacklist.png"), 'rb') as fd:
                 image_data = fd.read()
             return image_data
         else:
             return image
+
+
+        
 
     def cache_clear(self):
         if os.path.exists(self.cache_location) and os.path.isdir(self.cache_location):
@@ -168,6 +266,9 @@ class Library:
             self.cache_discard += 1
             self.cache_list.pop(0)
         return deleted
+
+    def cache_delete_page(self, comic_id, page_number, path):
+        pass
 
     def cache_load(self, comic_id, page_number, path):
         if self.cache_active:
@@ -444,6 +545,7 @@ class Library:
                 role = self.getNamedEntity(Role, credit['role'].lower().strip())
                 person = self.getNamedEntity(Person, credit['person'].strip())
                 comic.credits_raw.append(Credit(person, role))
+                
         return comic
 
     def getNamedEntity(self, cls, name):

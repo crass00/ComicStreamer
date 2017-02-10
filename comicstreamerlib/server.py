@@ -1676,6 +1676,8 @@ class APIServer(tornado.web.Application):
 
         tornado.web.Application.__init__(self, handlers, **settings)
 
+        self.library.loadBlacklistFromFile(os.path.join(AppFolders.static(),'comicstreamer'))
+        
         if not opts.no_monitor:     
             self.monitor = Monitor(self.dm, self.config['general']['folder_list'])
             self.monitor.start()
@@ -1707,9 +1709,9 @@ class APIServer(tornado.web.Application):
         self.shutdown()
         executable = sys.executable
         
+        new_argv = ["--nobrowser"]
         new_argv.append("-p");
         new_argv.append(str(self.port))
-        new_argv = ["--nobrowser"]
         if self.opts.quiet:
             new_argv.append("-q")
         if self.opts.debug:

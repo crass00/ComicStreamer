@@ -59,27 +59,9 @@ class Blacklist(threading.Thread):
         if comic_id is not None:
             session = self.dm.Session()
             if pagenum == 'clear':
-                session.delete(Blacklist).filter(database.Blacklist.comic_id == int(comic_id),database.Blacklist.page == int(pagenum))
+                self.library.comicBlacklist(comic_id)
             else:
-                obj = session.query(database.Blacklist).filter(database.Blacklist.comic_id == int(comic_id),database.Blacklist.page == int(pagenum)).first()
-                if obj is None:
-                    try:
-                        blacklist = database.Blacklist()
-                        image_data = self.library.getComicPage(comic_id, pagenum, False)
-                        blacklist.hash = utils.hash(image_data)
-                        file = open(os.path.join(AppFolders.appBlacklistPages(),str(blacklist.hash)), "w")
-                        file.write(image_data)
-                        file.close()
-                        blacklist.comic_id = int(comic_id)
-                        blacklist.page = int(pagenum)
-                        blacklist.ts = datetime.datetime.utcnow()
-                        session.add(blacklist)
-                    except Exception, e:
-                        print str(e)
-                        logging.error("Blacklist: Problem blocking page {} on comic {}".format(pagenum, comic_id))
-
-            session.commit()
-            session.close()
-
+                self.library.comicBlacklist(comic_id, pagenum)
+               
 #-------------------------------------------------
 

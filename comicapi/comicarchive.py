@@ -781,7 +781,7 @@ class PdfArchiver:
     
     def getArchiveFilesizeList( self ):
         sizelist = []
-        for i in self.getArchiveFilenameList()
+        for i in self.getArchiveFilenameList():
             sizelist += [(i,-1)]
         return sizelist
    
@@ -921,7 +921,7 @@ class EbookArchiver(PdfArchiver):
 
     def getArchiveFilesizeList( self ):
         sizelist = []
-        for i in self.getArchiveFilenameList()
+        for i in self.getArchiveFilenameList():
             sizelist += [(i,-1)]
         return sizelist
     
