@@ -231,7 +231,7 @@ class Library:
         cache_free_size = utils.get_free_space(self.cache_location)
         self.cache_maxsize = cache_free_size - self.cache_free*1048576 - self.cache_filled
         if self.cache_maxsize < 0:
-            self.cache_maxsize += self.cache_delete(abs(x))
+            self.cache_maxsize += self.cache_delete(abs(self.cache_maxsize))
             if self.cache_maxsize < 0:
                 self.cache_maxsize = 0
         if self.cache_size > 0 and self.cache_maxsize > self.cache_size*1048576:
