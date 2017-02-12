@@ -192,11 +192,17 @@ class Monitor():
                 style = MetaDataStyle.CIX
             elif ca.hasMetadata( MetaDataStyle.CBI ):
                 style = MetaDataStyle.CBI
+            elif ca.hasMetadata( MetaDataStyle.COMET ):
+                style = MetaDataStyle.COMET
+            elif ca.hasMetadata( MetaDataStyle.EPUB ):
+                style = MetaDataStyle.EPUB
             else:
                 style = None
                 
             if style is not None:
                 md = ca.readMetadata(style)
+                if md.isEmpty:
+                     md = ca.metadataFromFilename()
             else:
                 # No metadata in comic.  make some guesses from the filename
                 md = ca.metadataFromFilename()

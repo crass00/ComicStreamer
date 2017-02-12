@@ -9,6 +9,9 @@ import locale
 import shutil
 import tarfile
 
+import zipfile
+from lxml import etree
+
 
 from natsort import natsorted
 from unrar import rarfile
@@ -101,7 +104,8 @@ class MetaDataStyle:
     CIX = 1
     COMET = 2
     CALIBRE = 3
-    name = [ 'ComicBookLover', 'ComicRack', 'CoMet' , 'Calibre' ]
+    EPUB = 4
+    name = [ 'ComicBookLover', 'ComicRack', 'CoMet' , 'Calibre', 'Epub' ]
 
 class ZipArchiver:
 
@@ -972,7 +976,7 @@ class ComicArchive:
         # Use file extension to decide which archive test we do first
         ext = os.path.splitext(path)[1].lower()
 
-        self.archive_type =  self.ArchiveType.Unknown
+        self.archive_type = self.ArchiveType.Unknown
         self.archiver = UnknownArchiver( self.path )
 
         # test all known types even if they have the wrong extension
@@ -1046,10 +1050,11 @@ class ComicArchive:
 
         elif ext == ".pdf":
             # skip converted ebook
-            if os.path.basename(self.path)[-8:] != '.tmp.pdf':
-                self.archive_type = self.ArchiveType.Pdf
-                self.archiver = PdfArchiver(self.path)
+            self.archive_type = self.ArchiveType.Pdf
+            self.archiver = PdfArchiver(self.path)
         elif ext in ebook_extentions:
+            if ext == ".epub":
+                self.has_epub = True
             self.archive_type = self.ArchiveType.Ebook
             self.archiver = EbookArchiver(self.path)
         else:
@@ -1194,18 +1199,18 @@ class ComicArchive:
             return False
 
     def readMetadata( self, style ):
-
         if style == MetaDataStyle.CIX:
             return self.readCIX()
         elif style == MetaDataStyle.CBI:
             return self.readCBI()
         elif style == MetaDataStyle.COMET:
             return self.readCoMet()
+        elif style == MetaDataStyle.EPUB:
+            return self.readEPUB()
         else:
             return GenericMetadata()
 
     def writeMetadata( self, metadata, style ):
-
         retcode = None
         if style == MetaDataStyle.CIX:
             retcode = self.writeCIX( metadata )
@@ -1217,13 +1222,14 @@ class ComicArchive:
 
 
     def hasMetadata( self, style ):
-
         if style == MetaDataStyle.CIX:
             return self.hasCIX()
         elif style == MetaDataStyle.CBI:
             return self.hasCBI()
         elif style == MetaDataStyle.COMET:
             return self.hasCoMet()
+        elif style == MetaDataStyle.EPUB:
+            return self.hasEPUB()
         else:
             return False
 
@@ -1418,6 +1424,55 @@ class ComicArchive:
             self.resetCache()
             return write_success
         return True
+
+
+
+    def readEPUB( self ):
+    
+        def readEPUBMeta( fname ):
+            ns = {
+                'n':'urn:oasis:names:tc:opendocument:xmlns:container',
+                'pkg':'http://www.idpf.org/2007/opf',
+                'dc':'http://purl.org/dc/elements/1.1/'
+            }
+
+            # prepare to read from the .epub file
+            zip = zipfile.ZipFile(fname)
+
+            # find the contents metafile
+            txt = zip.read('META-INF/container.xml')
+            tree = etree.fromstring(txt)
+            cfname = tree.xpath('n:rootfiles/n:rootfile/@full-path',namespaces=ns)[0]
+
+            # grab the metadata block from the contents metafile
+            cf = zip.read(cfname)
+            tree = etree.fromstring(cf)
+            p = tree.xpath('/pkg:package/pkg:metadata',namespaces=ns)[0]
+
+            # repackage the data
+            res = {}
+            for s in ['title','language','creator','date','identifier','publisher']:
+                res[s] = p.xpath('dc:%s/text()'%(s),namespaces=ns)[0]
+            return res
+        
+        metadata = GenericMetadata()
+        try:
+            meta = readEPUBMeta( self.path )
+            metadata.title = meta['title']
+            metadata.publisher = meta['publisher']
+            metadata.language = meta['language']
+            metadata.identifier = meta['identifier']
+            metadata.addCredit( 'writer', meta['creator'] )
+            metadata.isEmpty = False
+        except:
+            print  >> sys.stderr, u"Error reading in raw EPUB meta!"
+        return metadata
+  
+    def hasEPUB(self):
+        if self.has_epub is None:
+            return False
+        else:
+            return True
 
     def readCIX( self ):
         if self.cix_md is None:

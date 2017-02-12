@@ -5,6 +5,16 @@ import os
 import random
 
 import logging
+import StringIO
+
+from PIL import Image
+try:
+    from PIL import WebPImagePlugin
+except:
+    pass
+
+from PIL import ImageFile
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 from sqlalchemy import func, distinct
 from sqlalchemy.orm import subqueryload
@@ -48,6 +58,12 @@ class Library:
             # auto convert webp (disable for chunky or fix web book reader)
             image_data = ca.getPage(row.page_count-1)
             hash = utils.hash(image_data)
+            
+            # ascept ratio check
+            im = Image.open(StringIO.StringIO(image_data))
+            w,h = im.size
+            if h > w:
+                continue
             
             if hash+'\n' in self.internalBlacklist:
                 continue

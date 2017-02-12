@@ -93,9 +93,10 @@ So now what? how do i fix that...
 
 Maybe somebody add this to a readme!
 
-
-
-
+run
+ xcode-select --install
+pip install lxml
+pip install requests
 ....
 
 sloppy doc...
