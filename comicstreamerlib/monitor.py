@@ -208,7 +208,11 @@ class Monitor():
             else:
                 # No metadata in comic.  make some guesses from the filename
                 md = ca.metadataFromFilename()
-                
+            
+            if (md.title is None or md.title == "") and not md.series is None:
+                md.title = md.series
+                md.series = None
+            
             md.path = ca.path 
             md.page_count = ca.page_count
             md.mod_ts = datetime.utcfromtimestamp(getmtime(ca.path))
