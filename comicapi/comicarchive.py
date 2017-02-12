@@ -8,6 +8,7 @@ import platform
 import locale
 import shutil
 import tarfile
+import re
 
 import zipfile
 from lxml import etree
