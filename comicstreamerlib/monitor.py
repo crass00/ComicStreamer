@@ -194,6 +194,8 @@ class Monitor():
                 style = MetaDataStyle.CBI
             elif ca.hasMetadata( MetaDataStyle.COMET ):
                 style = MetaDataStyle.COMET
+            elif ca.hasMetadata( MetaDataStyle.CALIBRE ):
+                style = MetaDataStyle.CALIBRE
             elif ca.hasMetadata( MetaDataStyle.EPUB ):
                 style = MetaDataStyle.EPUB
             else:

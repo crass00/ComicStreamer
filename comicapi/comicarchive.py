@@ -1206,6 +1206,8 @@ class ComicArchive:
             return self.readCBI()
         elif style == MetaDataStyle.COMET:
             return self.readCoMet()
+        elif style == MetaDataStyle.CALIBRE:
+            return self.readCALIBRE()
         elif style == MetaDataStyle.EPUB:
             return self.readEPUB()
         else:
@@ -1229,6 +1231,8 @@ class ComicArchive:
             return self.hasCBI()
         elif style == MetaDataStyle.COMET:
             return self.hasCoMet()
+        elif style == MetaDataStyle.CALIBRE:
+            return self.hasCALIBRE()
         elif style == MetaDataStyle.EPUB:
             return self.hasEPUB()
         else:
@@ -1427,9 +1431,54 @@ class ComicArchive:
         return True
 
 
+    def readCALIBRE( self ):
+    
+        def readEPUBMeta( fname ):
+            ns = {
+                'n':'urn:oasis:names:tc:opendocument:xmlns:container',
+                'pkg':'http://www.idpf.org/2007/opf',
+                'dc':'http://purl.org/dc/elements/1.1/'
+            }
+
+            # prepare to read from the .epub file
+            #zip = zipfile.ZipFile(fname)
+
+            # find the contents metafile
+            #txt = zip.read('META-INF/container.xml')
+            #tree = etree.fromstring(txt)
+            #cfname = tree.xpath('n:rootfiles/n:rootfile/@full-path',namespaces=ns)[0]
+
+            # grab the metadata block from the contents metafile
+            opf = open(fname, 'r')
+            cf = opf.read()
+            tree = etree.fromstring(cf)
+            p = tree.xpath('/pkg:package/pkg:metadata',namespaces=ns)[0]
+
+            # repackage the data
+            res = {}
+            for s in ['title','language','creator','date','identifier','publisher']:
+                res[s] = p.xpath('dc:%s/text()'%(s),namespaces=ns)[0]
+            return res
+        
+        metadata = GenericMetadata()
+        try:
+            meta = readEPUBMeta( os.path.join(os.path.dirname(self.path),'metadata.opf') )
+            metadata.title = meta['title']
+            metadata.publisher = meta['publisher']
+            metadata.language = meta['language']
+            metadata.identifier = meta['identifier']
+            metadata.addCredit( 'writer', meta['creator'] )
+            metadata.isEmpty = False
+        except:
+            print  >> sys.stderr, u"Error reading in raw EPUB meta!"
+        return metadata
+  
+    def hasCALIBRE(self):
+        return os.path.isfile(os.path.join(os.path.dirname(self.path),'metadata.opf'))
+
 
     def readEPUB( self ):
-    
+        
         def readEPUBMeta( fname ):
             ns = {
                 'n':'urn:oasis:names:tc:opendocument:xmlns:container',
