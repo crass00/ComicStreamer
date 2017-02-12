@@ -1456,7 +1456,7 @@ class ComicArchive:
 
             # repackage the data
             res = {}
-            for s in ['title','language','creator','date','identifier','publisher']:
+            for s in ['title','language','creator','date','identifier','publisher','description']:
                 res[s] = p.xpath('dc:%s/text()'%(s),namespaces=ns)[0]
             return res
         
@@ -1467,6 +1467,7 @@ class ComicArchive:
             metadata.publisher = meta['publisher']
             metadata.language = meta['language']
             metadata.identifier = meta['identifier']
+            metadata.comments = meta['description']
             metadata.addCredit( 'writer', meta['creator'] )
             metadata.isEmpty = False
         except:
@@ -1501,7 +1502,7 @@ class ComicArchive:
 
             # repackage the data
             res = {}
-            for s in ['title','language','creator','date','identifier','publisher']:
+            for s in ['title','language','creator','date','identifier','publisher','description']:
                 res[s] = p.xpath('dc:%s/text()'%(s),namespaces=ns)[0]
             return res
         
@@ -1512,6 +1513,7 @@ class ComicArchive:
             metadata.publisher = meta['publisher']
             metadata.language = meta['language']
             metadata.identifier = meta['identifier']
+            metadata.comments = meta['description']
             metadata.addCredit( 'writer', meta['creator'] )
             metadata.isEmpty = False
         except:
