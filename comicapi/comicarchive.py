@@ -1467,7 +1467,8 @@ class ComicArchive:
             metadata.publisher = meta['publisher']
             metadata.language = meta['language']
             metadata.identifier = meta['identifier']
-            metadata.comments = meta['description']
+            metadata.comments = re.sub("<.*?>", " ", meta['description'])
+            
             metadata.addCredit( 'writer', meta['creator'] )
             metadata.isEmpty = False
         except:
