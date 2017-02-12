@@ -970,6 +970,7 @@ class ComicArchive:
         self.rar_exe_path = rar_exe_path
         self.ci_xml_filename = 'ComicInfo.xml'
         self.comet_default_filename = 'CoMet.xml'
+        self.has_epub = False
         self.resetCache()
         self.default_image_path = default_image_path
 
