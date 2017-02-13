@@ -1514,18 +1514,18 @@ class ComicArchive:
             return res
         
         metadata = GenericMetadata()
-        #try:
-        meta = readEPUBMeta( self.path )
-        metadata.title = meta.get('title')
-        metadata.publisher = meta.get('publisher')
-        metadata.language = meta.get('language')
-        metadata.identifier = meta.get('identifier')
-        if meta.get('description') is not None:
-            metadata.comments = re.sub("<.*?>", " ", meta.get('description'))
-        metadata.addCredit( meta.get('creator') , 'writer'  )
-        metadata.isEmpty = False
-        #except:
-        #    print  >> sys.stderr, u"Error reading in raw EPUB meta!"
+        try:
+            meta = readEPUBMeta( self.path )
+            metadata.title = meta.get('title')
+            metadata.publisher = meta.get('publisher')
+            metadata.language = meta.get('language')
+            metadata.identifier = meta.get('identifier')
+            if meta.get('description') is not None:
+                metadata.comments = re.sub("<.*?>", " ", meta.get('description'))
+            metadata.addCredit( meta.get('creator') , 'writer'  )
+            metadata.isEmpty = False
+        except:
+            print  >> sys.stderr, u"Error reading in raw EPUB meta!"
         return metadata
   
     def hasEPUB(self):
