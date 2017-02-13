@@ -1460,7 +1460,7 @@ class ComicArchive:
             for s in ['title','language','creator','date','identifier','publisher','description']:
                 ex = p.xpath('dc:%s/text()'%(s),namespaces=ns)
                 if ex != []:
-                res[s] = ex[0]
+                    res[s] = ex[0]
             return res
         
         metadata = GenericMetadata()
@@ -1510,7 +1510,7 @@ class ComicArchive:
             for s in ['title','language','creator','date','identifier','publisher','description']:
                 ex = p.xpath('dc:%s/text()'%(s),namespaces=ns)
                 if ex != []:
-                res[s] = ex[0]
+                    res[s] = ex[0]
             return res
         
         metadata = GenericMetadata()
