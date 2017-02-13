@@ -1458,7 +1458,9 @@ class ComicArchive:
             # repackage the data
             res = {}
             for s in ['title','language','creator','date','identifier','publisher','description']:
-                res[s] = p.xpath('dc:%s/text()'%(s),namespaces=ns)[0]
+                ex = p.xpath('dc:%s/text()'%(s),namespaces=ns)
+                if ex != []:
+                res[s] = ex[0]
             return res
         
         metadata = GenericMetadata()
@@ -1503,23 +1505,27 @@ class ComicArchive:
             p = tree.xpath('/pkg:package/pkg:metadata',namespaces=ns)[0]
 
             # repackage the data
+            print cf.decode('UTF8')
             res = {}
             for s in ['title','language','creator','date','identifier','publisher','description']:
-                res[s] = p.xpath('dc:%s/text()'%(s),namespaces=ns)[0]
+                ex = p.xpath('dc:%s/text()'%(s),namespaces=ns)
+                if ex != []:
+                res[s] = ex[0]
             return res
         
         metadata = GenericMetadata()
-        try:
-            meta = readEPUBMeta( self.path )
-            metadata.title = meta['title']
-            metadata.publisher = meta['publisher']
-            metadata.language = meta['language']
-            metadata.identifier = meta['identifier']
-            metadata.comments = meta['description']
-            metadata.addCredit( 'writer', meta['creator'] )
-            metadata.isEmpty = False
-        except:
-            print  >> sys.stderr, u"Error reading in raw EPUB meta!"
+        #try:
+        meta = readEPUBMeta( self.path )
+        print "HERE"
+        metadata.title = meta['title']
+        metadata.publisher = meta['publisher']
+        metadata.language = meta['language']
+        metadata.identifier = meta['identifier']
+        metadata.comments = meta['description']
+        metadata.addCredit( 'writer', meta['creator'] )
+        metadata.isEmpty = False
+        #except:
+        #    print  >> sys.stderr, u"Error reading in raw EPUB meta!"
         return metadata
   
     def hasEPUB(self):
