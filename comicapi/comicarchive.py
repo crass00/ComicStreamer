@@ -1466,13 +1466,12 @@ class ComicArchive:
         metadata = GenericMetadata()
         try:
             meta = readEPUBMeta( os.path.join(os.path.dirname(self.path),'metadata.opf') )
-            metadata.title = meta['title']
-            metadata.publisher = meta['publisher']
-            metadata.language = meta['language']
-            metadata.identifier = meta['identifier']
-            metadata.comments = re.sub("<.*?>", " ", meta['description'])
-            
-            metadata.addCredit( 'writer', meta['creator'] )
+            metadata.title = meta.get('title')
+            metadata.publisher = meta.get('publisher')
+            metadata.language = meta.get('language')
+            metadata.identifier = meta.get('identifier')
+            metadata.comments = re.sub("<.*?>", " ", meta.get('description'))
+            metadata.addCredit( meta.get('creator') , 'writer'  )
             metadata.isEmpty = False
         except:
             print  >> sys.stderr, u"Error reading in raw EPUB meta!"
@@ -1505,7 +1504,7 @@ class ComicArchive:
             p = tree.xpath('/pkg:package/pkg:metadata',namespaces=ns)[0]
 
             # repackage the data
-            print cf.decode('UTF8')
+            #print cf.decode('UTF8')
             res = {}
             for s in ['title','language','creator','date','identifier','publisher','description']:
                 ex = p.xpath('dc:%s/text()'%(s),namespaces=ns)
@@ -1514,18 +1513,17 @@ class ComicArchive:
             return res
         
         metadata = GenericMetadata()
-        #try:
-        meta = readEPUBMeta( self.path )
-        print "HERE"
-        metadata.title = meta['title']
-        metadata.publisher = meta['publisher']
-        metadata.language = meta['language']
-        metadata.identifier = meta['identifier']
-        metadata.comments = meta['description']
-        metadata.addCredit( 'writer', meta['creator'] )
-        metadata.isEmpty = False
-        #except:
-        #    print  >> sys.stderr, u"Error reading in raw EPUB meta!"
+        try:
+            meta = readEPUBMeta( self.path )
+            metadata.title = meta.get('title')
+            metadata.publisher = meta.get('publisher')
+            metadata.language = meta.get('language')
+            metadata.identifier = meta.get('identifier')
+            metadata.comments = re.sub("<.*?>", " ", meta.get('description'))
+            metadata.addCredit( meta.get('creator') , 'writer'  )
+            metadata.isEmpty = False
+        except:
+            print  >> sys.stderr, u"Error reading in raw EPUB meta!"
         return metadata
   
     def hasEPUB(self):
