@@ -14,7 +14,7 @@ __Experimental Packages__
 
 [MacOS](https://dl.dropboxusercontent.com/u/12474226/ComicStreamer-0.9.51.dmg)
 
-## Help wanted
+## Help wanted (fork it pull request it!)
 There is something missing... yes! 
 
 _Are you are a database wizard..._
@@ -38,13 +38,15 @@ Please help!
    
 ## Work done
 
-Tristan79 Work on this fork (januari 31 -february 7 2017)
+Tristan79 Work on this fork (januari 31 -february 12 2017)
 
-- EBook support (except metadata)
+- EBook support (basic metadata support)
 - Much better (faster) random comic query
 - MySQL support (experimental, no modify!) 
 - Fixed bug (appartently source didn't work for months)
+- Page blocker
 - Added cbt/tar/webp support
+- Comex was disabled, enabled!
 - Patched webp (it does not load in web comic book, haven't tested chunky so converted to jpeg :/)
 - Experimental Cache System (since remote storage could be slow, even usb2 vs ssd :-)
 - Fixed a lot of gui bugs.
