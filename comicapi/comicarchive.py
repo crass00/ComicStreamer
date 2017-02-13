@@ -1472,7 +1472,8 @@ class ComicArchive:
             metadata.identifier = meta.get('identifier')
             if meta.get('description') is not None:
                 metadata.comments = re.sub("<.*?>", " ", meta.get('description'))
-            metadata.addCredit( meta.get('creator') , 'writer'  )
+            if meta.get('creator') is not None:
+                metadata.addCredit( meta.get('creator') , 'writer'  )
             metadata.isEmpty = False
         except:
             print  >> sys.stderr, u"Error reading in raw EPUB meta!"
@@ -1522,7 +1523,8 @@ class ComicArchive:
             metadata.identifier = meta.get('identifier')
             if meta.get('description') is not None:
                 metadata.comments = re.sub("<.*?>", " ", meta.get('description'))
-            metadata.addCredit( meta.get('creator') , 'writer'  )
+            if meta.get('creator') is not None:
+                metadata.addCredit( meta.get('creator') , 'writer'  )
             metadata.isEmpty = False
         except:
             print  >> sys.stderr, u"Error reading in raw EPUB meta!"
