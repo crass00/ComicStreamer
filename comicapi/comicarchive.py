@@ -1470,7 +1470,8 @@ class ComicArchive:
             metadata.publisher = meta.get('publisher')
             metadata.language = meta.get('language')
             metadata.identifier = meta.get('identifier')
-            metadata.comments = re.sub("<.*?>", " ", meta.get('description'))
+            if meta.get('description') is not None:
+                metadata.comments = re.sub("<.*?>", " ", meta.get('description'))
             metadata.addCredit( meta.get('creator') , 'writer'  )
             metadata.isEmpty = False
         except:
@@ -1519,7 +1520,8 @@ class ComicArchive:
         metadata.publisher = meta.get('publisher')
         metadata.language = meta.get('language')
         metadata.identifier = meta.get('identifier')
-        metadata.comments = re.sub("<.*?>", " ", meta.get('description'))
+        if meta.get('description') is not None:
+            metadata.comments = re.sub("<.*?>", " ", meta.get('description'))
         metadata.addCredit( meta.get('creator') , 'writer'  )
         metadata.isEmpty = False
         #except:
