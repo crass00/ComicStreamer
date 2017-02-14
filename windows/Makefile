@@ -20,6 +20,7 @@ dist:
 	cp mutool.exe $(DIST_DIR)\comicstreamer
 
 dist32:
+	echo "use on windows 64 bit: make x64
 	cp "$(STREAMER_BASE)\comicapi\UnRAR2\UnRARDLL\unrar.dll" $(DIST_DIR)\comicstreamer
 	
 dist64:
