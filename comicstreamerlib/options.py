@@ -117,7 +117,6 @@ Example:
                 self.user_dir = a
             #if o in ("-c","--config-file"):
             #    self.config_file = a
-            print o
 
         filename_encoding = sys.getfilesystemencoding()
         if len(args) > 0:
