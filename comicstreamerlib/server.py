@@ -1696,8 +1696,9 @@ class APIServer(tornado.web.Application):
         self.blacklist = Blacklist(self.dm)
         self.blacklist.start()
 
-        self.wakeup = WakeUp(self.dm)
-        self.wakeup.start()
+        if mysql_active:
+            self.wakeup = WakeUp(self.dm)
+            self.wakeup.start()
         
         if opts.launch_client and self.config['general']['launch_client']:
             if ((platform.system() == "Linux" and os.environ.has_key('DISPLAY')) or
@@ -1758,7 +1759,8 @@ class APIServer(tornado.web.Application):
         if not self.opts.no_monitor:
             self.monitor.stop()
         self.bookmark.stop()
-        self.wakeup.stop()
+        if mysql_active:
+            self.wakeup.stop()
         self.blacklist.stop()
         self.bonjour.stop()
         
