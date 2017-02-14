@@ -94,7 +94,7 @@ function myAttributeWriter(record)
     if (this.id == 'thumb_url')
     {
         
-        val = '<a href={{handler.webroot}}/comic/'+ record.id +'/reader?api_key={{api_key}}><img id="result_thumb" src="{{handler.webroot}}/comic/'+ record.id +'/thumbnail/small?api_key={{api_key}}"/></a>';
+        val = '<a href={{handler.webroot}}/comic/'+ record.id +'/reader?api_key={{api_key}}><img id="result_thumb" src="{{handler.webroot}}/comic/'+ record.id +'/thumbnail?api_key={{api_key}}"/></a>';
     }
 
     if (this.id == 'series')
@@ -144,7 +144,7 @@ function myAttributeWriter2(record)
     if (this.id == 'thumb_url_big')
     {
         
-        val = '<a href={{handler.webroot}}/comic/'+ record.id +'/reader?api_key={{api_key}}><img id="result_thumb_big" src="{{handler.webroot}}/comic/'+ record.id +'/thumbnail/large?api_key={{api_key}}"/></a>';
+        val = '<a href={{handler.webroot}}/comic/'+ record.id +'/reader?api_key={{api_key}}><img id="result_thumb_big" src="{{handler.webroot}}/comic/'+ record.id +'/thumbnail?api_key={{api_key}}"/></a>';
     }
     return val;
 }
@@ -169,7 +169,7 @@ function myRowWriter(rowIndex, record, columns, cellWriter)
 function ulWriter(rowIndex, record, columns, cellWriter) {
   var cssClass = "thumb_url_big", li;
 //  if (rowIndex % 3 === 0) { cssClass += ' first'; }
-  li = '<li class="' + cssClass + '"><div class="caption"><a href={{handler.webroot}}/comic/'+ record.id +'/reader?api_key={{api_key}}><img id="result_thumb_big" src="{{handler.webroot}}/comic/'+ record.id +'/thumbnail/large?api_key={{api_key}}"/></a></div></li>';
+  li = '<li class="' + cssClass + '"><div class="caption"><a href={{handler.webroot}}/comic/'+ record.id +'/reader?api_key={{api_key}}><img id="result_thumb_big" src="{{handler.webroot}}/comic/'+ record.id +'/thumbnail?api_key={{api_key}}"/></a></div></li>';
   return li;
 }
 

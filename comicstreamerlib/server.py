@@ -594,7 +594,7 @@ class ComicPageAPIHandler(ImageAPIHandler):
         self.setContentType(image_data)
         self.write(image_data)
 
-class ThumbnailLargeAPIHandler(ImageAPIHandler):
+class ThumbnailAPIHandler(ImageAPIHandler):
     def get(self, comic_id):
         self.validateAPIKey()
         thumbnail = self.library.getComicThumbnail(comic_id)
@@ -610,33 +610,6 @@ class ThumbnailLargeAPIHandler(ImageAPIHandler):
             utils.resize(thumbnail, (400, 400), thumb)
             self.write(thumb.getvalue())
 
-class ThumbnailSmallAPIHandler(ImageAPIHandler):
-    def get(self, comic_id):
-        self.validateAPIKey()
-        thumbnail = self.library.getComicThumbnail(comic_id)
-        thumb = StringIO.StringIO()
-        if thumbnail == None:
-            default_img_file = AppFolders.missingPath("cover.png")
-            with open(default_img_file, 'rb') as fd:
-                thumbnail = fd.read()
-                fd.close()
-        utils.resize(thumbnail, (100, 100), thumb)
-        self.setContentType('image/jpg')
-        self.write(thumb.getvalue())
-
-class ThumbnailAPIHandler(ImageAPIHandler):
-    def get(self, comic_id):
-        self.validateAPIKey()
-        thumbnail = self.library.getComicThumbnail(comic_id)
-        thumb = StringIO.StringIO()
-        if thumbnail == None:
-            default_img_file = AppFolders.missingPath("cover.png")
-            with open(default_img_file, 'rb') as fd:
-                thumbnail = fd.read()
-                fd.close()
-        utils.resize(thumbnail, (200, 200), thumb)
-        self.setContentType('image/jpg')
-        self.write(thumb.getvalue())
 
 class FileAPIHandler(GenericAPIHandler):
     @tornado.web.asynchronous
@@ -1659,8 +1632,6 @@ class APIServer(tornado.web.Application):
             (self.webroot + r"/comic/([0-9]+)/page/([0-9]+|clear)/cache", ComicBlacklistAPIHandler ),
             (self.webroot + r"/comic/([0-9]+)/page/([0-9]+)", ComicPageAPIHandler ),
             (self.webroot + r"/comic/([0-9]+)/thumbnail", ThumbnailAPIHandler),
-            (self.webroot + r"/comic/([0-9]+)/thumbnail/small", ThumbnailSmallAPIHandler),
-            (self.webroot + r"/comic/([0-9]+)/thumbnail/large", ThumbnailLargeAPIHandler),
             (self.webroot + r"/comic/([0-9]+)/file", FileAPIHandler),
             (self.webroot + r"/entities(/.*)*", EntityAPIHandler),
             (self.webroot + r"/folders(/.*)*", FolderAPIHandler),
