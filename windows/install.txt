@@ -1,10 +1,13 @@
 http://www.lfd.uci.edu/~gohlke/pythonlibs/#lxml
 
 download:
-lxml‑3.7.2‑cp27‑cp27m‑win32.whl
+lxml‑3.7.2‑cp27‑cp27m‑win32.whl  
+or
 lxml‑3.7.2‑cp27‑cp27m‑win_amd64.whl
 
-use pip install 
+install it:
+pip install lxml‑3.7.2‑cp27‑cp27m‑win32.whl
+pip install mysqlclient
 
 Install MySQL Server and the utilities, choose root password.
 

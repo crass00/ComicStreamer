@@ -13,6 +13,8 @@ PDF, EPUB, MOBI, AZW3, FB2, LIT, DJVU, CHM Support through calibre's ebook-conve
 __Experimental Packages__
 
 [MacOS](https://dl.dropboxusercontent.com/u/12474226/ComicStreamer-0.9.51.dmg)
+[Windows x64](https://dl.dropboxusercontent.com/u/12474226/ComicStreamer-0.9.51-x64.exe)
+[Windows x86](https://dl.dropboxusercontent.com/u/12474226/ComicStreamer-0.9.51.exe)
 
 ## Help wanted (fork it pull request it!)
 There is something missing... yes! 
