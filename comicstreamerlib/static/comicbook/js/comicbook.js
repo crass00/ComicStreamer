@@ -1951,14 +1951,17 @@ var ComicBook = (function ($) {
         var page = new Image();
         page.src = srcs[i];
 
+        var page_thumb = new Image();
+        page_thumb.src = srcs[i];
+        page_thumb.height = 150;
+
+        page_thumb.onload = function () {
+          pages_thumbs[i] = this;
+        }
+        
         page.onload = function () {
 
           pages[i] = this;
-          
-          var page_thumb = new Image();
-          page_thumb.src = srcs[i];
-          pages_thumbs[i] = page_thumb;
-          pages_thumbs[i].height = 150;
           loaded.push(i);
 
           // BUG FIXED -1
