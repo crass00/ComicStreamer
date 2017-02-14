@@ -210,8 +210,15 @@ a
 .random_comic
 {
       box-shadow: 0 0px 10px rgba(0, 0, 0, 0.4);
+      
 }
 
+.recently_comic
+{
+      box-shadow: 0 0px 10px rgba(0, 0, 0, 0.4);
+        max-height: 200px;
+        max-width: 200px;
+}
 
 /*----------------------------------------------*
  *
@@ -467,6 +474,8 @@ ui-tooltip .ui-tooltip-content,
     /*position: absolute;*/
     float: left;
     left: 0px;
+    max-width: 200px;
+    max-height: 200px;
     margin-right: 10px;
     z-index: 99;
     border : 0px;
