@@ -5,3 +5,18 @@ lxml‑3.7.2‑cp27‑cp27m‑win32.whl
 lxml‑3.7.2‑cp27‑cp27m‑win_amd64.whl
 
 use pip install 
+
+Install MySQL Server and the utilities, choose root password.
+
+C:\Program Files\MySQL\MySQL Server 5.7\bin>mysql -u root -pXYROOTPASSWORDZ
+
+CREATE DATABASE comicstreamer;
+CREATE USER 'comic'@'%' IDENTIFIED BY 'comic';
+GRANT ALL PRIVILEGES ON *.* TO 'comic'@'%' WITH GRANT OPTION;
+CREATE USER 'comic'@'localhost' IDENTIFIED BY 'comic';
+GRANT ALL ON *.* TO 'comic'@'localhost';
+FLUSH PRIVILEGES;
+
+to remove database
+
+DROP DATABASE comicstreamer;

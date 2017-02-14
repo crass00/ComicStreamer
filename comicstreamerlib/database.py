@@ -622,9 +622,10 @@ class DataManager():
                 logging.debug("Database: MySQL: Started")
                 self.engine = create_engine("mysql://"+self.config['database.mysql']['username']+":"+utils.decode(self.config['general']['install_id'],self.config['database.mysql']['password'])+"@"+self.config['database.mysql']['host']+":"+str(self.config['database.mysql']['port'])+"/"+self.config['database.mysql']['database']+"?charset=utf8", pool_recycle=3600,  echo=False, isolation_level="READ COMMITTED")
                 logging.info("Database: MySQL: " + self.config['database.mysql']['database'] + " (" + self.config['database.mysql']['host'] + ":" + str(self.config['database.mysql']['port']) + ")")
-            except:
+            except Exception, e:
                 mysql_active = False
                 logging.error("Database: MySQL: Failed (" + self.config['database.mysql']['database'] + " [" + self.config['database.mysql']['host'] + ":" + str(self.config['database.mysql']['port']) + "])")
+                logging.error("Database: MySQL: Failed ("+ str(e) +")")
                 logging.warning("Database: Switching to SQLite Engine")
 
         if not mysql_active:
