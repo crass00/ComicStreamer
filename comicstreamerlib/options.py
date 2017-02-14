@@ -23,7 +23,6 @@ for comics to add to the database (persisted)
   -p, --port           [PORT] The port the server should listen on. (persisted)
   -b, --bind             [IP] Bind server traffic to ip (persisted)
   -w, --webroot     [WEBROOT] Webroot for reverse proxy (persisted)
-  -c, --config-file    [FILE] Config file
   -u, --user-dir     [FOLDER] Set path for user folder
   -r, --reset                 Purge the existing database and quit
   -d, --debug                 More verbose console output
@@ -37,6 +36,7 @@ for comics to add to the database (persisted)
 Example:
     comicstreamer -p 32502 --config-file ~/comcistreamer/comics.conf
     """
+#   -c, --config-file    [FILE] Config file not implemented
 
 
     def __init__(self):
@@ -63,7 +63,7 @@ Example:
             print "For more help, run with '--help'"
         sys.exit(code)  
 
-    def parseCmdLineArgs(self):
+    def parseCmdLineArgs(self,remove=True):
         
         if platform.system() == "Darwin" and hasattr(sys, "frozen") and sys.frozen == 1:
             # remove the PSN ("process serial number") argument from OS/X
@@ -115,8 +115,9 @@ Example:
                 self.reset_and_run = True
             if o in ("-u","--user-dir"):
                 self.user_dir = a
-            if o in ("-c","--config-file"):
-                self.config_file = a
+            #if o in ("-c","--config-file"):
+            #    self.config_file = a
+            print o
 
         filename_encoding = sys.getfilesystemencoding()
         if len(args) > 0:
@@ -124,9 +125,10 @@ Example:
             self.folder_list = [os.path.abspath(os.path.normpath(unicode(a.decode(filename_encoding)))) for a in args]
     
         # remove certain private flags from args
-        try:
-            sys.argv.remove("--_resetdb_and_run")
-        except:
-            pass
+        if remove:
+            try:
+                sys.argv.remove("--_resetdb_and_run")
+            except:
+                pass
 
 

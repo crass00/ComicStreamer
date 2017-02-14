@@ -209,7 +209,8 @@ class Monitor():
                 # No metadata in comic.  make some guesses from the filename
                 md = ca.metadataFromFilename()
             
-            if (md.title is None or md.title == "") and not md.series is None:
+            # patch version 2
+            if (md.title is None or md.title == "") and md.issue is None and not md.series is None:
                 md.title = md.series
                 md.series = None
             

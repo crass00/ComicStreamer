@@ -1572,11 +1572,18 @@ class APIServer(tornado.web.Application):
             msg = "Couldn't open database. Probably the schema has changed."
             logging.error("Database: " + msg)
             utils.alert("Schema change", msg)
-            sys.exit(-1)
+            
+            if mysql_active:
+                logging.error("Database: Please Drop the Database in MySQL and recreate it")
+                sys.exit(-1)
+            else:
+                self.dm.delete()
+                self.restart(True)
         except sqlalchemy.exc.OperationalError as e:
             msg = "Could not open database."
             logging.error("Database: " + msg)
             utils.alert("Database Error", msg)
+            logging.error("Database: Please delete Database file or restore backup!")
             
             # "HERE FIX open sqlite temp db so you canfix the problem......
             sys.exit(-1)        
@@ -1705,8 +1712,9 @@ class APIServer(tornado.web.Application):
         sys.argv.insert(1, "--_resetdb_and_run")
         self.restart()
         
-    def restart(self):
-        self.shutdown()
+    def restart(self,fast=False):
+        if not fast:
+            self.shutdown()
         executable = sys.executable
         
         new_argv = ["--nobrowser"]
@@ -1718,12 +1726,18 @@ class APIServer(tornado.web.Application):
             new_argv.append("-d")
         if self.opts.no_monitor:
             new_argv.append("--nomonitor")
-        if self.opts.userdir:
+#        if self.opts.config_file:
+#            new_argv.append("--config-file")
+#            new_argv.append(self.opts.config_file)
+        if self.opts.user_dir:
             new_argv.append("--user-dir")
-            new_argv.append(self.opts.userdir)
+            new_argv.append(self.opts.user_dir)
         if self.opts.webroot:
             new_argv.append("--webroot")
             new_argv.append(self.opts.webroot)
+        if self.opts.bind:
+            new_argv.append("-b")
+            new_argv.append(self.opts.bind)
         
         if  "--_resetdb_and_run" in sys.argv:
             new_argv.append("--_resetdb_and_run")

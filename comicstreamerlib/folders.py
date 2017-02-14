@@ -31,9 +31,8 @@ class AppFolders():
 
     @staticmethod
     def userFolder():
-        
         opts = Options()
-        opts.parseCmdLineArgs()
+        opts.parseCmdLineArgs(False)
         
         filename_encoding = sys.getfilesystemencoding()
 

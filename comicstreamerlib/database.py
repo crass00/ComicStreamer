@@ -668,6 +668,8 @@ class DataManager():
     def delete(self):
         logging.info("Database: Wiping Database")
         if mysql_active:
+            # "HERE fix
+            print "Bug this does not work :-/"
             Base.metadata.drop_all(self.engine)
             self.engine.dispose()
             self.init()
