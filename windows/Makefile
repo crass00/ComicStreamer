@@ -24,5 +24,6 @@ package:
 
 clean:
 	-rm -rf dist
-# -rm -rf build
+	-rm comicstreamer.spec
+	-rm -rf build
 	-rm -rf nsis/release.nsh
