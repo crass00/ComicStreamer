@@ -5,12 +5,13 @@ HOMEPATH ?= $(HOME)
 STREAMER_BASE?= ..
 STREAMER_SRC := $(STREAMER_BASE)\comicstreamerlib
 DIST_DIR := $(STREAMER_BASE)\windows\dist
-NSIS_CMD :=	"C:\Program Files\NSIS\Bin\makensis.exe"
+NSIS_CMD32 :=	"C:\Program Files\NSIS\Bin\makensis.exe"
+NSIS_CMD64 :=	"C:\Program Files (x86)\NSIS\Bin\makensis.exe"
 VERSION := $(shell grep version "$(STREAMER_SRC)/csversion.py" | cut -d= -f2)
 
-all: clean dist dist32 package
+all: clean dist dist32 package32
 
-x64: clean dist dist64 package
+x64: clean dist dist64 package64
 
 dist:
 	cd "$(STREAMER_BASE)"
@@ -27,9 +28,13 @@ dist64:
 	cp "$(STREAMER_BASE)\comicapi\UnRAR2\UnRARDLL\x64\unrar64.dll" $(DIST_DIR)\comicstreamer\unrar.dll
 	
 
-package:
+package32:
 	echo !define RELEASE_STR $(VERSION) > $(STREAMER_BASE)\windows\nsis\release.nsh
-	$(NSIS_CMD) "$(STREAMER_BASE)\windows\nsis\comicstreamer.nsi"
+	$(NSIS_CMD32) "$(STREAMER_BASE)\windows\nsis\comicstreamer.nsi"
+
+package64:
+	echo !define RELEASE_STR $(VERSION) > $(STREAMER_BASE)\windows\nsis\release.nsh
+	$(NSIS_CMD64) "$(STREAMER_BASE)\windows\nsis\comicstreamer.nsi"
 
 clean:
 	-rm -rf dist
