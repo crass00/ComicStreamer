@@ -77,7 +77,7 @@ class Monitor():
             logging.info(u"Monitor: Scanning '"+l+"'")
 
         self.session = self.dm.Session()
-        self.library = Library(self.dm.Session)
+        self.library = Library(self.session)
         self.observer = Observer()
         self.eventHandler = MonitorEventHandler(self)
         self.status = u"INDEXING"

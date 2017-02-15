@@ -620,7 +620,7 @@ class DataManager():
         if mysql_active:
             try:
                 logging.debug("Database: MySQL: Started")
-                self.engine = create_engine("mysql://"+self.config['database.mysql']['username']+":"+utils.decode(self.config['general']['install_id'],self.config['database.mysql']['password'])+"@"+self.config['database.mysql']['host']+":"+str(self.config['database.mysql']['port'])+"/"+self.config['database.mysql']['database']+"?charset=utf8", pool_recycle=3600,  echo=False, isolation_level="READ COMMITTED")
+                self.engine = create_engine("mysql://"+self.config['database.mysql']['username']+":"+utils.decode(self.config['general']['install_id'],self.config['database.mysql']['password'])+"@"+self.config['database.mysql']['host']+":"+str(self.config['database.mysql']['port'])+"/"+self.config['database.mysql']['database']+"?charset=utf8", pool_recycle=3600,  echo=False)
                 logging.info("Database: MySQL: " + self.config['database.mysql']['database'] + " (" + self.config['database.mysql']['host'] + ":" + str(self.config['database.mysql']['port']) + ")")
             except Exception, e:
                 mysql_active = False
@@ -661,7 +661,7 @@ class DataManager():
                     logging.error("Database: SQLite: Failed (" + self.dbfile + ")")
 
         if mysql_active:
-            session_factory = sessionmaker(bind=self.engine, expire_on_commit=True, autoflush=False, autocommit=False) #, autoflush=False, autocommit=True, expire_on_commit=True) #,autocommit=True)
+            session_factory = sessionmaker(bind=self.engine, expire_on_commit=True, autoflush=True, autocommit=False) #, autoflush=False, autocommit=True, expire_on_commit=True) #,autocommit=True)
         else:
             session_factory = sessionmaker(bind=self.engine, expire_on_commit=True) #, autocommit=True) #, autoflush=False, autocommit=True, expire_on_commit=True) #,autocommit=True)
         self.Session = scoped_session(session_factory)
@@ -725,6 +725,7 @@ class DataManager():
            session.add(user)
            session.commit()
         """
+        session.close()
 
 if __name__ == "__main__":
     dm = DataManager()
