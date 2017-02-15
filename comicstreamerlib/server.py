@@ -1478,6 +1478,7 @@ class WakeUp:
                     session = self.dm.Session()
                     obj = session.query(SchemaInfo).first()
                     i = 0
+                    session.close()
             except:
                 break;
         logging.debug("WakeUp: Stopped")
