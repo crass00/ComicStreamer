@@ -76,7 +76,7 @@ class Monitor():
         for l in self.paths:
             logging.info(u"Monitor: Scanning '"+l+"'")
 
-        self.session = self.dm.Session()
+        self.session = self.dm.Session
         self.library = Library(self.session)
         self.observer = Observer()
         self.eventHandler = MonitorEventHandler(self)

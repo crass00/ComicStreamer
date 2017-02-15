@@ -53,8 +53,7 @@ class Blacklist(threading.Thread):
 
     def actualSetBlacklist(self, comic_id, pagenum):
         if comic_id is not None:
-            session = self.dm.Session()
-            library = Library(session)
+            library = Library(self.dm.Session)
             if pagenum == 'clear':
                 library.comicBlacklist(comic_id)
             else:
