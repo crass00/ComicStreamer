@@ -1515,7 +1515,7 @@ class APIServer(tornado.web.Application):
         
         #self.dm = DataManager()
         self.dm = DataManager(config)
-        self.library = Library(self.dm.Session)
+        self.library = Library(self.dm.Session())
         
         if opts.extract_last_page:
             self.library.lastpage_extractor_for_blacklist()

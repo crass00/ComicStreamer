@@ -144,13 +144,11 @@ class Library:
                 #blacklist.page = int(pagenum)
                 blacklist.ts = datetime.datetime.utcnow()
                 session.add(blacklist)
+                session.commit()
+                session.close()
             except Exception, e:
                 print str(e)
                 logging.error("Blacklist: Problem blocking page {} on comic {}".format(pagenum, comic_id))
-
-
-        session.commit()
-        session.close()
         self.cache_delete_page(comic_id, pagenum)
 
     def loadBlacklistFromFile(self,file):

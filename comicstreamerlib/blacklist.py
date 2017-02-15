@@ -22,16 +22,13 @@ from library import Library
 class Blacklist(threading.Thread):
     def __init__(self, dm):
         super(Blacklist, self).__init__()
-
         self.queue = Queue.Queue(0)
         self.quit = False
         self.dm = dm
-        self.library = Library(self.dm.Session)
-        
+    
     def stop(self):
         self.quit = True
         self.join()
-
 
     def setBlacklist(self, comic_id, pagenum):
         # for now, don't defer the blacklist setting, maybe it's not needed
@@ -55,13 +52,11 @@ class Blacklist(threading.Thread):
         logging.debug("Blacklist: Stopped")
 
     def actualSetBlacklist(self, comic_id, pagenum):
-                
         if comic_id is not None:
             session = self.dm.Session()
+            library = Library(session)
             if pagenum == 'clear':
-                self.library.comicBlacklist(comic_id)
+                library.comicBlacklist(comic_id)
             else:
-                self.library.comicBlacklist(comic_id, pagenum)
-               
-#-------------------------------------------------
+                library.comicBlacklist(comic_id, pagenum)
 
