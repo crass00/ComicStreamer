@@ -65,7 +65,7 @@ class Library:
             #if h > w:
             #    continue
             
-            if hash+'\n' in self.internalBlacklist:
+            if self.checkHashBlacklist(hash):
                 continue
             if os.path.isfile(os.path.join(x,str(hash))):
                 if os.path.isfile(os.path.join(y,str(hash))):
@@ -97,6 +97,17 @@ class Library:
  
     def checkBlacklist(self,comic):
         pass
+        
+    def checkHashBlacklist(self,hash):
+        if hash is None:
+            return False
+        
+        obj = self.getSession().query(Blacklist.hash).filter(Blacklist.hash == hash).first()
+        if obj is  None:
+            return False
+        else:
+            return True
+
     
 
     def getHashEntity(self, cls, hash):
@@ -197,8 +208,6 @@ class Library:
         else:
             return image
 
-
-        
 
     def cache_clear(self):
         if os.path.exists(self.cache_location) and os.path.isdir(self.cache_location):
