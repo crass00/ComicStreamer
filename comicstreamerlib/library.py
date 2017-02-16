@@ -60,10 +60,10 @@ class Library:
             hash = utils.hash(image_data)
             
             # ascept ratio check
-            im = Image.open(StringIO.StringIO(image_data))
-            w,h = im.size
-            if h > w:
-                continue
+            #im = Image.open(StringIO.StringIO(image_data))
+            #w,h = im.size
+            #if h > w:
+            #    continue
             
             if hash+'\n' in self.internalBlacklist:
                 continue
