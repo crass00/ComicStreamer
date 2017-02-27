@@ -1150,20 +1150,46 @@ class WebArchiver:
                     lastpage = False
                     scrape = start
                     
-                    with open(os.path.join(cache_folder,"webcomic_index.txt")) as f:
-                        last = None
-                        last2 = None
-                        last3 = None
-                        for line in (line for line in f if line.rstrip('\n')):
-                            last3 = last2
-                            last2 = last
-                            last = line
-                    if last3[0] == '[':
-                        scrape = last
-                        pages = int(last3[1:-2])
-                    elif last2[0] == '[' and last3 is not None:
-                        scrape == last3
-                        pages = int(last2[1:-2])
+
+
+                    # remove partial images
+                    for item in os.listdir( cache_folder ):
+                        if item.endswith(".tmp"):
+                            os.remove( os.path.join( cache_folder, item ) )
+                    
+                    if os.path.isfile(os.path.join(cache_folder,"webcomic_index.txt")):
+                        try:
+                            with open(os.path.join(cache_folder,"webcomic_index.txt")) as f:
+                                last = ""
+                                last2 = ""
+                                last3 = ""
+                                for line in (line for line in f if line.rstrip('\n')):
+                                    print last3
+                                    print last2
+                                    print last
+                                    print "HEROE"
+                                    if line[:-1] != "":
+                                        last3 = last2
+                                        last2 = last
+                                        last = line[:-1]
+                                    if last3 != "" and last3[0] == '[':
+                                        scrape = last
+                                        pages = int(last3[1:-1])
+                                    elif last2 != "" and last2[0] == '[' and last3 != "":
+                                        scrape == last3
+                                        pages = int(last2[1:-1])
+                            
+                            print last3
+                            print last2
+                            print last
+                            print scrape
+                        except Exception, e:
+                            print str(e)
+                            print "FUCKING KUTOZII"
+                            scrape = start
+                            pages = 0
+                    
+                    raw_input("You can abort now")
                     
                     next_url = ""
                     while not lastpage:
@@ -1219,11 +1245,14 @@ class WebArchiver:
                                     image_data = response.read()
                                     
                                     try:
+                                        imagefilename = os.path.join(cache_folder,str(pages)+"."+img_ext)
                                         i=Image.open(StringIO.StringIO(image_data))
                                         img_ext = i.format.lower()
-                                        f = open(os.path.join(cache_folder,str(pages)+"."+img_ext), 'w')
+                                        f = open(imagefilename + ".tmp", 'w')
                                         f.write(image_data)
                                         f.close
+                                        # such that we do not het partial images...
+                                        os.rename(imagefilename + ".tmp",imagefilename)
                                     except IOError:
                                         print "Web Comic: BrowseScraper: Not an image"
                                     # check if image?
