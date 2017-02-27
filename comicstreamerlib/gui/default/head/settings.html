@@ -90,6 +90,7 @@ body {
                       use_https_toggle();
                       use_cache_toggle();
                       use_pdf_toggle();
+                      use_cbw_toggle();
                       use_ebook_toggle();
                       }
                       );
@@ -204,6 +205,16 @@ function use_pdf_toggle()
     }
 }
 
+function use_cbw_toggle()
+{
+   if ( !($("#use_cbw").is(':checked'))) {
+            document.getElementById("settings_cbw").style.display = "none";
+    }
+    else {
+        document.getElementById("settings_cbw").style.display = "inline";
+    }
+}
+ 
 
 function use_mudraw_toggle()
 {

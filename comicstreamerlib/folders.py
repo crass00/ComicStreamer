@@ -20,7 +20,8 @@ class AppFolders():
         make(AppFolders.appCachePages())
         make(AppFolders.appBlacklistPages())
         make(AppFolders.appCacheEbooks())
-
+        make(AppFolders.appWebComic())
+    
     @staticmethod
     def runningAtRoolLevel():
         return False
@@ -97,6 +98,10 @@ class AppFolders():
             folder = os.path.join(AppFolders.userFolder())
         return folder
 
+
+    @staticmethod
+    def appWebComic():
+        return os.path.join(AppFolders.appData(), "webcomic")
 
     @staticmethod
     def appCachePages():

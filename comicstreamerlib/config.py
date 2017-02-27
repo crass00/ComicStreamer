@@ -55,6 +55,9 @@ class ComicStreamerConfig(ConfigObj):
             password=string(default="")
             host=string(default="localhost")
             port=integer(default=3306)
+            [webcomic]
+            active=boolean(default="False")
+            location=string(default="")
             [pdf]
             active=boolean(default="False")
             engine=string(default="mudraw")

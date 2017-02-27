@@ -1047,6 +1047,7 @@ class ConfigPageHandler(BaseHandler):
         #convert boolean to "checked" or ""
 
         formdata['use_pdf'] = "checked" if formdata['use_pdf'] else ""
+        formdata['use_cbw'] = "checked" if formdata['use_cbw'] else ""
         formdata['use_ebook'] = "checked" if formdata['use_ebook'] else ""
 
         formdata['use_mutool'] = "checked" if formdata['use_mutool'] else ""
@@ -1119,8 +1120,10 @@ class ConfigPageHandler(BaseHandler):
         formdata['mudraw'] = self.application.config['pdf']['mudraw']
         formdata['mutool'] = self.application.config['pdf']['mutool']
         formdata['pdf2png'] = self.application.config['pdf']['pdf2png']
+
+        formdata['cbw_location'] = self.application.config['webcomic']['location']
         
-        
+        formdata['use_cbw'] = self.application.config['webcomic']['active']
         formdata['use_pdf'] = self.application.config['pdf']['active']
         formdata['use_ebook'] = self.application.config['ebook']['active']
         formdata['calibre'] = self.application.config['ebook']['calibre']
@@ -1171,11 +1174,14 @@ class ConfigPageHandler(BaseHandler):
         formdata['use_mudraw'] = formdata['pdf_engine'] == 'mudraw'
         formdata['use_pdf2png'] = formdata['pdf_engine'] == 'pdf2png'
 
+        formdata['cbw_location'] = self.get_argument(u"cbw_location", default="")
+
         formdata['mudraw'] = self.get_argument(u"mudraw", default="")
         formdata['mutool'] = self.get_argument(u"mutool", default="")
         formdata['pdf2png'] = self.get_argument(u"pdf2png", default="")
         formdata['qpdf'] = self.get_argument(u"qpdf", default="")
         formdata['use_pdf'] = (len(self.get_arguments("use_pdf"))!=0)
+        formdata['use_cbw'] = (len(self.get_arguments("use_cbw"))!=0)
         formdata['use_ebook'] = (len(self.get_arguments("use_ebook"))!=0)
         formdata['calibre'] = self.get_argument(u"calibre", default="")
         formdata['ebook_cache_location'] = self.get_argument(u"ebook_cache_location", default="")
@@ -1333,6 +1339,8 @@ class ConfigPageHandler(BaseHandler):
                 formdata['mysql_host'] != self.application.config['database.mysql']['host'] or
                 formdata['sqlite_database'] != self.application.config['database.sqlite']['database'] or
                 formdata['sqlite_location'] != self.application.config['database.sqlite']['location'] or
+                formdata['cbw_location'] != self.application.config['webcomic']['location'] or
+                formdata['use_cbw'] != self.application.config['webcomic']['active'] or
                 formdata['use_pdf'] != self.application.config['pdf']['active'] or
                 formdata['pdf_resolution'] != self.application.config['pdf']['resolution'] or
                 formdata['ebook_margin'] != self.application.config['ebook']['margin'] or
@@ -1387,6 +1395,9 @@ class ConfigPageHandler(BaseHandler):
                 self.application.config['ebook.cache']['free'] = formdata['ebook_cache_free']
                 self.application.config['ebook.cache']['size'] = formdata['ebook_cache_size']
                 self.application.config['ebook']['active'] =  formdata['use_ebook']
+                
+                self.application.config['webcomic']['active'] =  formdata['use_cbw']
+                self.application.config['webcomic']['location'] =  formdata['cbw_location']
 
                 self.application.config['pdf']['active'] =  formdata['use_pdf']
                 self.application.config['pdf']['resolution'] =  formdata['pdf_resolution']
@@ -1513,7 +1524,10 @@ class APIServer(tornado.web.Application):
 
         if not os.path.exists(AppFolders.appBlacklistPages()):
             os.makedirs(AppFolders.appBlacklistPages())
-        
+
+        if not os.path.exists(AppFolders.appWebComic()):
+            os.makedirs(AppFolders.appWebComic())
+
         #self.dm = DataManager()
         self.dm = DataManager(config)
         self.library = Library(self.dm.Session)

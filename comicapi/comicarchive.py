@@ -1,7 +1,6 @@
 import zipfile
 import os
 import struct
-import sys
 import tempfile
 import subprocess
 import platform
@@ -9,6 +8,11 @@ import locale
 import shutil
 import tarfile
 import re
+import sys
+import urllib2
+import HTMLParser
+import urlparse
+
 
 import zipfile
 from lxml import etree
@@ -24,6 +28,7 @@ import pylzma
 from py7zlib import Archive7z
 from unrar import constants
 
+import xml.etree.ElementTree as ET
 
 from comicstreamerlib.config import ComicStreamerConfig
 
@@ -106,7 +111,12 @@ class MetaDataStyle:
     COMET = 2
     CALIBRE = 3
     EPUB = 4
-    name = [ 'ComicBookLover', 'ComicRack', 'CoMet' , 'Calibre', 'Epub' ]
+    CBW = 5
+    name = [ 'ComicBookLover', 'ComicRack', 'CoMet' , 'Calibre', 'Epub' , 'WebComic' ]
+
+#------------------------------------------
+# Zip Implementation
+#------------------------------------------
 
 class ZipArchiver:
 
@@ -420,8 +430,10 @@ class TarArchiver:
             print >> sys.stderr, u"Unable to get tarfile list [{0}]: {1}".format(e, self.path)
             return []
 
+
 #------------------------------------------
 # RAR implementation
+#------------------------------------------
 
 class RarArchiver:
 
@@ -651,6 +663,8 @@ class RarArchiver:
 
 #------------------------------------------
 # Folder implementation
+#------------------------------------------
+
 class FolderArchiver:
 
     def __init__( self, path ):
@@ -714,6 +728,8 @@ class FolderArchiver:
 
 #------------------------------------------
 # Unknown implementation
+#------------------------------------------
+
 class UnknownArchiver:
 
     def __init__( self, path ):
@@ -733,6 +749,10 @@ class UnknownArchiver:
         return []
     def getArchiveFilesizeList( self ):
         return []
+
+#------------------------------------------
+# PDF Implementation
+#------------------------------------------
 
 class PdfArchiver:
     def __init__( self, path ):
@@ -837,6 +857,10 @@ class PdfArchiver:
         except Exception as e:
             print >> sys.stderr, u"PDF Unreadable [{0}]: {1}".format(str(e),self.path)
         return out
+
+#------------------------------------------
+# EBook Implementation
+#------------------------------------------
 
 ebook_extentions = [".epub",".mobi",".chm",".azw3",".lit",".fb2",".djvu"]
 
@@ -956,7 +980,340 @@ class EbookArchiver(PdfArchiver):
             print >> sys.stderr, u"EBOOK Cached PDF Unreadable [{0}]: {1}".format(str(e),self.cache_file)
         return out
 
-#------------------------------------------------------------------
+#------------------------------------------
+# Web (CBW) Implentation
+#------------------------------------------
+
+
+class WebArchiver:
+
+    cache_file = None
+
+    def __init__( self, path ):
+        self.path = path
+
+    def getArchiveComment( self ):
+        return ""
+    
+    def setArchiveComment( self, comment ):
+        return False
+
+    def readArchiveFile( self, page_num ):
+        pass
+  
+    def writeArchiveFile( self, archive_file, data ):
+        return False
+    
+    def removeArchiveFile( self, archive_file ):
+        return False
+    
+    def getArchiveFilesizeList( self ):
+        sizelist = []
+        for i in self.getArchiveFilenameList():
+            sizelist += [(i,-1)]
+        return sizelist
+     
+     
+    def readCBW(self):
+        h= HTMLParser.HTMLParser()
+        # We ignore composition... you implement that
+        images = []
+        
+        nextlist = []
+        
+        cache_location = config['webcomic']['location']
+        if cache_location == "" or not os.path.exists(cache_location):
+            cache_location = AppFolders.appWebComic()
+        cache_folder = os.path.join(cache_location,os.path.basename(self.path))
+        ext = os.path.splitext(self.path)[1].lower()
+        if ext == ".cbw":
+            cache_folder = cache_folder[:-4]
+      
+        if not os.path.isdir(cache_folder):
+            try:
+                os.makedirs(cache_folder)
+            except:
+                print "Web Comic: Could not make folder " + cache_folder
+                return images
+
+        tree = ET.parse(self.path)
+        
+        root = tree.find('Images')
+        
+        if root is None:
+            return images
+        pages = 0
+        
+        for n in root:
+        
+            if n.tag == 'Image':
+                try:
+                    type = n.attrib['Type']
+                except:
+                    type = "Unknown"
+                
+                try:
+                    url =  n.attrib['Url']
+                except:
+                    continue
+        
+        
+                if type == "BrowseScraper" or url[0] == "?":
+                    start = ""
+                    image = ""
+                    nextpage = ""
+    
+                    # Not implemented
+                    image_MaximumMatches = "1"
+                    image_Reverse=False
+                    image_Sort=False
+                    image_AddOwn=False
+                    image_Cut=""
+                    
+                    nextpage_MaximumMatches = "1"
+                    nextpage_Reverse=False
+                    nextpage_Sort=False
+                    nextpage_AddOwn=False
+                    nextpage_Cut=""
+                    
+                    if url[0] == "?":
+                        url = url[1:]
+                    url_split =  url.split('|')
+                    start = url_split[0]
+                    if len(url_split) == 3:
+                        image = url_split[1]
+                        nextpage = url_split[2]
+                    else:
+                        i = 1
+                        try:
+                            parts = n.find('Parts')
+                            for p in parts:
+                                if i == 1:
+                                    image = h.unescape(p.text) #.encode('ascii','ignore')
+                                
+                                    try:
+                                        image_MaximumMatches = p.attrib['MaximumMatches']
+                                    except:
+                                        pass
+                                    try:
+                                        image_Reverse = p.attrib['Reverse']
+                                    except:
+                                        pass
+                                    try:
+                                        image_Sort = p.attrib['Sort']
+                                    except:
+                                        pass
+                                    try:
+                                        image_Cut = p.attrib['Cut']
+                                    except:
+                                        pass
+                                    try:
+                                        image_AddOwn = p.attrib['AddOwn']
+                                    except:
+                                        pass
+                                else:
+                                    nextpage = h.unescape(p.text)
+
+
+                                
+                                    try:
+                                        nextpage_MaximumMatches = p.attrib['MaximumMatches']
+                                    except:
+                                        pass
+                                    try:
+                                        nextpage_Reverse = p.attrib['Reverse']
+                                    except:
+                                        pass
+                                    try:
+                                        nextpage_Sort = p.attrib['Sort']
+                                    except:
+                                        pass
+                                    try:
+                                        nextpage_Cut = p.attrib['Cut']
+                                    except:
+                                        pass
+                                    try:
+                                        nextpage_AddOwn = p.attrib['AddOwn']
+                                    except:
+                                        pass
+                                i += 1
+                                if i > 2: break
+                        except:
+                            print "Web Comic: BrowseScraper: Failed"
+                            continue
+                    if i <= 2:
+                        print "Web Comic: BrowseScraper: Failed"
+                        continue
+                        
+                    print "Web Comic: BrowseScraper " + start #+ "\n" + image + "\n" + nextpage
+                    
+                    lastpage = False
+                    scrape = start
+                    
+                    with open(os.path.join(cache_folder,"webcomic_index.txt")) as f:
+                        last = None
+                        last2 = None
+                        last3 = None
+                        for line in (line for line in f if line.rstrip('\n')):
+                            last3 = last2
+                            last2 = last
+                            last = line
+                    if last3[0] == '[':
+                        scrape = last
+                        pages = int(last3[1:-2])
+                    elif last2[0] == '[' and last3 is not None:
+                        scrape == last3
+                        pages = int(last2[1:-2])
+                    
+                    next_url = ""
+                    while not lastpage:
+                        pages += 1
+                        try:
+                            print "Page: " + str(pages)
+                            print scrape
+                            req = urllib2.Request(scrape, headers={ 'User-Agent': 'Mozilla/5.0' })
+                            response  = urllib2.urlopen(req)
+                            self.content = response.read()
+                            print "HERE"
+                            # going from .net to python regular expressions
+                            
+                            # replace ?P<link> with ?<link>
+                            # escape char with /
+                            
+                            im = image.replace("?<link>","?P<link>")
+                            im = im.replace('-','\-')
+
+                            pattern = re.compile(im)
+                            
+                            m = pattern.search(self.content)
+                            if m:
+                                image_url = m.group(0).strip()
+                                
+                                src = re.search(r'src="(.*?)"', image_url)
+                                
+                                if src:
+                                    url = src.group(0)[5:].split('"', 1)[0]
+                     
+                                    if url[0:4] != 'http':
+                                        image_url = (urlparse.urljoin(scrape, '/') + url).replace("//","/").replace("http:/","http://")
+                                    else:
+                                        image_url = url
+                                    images += [image_url]
+                                elif image_url.strip('"')[0:4] == "http":
+                                    image_url = image_url.strip('"').split('"', 1)[0]
+                                    images += [image_url]
+                                elif image_url.strip('"')[0:2] == "//":
+                                    image_url = "http:" + image_url.strip('"').split('"', 1)[0]
+                                    images += [image_url]
+                                elif image_url[0] == "/":
+                                    image_url = (urlparse.urljoin(scrape, '/') + image_url).replace("//","/").replace("http:/","http://")
+                                
+                                else:
+                                    print image_url
+                                    print "NOT IMPLEMENTED"
+                                    continue
+                            
+                                try:
+                                    req = urllib2.Request(image_url, headers={ 'User-Agent': 'Mozilla/5.0' })
+                                    response  = urllib2.urlopen(req)
+                                    image_data = response.read()
+                                    
+                                    try:
+                                        i=Image.open(StringIO.StringIO(image_data))
+                                        img_ext = i.format.lower()
+                                        f = open(os.path.join(cache_folder,str(pages)+"."+img_ext), 'w')
+                                        f.write(image_data)
+                                        f.close
+                                    except IOError:
+                                        print "Web Comic: BrowseScraper: Not an image"
+                                    # check if image?
+                                    
+                            
+                        
+                                except Exception, e:
+                                    print str(e)
+                            else:
+                                pass # Match attempt failed
+                    
+                            print str(pages) + " NEXT PAGE"  + nextpage
+                            np = nextpage.replace("?<link>","?P<link>")
+                            np = np.replace('-','\-')
+                            pat = re.compile(np)
+                            n = pat.search(self.content)
+                            
+                            if n:
+                                next_url = n.group(0).strip()
+                                print "DFDDFDF" + next_url
+                        
+                                href = re.search(r'href="(.*?)"',next_url)
+                            
+                            
+                                if href:
+                                    url = href.group(0)[6:].split('"', 1)[0]
+                                    if url[0:4] != 'http':
+                                        next_url = (urlparse.urljoin(scrape, '/') + url).replace("//","/").replace("http:/","http://")
+                                    else:
+                                        next_url = url
+                                    nextlist += [next_url]
+                                elif next_url.strip('"')[0:4] == "http":
+                                    next_url = next_url.strip('"').split('"', 1)[0]
+                                    nextlist += [next_url]
+                                elif next_url.strip('"')[0:2] == "//":
+                                    next_url = "http:" + next_url.strip('"').split('"', 1)[0]
+                                    nextlist += [next_url]
+                                elif next_url[0] == "/":
+                                    next_url = (urlparse.urljoin(scrape, '/') + next_url).replace("//","/").replace("http:/","http://")
+                                else:
+                                    lastpage = True
+                                    print "NOT IMPLEMENTED"
+                                    continue
+                            else:
+                                next_url = ""
+                                print "HERE"
+                            print next_url
+                                
+                        except Exception, e:
+                            print str(e)
+                            print "Web Comic: BrowseScraper: Failed to scrape page"
+                            lastpage = True
+                        if next_url == "": # or pages == 2:
+                            lastpage = True
+                        scrape = next_url
+                        thefile = open(os.path.join(cache_folder,"webcomic_index.txt"), 'a')
+                        thefile.write("[" + str(pages) + "]\n" + image_url + "\n" + next_url + "\n")
+
+                elif type == "Url":
+                    print "UrlScraper"
+                    req = urllib2.Request(image_url, headers={ 'User-Agent': 'Mozilla/5.0' })
+                    response  = urllib2.urlopen(req)
+                    self.content = response.read()
+                    f = open(os.path.join(cache_folder,str(pages)), 'w')
+                    f.write(self.content)
+                    f.close
+                    pages += 1
+                    images += [url]
+                elif type == "IndexScraper" or url[0] == "!":
+                    print "IndexScraper"
+                    print "NOT IMPLEMENTED"
+        print images
+        return images
+
+
+    def getArchiveFilenameList( self ):
+        out = []
+        
+        try:
+            self.readCBW()
+        except Exception, e:
+            print str(e)
+            print "oops"
+        
+        return out
+
+
+#------------------------------------------
+# ComicArchive
+#------------------------------------------
 
 
 class ComicArchive:
@@ -964,7 +1321,7 @@ class ComicArchive:
     logo_data = None
 
     class ArchiveType:
-        Zip, SevenZip, Rar, Folder, Pdf, Ebook, Tar, Unknown = range(8)
+        Zip, SevenZip, Rar, Folder, Pdf, Ebook, Tar, Web, Unknown = range(9)
     
     def __init__( self, path, rar_exe_path=None, default_image_path=None ):
         self.path = path
@@ -982,7 +1339,12 @@ class ComicArchive:
         self.archiver = UnknownArchiver( self.path )
 
         # test all known types even if they have the wrong extension
-        if ext == ".cbr" or ext == ".rar":
+        if ext == ".cbw":
+            if self.webTest():
+                self.archive_type =  self.ArchiveType.Web
+                self.archiver = WebArchiver( self.path )
+
+        elif ext == ".cbr" or ext == ".rar":
             if self.rarTest():
                 self.archive_type =  self.ArchiveType.Rar
                 self.archiver = RarArchiver( self.path, rar_exe_path=self.rar_exe_path )
@@ -1108,6 +1470,16 @@ class ComicArchive:
         return zipfile.is_zipfile( self.path )
 
 
+    def webTest( self ):
+        try:
+            opf = open(self.path, 'r')
+            cf = opf.read()
+            tree = etree.fromstring(cf)
+        except:
+            return False
+        return True
+        
+        
     def sevenZipTest( self ):
         try:
             Archive7z(open(self.path)).getnames()
@@ -1135,6 +1507,8 @@ class ComicArchive:
             return True
 
 
+    def isWeb( self ):
+        return self.archive_type ==  self.ArchiveType.Web
     def isZip( self ):
         return self.archive_type ==  self.ArchiveType.Zip
     def isSevenZip( self ):
@@ -1163,6 +1537,9 @@ class ComicArchive:
         elif self.isPdf():
             return False
 
+        elif self.isWeb():
+            return False
+            
         elif self.isBook():
             return False
 
@@ -1198,7 +1575,10 @@ class ComicArchive:
             ):
             return True
         else:
+            if self.isWeb():
+                return True
             return False
+
 
     def readMetadata( self, style ):
         if style == MetaDataStyle.CIX:
@@ -1209,6 +1589,8 @@ class ComicArchive:
             return self.readCoMet()
         elif style == MetaDataStyle.CALIBRE:
             return self.readCALIBRE()
+        elif style == MetaDataStyle.CBW:
+            return self.readCBW()
         elif style == MetaDataStyle.EPUB:
             return self.readEPUB()
         else:
@@ -1232,10 +1614,13 @@ class ComicArchive:
             return self.hasCBI()
         elif style == MetaDataStyle.COMET:
             return self.hasCoMet()
+        elif style == MetaDataStyle.CBW:
+            return self.hasCBW()
         elif style == MetaDataStyle.CALIBRE:
             return self.hasCALIBRE()
         elif style == MetaDataStyle.EPUB:
             return self.hasEPUB()
+
         else:
             return False
 
@@ -1400,7 +1785,7 @@ class ComicArchive:
         if self.has_cbi is None:
 
             #if ( not ( self.isZip() or self.isRar()) or not self.seemsToBeAComicArchive() ):
-            if not self.seemsToBeAComicArchive():
+            if not self.seemsToBeAComicArchive() or self.isWeb() or self.isPdf() or self.isEbook():
                 self.has_cbi = False
             else:
                 comment = self.archiver.getArchiveComment()
@@ -1481,6 +1866,93 @@ class ComicArchive:
   
     def hasCALIBRE(self):
         return os.path.isfile(os.path.join(os.path.dirname(self.path),'metadata.opf'))
+
+
+    def hasCBW(self):
+        cbw = os.path.isfile(self.path) and os.path.splitext(self.path)[1].lower() == ".cbw"
+        if cbw:
+            root = ET.parse(self.path).find('Info')
+            if root is None:
+                return False
+        return True
+    
+    
+    def readCBW(self):
+
+        root = ET.parse(self.path).find('Info')
+        
+        metadata = GenericMetadata()
+        md = metadata
+
+        # Helper function
+        def xlate( tag ):
+            node = root.find( tag )
+            if node is not None:
+                return node.text
+            else:
+                return None
+                
+        md.series =           xlate( 'Series' )
+        md.title =            xlate( 'Title' )
+        md.issue =            xlate( 'Number' )
+        md.issueCount =       xlate( 'Count' )
+        md.volume =           xlate( 'Volume' )
+        md.alternateSeries =  xlate( 'AlternateSeries' )
+        md.alternateNumber =  xlate( 'AlternateNumber' )
+        md.alternateCount =   xlate( 'AlternateCount' )
+        md.comments =         xlate( 'Summary' )
+        md.notes =            xlate( 'Notes' )
+        md.year =             xlate( 'Year' )
+        md.month =            xlate( 'Month' )
+        md.day =              xlate( 'Day' )
+        md.publisher =        xlate( 'Publisher' )
+        md.imprint =          xlate( 'Imprint' )
+        md.genre =            xlate( 'Genre' )
+        md.webLink =          xlate( 'Web' )
+        md.language =         xlate( 'LanguageISO' )
+        md.format =           xlate( 'Format' )
+        md.manga =            xlate( 'Manga' )
+        md.characters =       xlate( 'Characters' )
+        md.teams =            xlate( 'Teams' )
+        md.locations =        xlate( 'Locations' )
+        md.pageCount =        xlate( 'PageCount' )
+        md.scanInfo =         xlate( 'ScanInformation' )
+        md.storyArc =         xlate( 'StoryArc' )
+        md.seriesGroup =      xlate( 'SeriesGroup' )
+        md.maturityRating =   xlate( 'AgeRating' )
+
+        tmp = xlate( 'BlackAndWhite' )
+        md.blackAndWhite = False
+        if tmp is not None and tmp.lower() in [ "yes", "true", "1" ]:
+            md.blackAndWhite = True
+        # Now extract the credit info
+        for n in root:
+            if (  n.tag == 'Writer' or 
+                n.tag == 'Penciller' or
+                n.tag == 'Inker' or
+                n.tag == 'Colorist' or
+                n.tag == 'Letterer' or
+                n.tag == 'Editor' 
+            ):
+                if n.text is not None:
+                    for name in n.text.split(','):
+                        metadata.addCredit( name.strip(), n.tag )
+
+            if n.tag == 'CoverArtist':
+                if n.text is not None:
+                    for name in n.text.split(','):
+                        metadata.addCredit( name.strip(), "Cover" )
+
+        # parse page data now	
+        pages_node = root.find( "Pages" )
+        if pages_node is not None:			
+            for page in pages_node:
+                metadata.pages.append( page.attrib )
+                #print page.attrib
+
+        metadata.isEmpty = False
+
+        return metadata
 
 
     def readEPUB( self ):
@@ -1594,7 +2066,7 @@ class ComicArchive:
     def hasCIX(self):
         if self.has_cix is None:
 
-            if not self.seemsToBeAComicArchive():
+            if not self.seemsToBeAComicArchive() or self.isWeb() or self.isPdf() or self.isEbook():
                 self.has_cix = False
             elif self.ci_xml_filename in self.archiver.getArchiveFilenameList():
                 self.has_cix = True
@@ -1674,7 +2146,7 @@ class ComicArchive:
     def hasCoMet(self):
         if self.has_comet is None:
             self.has_comet = False
-            if not self.seemsToBeAComicArchive():
+            if not self.seemsToBeAComicArchive() or self.isWeb() or self.isPdf() or self.isEbook():
                 return self.has_comet
 
             #look at all xml files in root, and search for CoMet data, get first

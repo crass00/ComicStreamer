@@ -46,6 +46,7 @@
         <span>cbr</span><input style="display:inline" type="checkbox" disabled name="use_cbr" class="formcheck" id="use_cbr" value="use" checked />
         <span>cb7</span><input style="display:inline" type="checkbox" disabled name="use_cb7" class="formcheck" id="use_cb7" value="use" checked />
         <span>cbt</span><input style="display:inline" type="checkbox" disabled name="use_cbt" class="formcheck" id="use_cbt" value="use" checked />
+        <span>cbw</span><input style="display:inline" type="checkbox" name="use_cbw" class="formcheck" id="use_cbw" value="use" onclick="use_cbw_toggle()" {{formdata['use_cbw']}} />
         <span>pdf</span><input style="display:inline" type="checkbox" name="use_pdf" class="formcheck" id="use_pdf" value="use" onclick="use_pdf_toggle()" {{formdata['use_pdf']}} />
         <span>EBOOK</span><input style="display:inline" type="checkbox" name="use_ebook" class="formcheck" id="use_ebook" value="use" onclick="use_ebook_toggle()" {{formdata['use_ebook']}} />
         <br>
@@ -59,7 +60,12 @@
         <br>
         <br>
         </div>
-
+        <div id="settings_cbw">
+            <h2>Web Comic</h2>
+            <br>
+            <span><input id="cbw_location" disabled type="text" name="cbw_location" value="{{formdata['cbw_location']}}" /></span>
+        </div>
+        <br>
         <div id="settings_pdf">
             <h2>PDF</h2>
             <br>
