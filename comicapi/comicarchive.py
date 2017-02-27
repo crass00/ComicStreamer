@@ -44,6 +44,8 @@ from PIL import ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
+ImageExtensions = [".bmp", ".jpg", "jpeg", ".png", ".gif", "webp", ".pcx", "tiff", ".dcx", ".tga" ]
+
 from comicstreamerlib.folders import AppFolders
 
 class OpenableRarFile(rarfile.RarFile):
@@ -999,7 +1001,95 @@ class WebArchiver:
         return False
 
     def readArchiveFile( self, page_num ):
-        pass
+        cache_location = config['webcomic']['location']
+        if cache_location == "" or not os.path.exists(cache_location):
+            cache_location = AppFolders.appWebComic()
+        cache_folder = os.path.join(cache_location,os.path.basename(self.path))
+        ext = os.path.splitext(self.path)[1].lower()
+        if ext == ".cbw":
+            cache_folder = cache_folder[:-4]
+      
+        if not os.path.isdir(cache_folder):
+            
+            print "Web Comic: Could find web comic cache " + cache_folder
+            return
+
+        scraperfile = os.path.join(cache_folder,"WebComicBrowseScraperIndex.txt")
+
+        # read filename from file...
+
+        image_file = ""
+        image_url = ""
+        if os.path.isfile(scraperfile):
+            mode = 0
+            found = False
+            try:
+                with open(scraperfile) as f:
+                    for line in (line for line in f if line.rstrip('\n')):
+                        if mode == 1:
+                            image_url = line[:-1]
+                            mode = 2
+                        elif mode == 3:
+                            mode = 0
+                        elif mode == 2:
+                            print item_page
+                            print os.path.splitext(page_num)[0]
+                            if str(item_page) == os.path.splitext(page_num)[0]:
+                                image_file = line[:-1]
+                                found = True
+                                break
+                            mode = 3
+                        elif mode == 0:
+                            if line[0] == '[':
+                                item_page = int(line[1:-2])
+                                image_url = ""
+                                mode = 1
+                            else:
+                                break
+            except:
+                print "Web Comic: BrowseScraper: Warning Page " + str(page_num) + ": Scraperfile corrupted: "+ scraperfile
+                return ""
+
+        if image_file != "":
+            
+            # try reading it...
+            imagefilename = os.path.join(cache_folder,image_file)
+            print 'gvd'
+            print imagefilename
+            if os.path.isfile(imagefilename):
+                print 'GVD'
+                try:
+                    with open(imagefilename, 'rb') as fd:
+                        data = fd.read()
+                        #i=Image.open(StringIO.StringIO(data))
+                        print "FFDDFDFDFDFDFDFDFDF"
+                        return data
+                except:
+                    print "Web Comic: BrowseScraper: Warning Page " + str(page_num) + ": Not an image: "+ imagefilename
+
+            
+        if image_url != "":
+            try:
+                req = urllib2.Request(image_url, headers={ 'User-Agent': 'Mozilla/5.0' })
+                response  = urllib2.urlopen(req)
+                image_data = response.read()
+            except:
+                print "Web Comic: BrowseScraper: Page " + str(page_num) + ": Could not get " + image_url
+                return ""
+            try:
+                i=Image.open(StringIO.StringIO(image_data))
+                img_ext = i.format.lower()
+                imagefilename = os.path.join(cache_folder,str(page_num))
+                f = open(imagefilename + ".tmp", 'w')
+                f.write(image_data)
+                f.close
+                os.rename(imagefilename + ".tmp",imagefilename)
+                return image_data
+            except:
+                print "Web Comic: BrowseScraper: Page " + str(page_num) + ": Not an image: "+ image_url
+                return ""
+        print "Web Comic: BrowseScraper: Failed Page " + str(page_num)
+        return ""
   
     def writeArchiveFile( self, archive_file, data ):
         return False
@@ -1018,8 +1108,10 @@ class WebArchiver:
         h= HTMLParser.HTMLParser()
         # We ignore composition... you implement that
         images = []
-        
+        cache = []
         nextlist = []
+        old_scrape = ""
+        scrape = ""
         
         cache_location = config['webcomic']['location']
         if cache_location == "" or not os.path.exists(cache_location):
@@ -1148,50 +1240,104 @@ class WebArchiver:
                     print "Web Comic: BrowseScraper " + start #+ "\n" + image + "\n" + nextpage
                     
                     lastpage = False
+                    old_scrape = scrape
                     scrape = start
                     
-
+                    scraperfile = os.path.join(cache_folder,"WebComicBrowseScraperIndex.txt")
 
                     # remove partial images
                     for item in os.listdir( cache_folder ):
                         if item.endswith(".tmp"):
                             os.remove( os.path.join( cache_folder, item ) )
                     
-                    if os.path.isfile(os.path.join(cache_folder,"webcomic_index.txt")):
+                    mode = 0
+                    ####
+                    #### FUNCTION LOAD SCRAPERFILE
+                    ####
+                    if os.path.isfile(scraperfile):
                         try:
-                            with open(os.path.join(cache_folder,"webcomic_index.txt")) as f:
-                                last = ""
-                                last2 = ""
-                                last3 = ""
+                            with open(scraperfile) as f:
+                                item_page = 0
+                                item_next = ""
+                                item_filename = ""
+                                item_source = ""
+                                
+                                lc_item_page = 0
+                                lc_item_next = ""
+                                lc_item_filename = ""
+                                lc_item_source = ""
+                                
+                                firstt = True
+                                
+                                mode = 0 # 0 = page, 1 = source, 2 = next, 3 = filename
                                 for line in (line for line in f if line.rstrip('\n')):
-                                    print last3
-                                    print last2
-                                    print last
-                                    print "HEROE"
-                                    if line[:-1] != "":
-                                        last3 = last2
-                                        last2 = last
-                                        last = line[:-1]
-                                    if last3 != "" and last3[0] == '[':
-                                        scrape = last
-                                        pages = int(last3[1:-1])
-                                    elif last2 != "" and last2[0] == '[' and last3 != "":
-                                        scrape == last3
-                                        pages = int(last2[1:-1])
+                                    data = line[:-1]
+                                    if mode == 0:
+                                        item_page = int(data[1:-1])
+                                        lc_item_page = item_page
+                                        lc_item_next = item_next
+                                        lc_item_filename = item_filename
+                                        lc_item_source = item_source
+                                        if firstt:
+                                            firstt = False
+                                        else:
+                                            pages = item_page
+                                            nextlist += [item_next]
+                                            images += [item_source]
+                                            cache += [item_filename]
+                                        mode = 1
+                                    elif mode == 1:
+                                        item_source = data
+                                        mode = 2
+                                    elif mode == 2:
+                                        item_filename = data
+                                        mode = 3
+                                    elif mode == 3:
+                                        item_next = data
+                                        mode = 0
+                            if mode == 0:
+
+                                lc_item_page = item_page
+                                lc_item_next = item_next
+                                lc_item_filename = item_filename
+                                lc_item_source = item_source
+                                if not firstt:
+                                    pages = item_page
+                                    nextlist += [item_next]
+                                    images += [item_source]
+                                    cache += [item_filename]
+                            elif mode == 3:
+                                if not firstt:
+                                    pages = item_page
+                                    images += [item_source]
+                                    cache += [item_filename]
+                            else:
+                                # file corrupted....
+                                old_scrape = scrape
+                                scrape = start
+                                pages = 0
+                                
+                            if lc_item_next != "":
+                                old_scrape = scrape
+                                scrape = lc_item_next
+                    
                             
-                            print last3
-                            print last2
-                            print last
-                            print scrape
+                            
                         except Exception, e:
                             print str(e)
                             print "FUCKING KUTOZII"
+                            old_scrape = scrape
                             scrape = start
                             pages = 0
                     
-                    raw_input("You can abort now")
+                    ####
+                    #### SCRAPING
+                    ####
+                    #raw_input("You can abort now")
                     
                     next_url = ""
+                    imagefilename = ""
+                    
                     while not lastpage:
                         pages += 1
                         try:
@@ -1209,6 +1355,8 @@ class WebArchiver:
                             im = image.replace("?<link>","?P<link>")
                             im = im.replace('-','\-')
 
+                            imagefilename = ""
+                            
                             pattern = re.compile(im)
                             
                             m = pattern.search(self.content)
@@ -1239,15 +1387,17 @@ class WebArchiver:
                                     print "NOT IMPLEMENTED"
                                     continue
                             
+                            
                                 try:
                                     req = urllib2.Request(image_url, headers={ 'User-Agent': 'Mozilla/5.0' })
                                     response  = urllib2.urlopen(req)
                                     image_data = response.read()
                                     
                                     try:
-                                        imagefilename = os.path.join(cache_folder,str(pages)+"."+img_ext)
                                         i=Image.open(StringIO.StringIO(image_data))
                                         img_ext = i.format.lower()
+                                        imagefilename = os.path.join(cache_folder,str(pages)+"."+img_ext)
+                                        cache += [str(pages)+"."+img_ext]
                                         f = open(imagefilename + ".tmp", 'w')
                                         f.write(image_data)
                                         f.close
@@ -1307,32 +1457,66 @@ class WebArchiver:
                             lastpage = True
                         if next_url == "": # or pages == 2:
                             lastpage = True
-                        scrape = next_url
-                        thefile = open(os.path.join(cache_folder,"webcomic_index.txt"), 'a')
-                        thefile.write("[" + str(pages) + "]\n" + image_url + "\n" + next_url + "\n")
+                        if scrape != next_url:
+                            old_scrape = scrape
+                            scrape = next_url
+                        else:
+                            lastpage = True
+
+                        imagefilename = os.path.basename(imagefilename)
+                        thefile = open(scraperfile, 'a')
+                        
+                        print mode
+                        print image_url
+                        print next_url
+                        print imagefilename
+
+                        if mode == 3:
+                            thefile.write(old_scrape + "\n")
+                        lastpage = True
+                        thefile.write("[" + str(pages) + "]\n")
+                        if image_url != "":
+                            thefile.write(image_url + "\n")
+                            if imagefilename != "":
+                                thefile.write(imagefilename + "\n")
+                                if next_url != "":
+                                    thefile.write(next_url + "\n")
+                                    lastpage = False
+                        thefile.close()
+                         
 
                 elif type == "Url":
                     print "UrlScraper"
                     req = urllib2.Request(image_url, headers={ 'User-Agent': 'Mozilla/5.0' })
                     response  = urllib2.urlopen(req)
-                    self.content = response.read()
-                    f = open(os.path.join(cache_folder,str(pages)), 'w')
-                    f.write(self.content)
-                    f.close
-                    pages += 1
-                    images += [url]
+                    image_data = response.read()
+                    
+                    
+                                                        
+                    try:
+                        i=Image.open(StringIO.StringIO(image_data))
+                        img_ext = i.format.lower()
+                        imagefilename = os.path.join(cache_folder,str(pages)+"."+img_ext)
+                        cache += [str(pages)+"."+img_ext]
+                        f = open(imagefilename + ".tmp", 'w')
+                        f.write(image_data)
+                        f.close
+                        # such that we do not het partial images...
+                        os.rename(imagefilename + ".tmp",imagefilename)
+                    except IOError:
+                        print "Web Comic: BrowseScraper: Not an image"
                 elif type == "IndexScraper" or url[0] == "!":
                     print "IndexScraper"
                     print "NOT IMPLEMENTED"
-        print images
-        return images
+        print cache
+        return cache
 
 
     def getArchiveFilenameList( self ):
         out = []
         
         try:
-            self.readCBW()
+            return self.readCBW()
         except Exception, e:
             print str(e)
             print "oops"
@@ -1619,7 +1803,7 @@ class ComicArchive:
         elif style == MetaDataStyle.CALIBRE:
             return self.readCALIBRE()
         elif style == MetaDataStyle.CBW:
-            return self.readCBW()
+            return self.readCBWMeta()
         elif style == MetaDataStyle.EPUB:
             return self.readEPUB()
         else:
@@ -1781,13 +1965,12 @@ class ComicArchive:
             # make a sub-list of image files
             self.page_list = []
             for name in files:
-                if ( name[-4:].lower() in [".bmp", ".jpg", "jpeg", ".png", ".gif", "webp", ".pcx", "tiff", ".dcx", ".tga" ] and os.path.basename(name)[0] != "." ):
+                if ( name[-4:].lower() in ImageExtensions and os.path.basename(name)[0] != "." ):
                     self.page_list.append(name)
 
         return self.page_list
 
     def getNumberOfPages( self ):
-
         if self.page_count is None:
             self.page_count = len( self.getPageNameList( ) )
         return self.page_count
@@ -1903,10 +2086,11 @@ class ComicArchive:
             root = ET.parse(self.path).find('Info')
             if root is None:
                 return False
-        return True
+            return True
+        return False
     
     
-    def readCBW(self):
+    def readCBWMeta(self):
 
         root = ET.parse(self.path).find('Info')
         
@@ -1981,6 +2165,38 @@ class ComicArchive:
 
         metadata.isEmpty = False
 
+        print "HERExddd"
+        cache_location = config['webcomic']['location']
+        if cache_location == "" or not os.path.exists(cache_location):
+            cache_location = AppFolders.appWebComic()
+        cache_folder = os.path.join(cache_location,os.path.basename(self.path))
+        ext = os.path.splitext(self.path)[1].lower()
+        if ext == ".cbw":
+            cache_folder = cache_folder[:-4]
+      
+        if not os.path.isdir(cache_folder):
+            return metadata
+
+        scraperfile = os.path.join(cache_folder,"WebComicBrowseScraperIndex.txt")
+
+        # read filename from file...
+
+        if os.path.isfile(scraperfile):
+            item_page = 1
+            last_page = 1
+            try:
+                with open(scraperfile) as f:
+                    for line in (line for line in f if line.rstrip('\n')):
+                        if line[0] == '[':
+                            item_page_tmp = int(line[1:-2])
+                            last_page = item_page
+                            item_page = item_page_tmp
+            except:
+                print "Web Comic: BrowseScraper: Warning"
+                md.pageCount = last_page
+            md.pageCount = item_page
+        else:
+            md.pageCount = 1
         return metadata
 
 
