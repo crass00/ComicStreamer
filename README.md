@@ -1,8 +1,11 @@
-# ComicStream: ToiletStreamer Edition
+# ComicStream: ToiletStreamer Edition Alpha
 
 Improved ComicStreamer!
 
-With CBT, CB7 support, new interface, caching system and a lot of bug fixes
+Note: this is my personal working branch... for my Mac, I could break stuff at any time! Add hacked-in mac tested features...
+If something is not working __fork it, fix it, pull request it!__
+
+With CBT, CB7 support, new interface, caching system, and a lot of bug fixes
 
 __Experimental__
 
@@ -10,8 +13,7 @@ MySQL support, static library only
 
 PDF, EPUB, MOBI, AZW3, FB2, LIT, DJVU, CHM Support through calibre's ebook-convert and mupdf's mudraw and qpdf
 
-WebComic support CBW (Hack version).
-
+WebComic support CBW (Hack version)... I got it to display and download CtrlAltDel :-) Currently rewritting the hack to something proper...
 
 __Experimental Old Packages__
 
