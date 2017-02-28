@@ -8,9 +8,12 @@ __Experimental__
 
 MySQL support, static library only
 
-PDF, EPUB, MOBI, AZW3, FB2, LIT, DJVU, CHM Support through calibre's ebook-convert and mupdf's mudraw
+PDF, EPUB, MOBI, AZW3, FB2, LIT, DJVU, CHM Support through calibre's ebook-convert and mupdf's mudraw and qpdf
 
-__Experimental Packages__
+WebComic support CBW (Hack version).
+
+
+__Experimental Old Packages__
 
 [MacOS](https://dl.dropboxusercontent.com/u/12474226/ComicStreamer/ComicStreamer-0.9.51.dmg)
 [Windows x64](https://dl.dropboxusercontent.com/u/12474226/ComicStreamer/ComicStreamer-0.9.51-x64.exe)
