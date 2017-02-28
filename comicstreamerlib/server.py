@@ -1048,6 +1048,7 @@ class ConfigPageHandler(BaseHandler):
 
         formdata['use_pdf'] = "checked" if formdata['use_pdf'] else ""
         formdata['use_cbw'] = "checked" if formdata['use_cbw'] else ""
+        formdata['cbw_autodownload'] = "checked" if formdata['cbw_autodownload'] else ""
         formdata['use_ebook'] = "checked" if formdata['use_ebook'] else ""
 
         formdata['use_mutool'] = "checked" if formdata['use_mutool'] else ""
@@ -1120,10 +1121,9 @@ class ConfigPageHandler(BaseHandler):
         formdata['mudraw'] = self.application.config['pdf']['mudraw']
         formdata['mutool'] = self.application.config['pdf']['mutool']
         formdata['pdf2png'] = self.application.config['pdf']['pdf2png']
-
         formdata['cbw_location'] = self.application.config['webcomic']['location']
-        
         formdata['use_cbw'] = self.application.config['webcomic']['active']
+        formdata['cbw_autodownload'] = self.application.config['webcomic']['auto_download']
         formdata['use_pdf'] = self.application.config['pdf']['active']
         formdata['use_ebook'] = self.application.config['ebook']['active']
         formdata['calibre'] = self.application.config['ebook']['calibre']
@@ -1182,6 +1182,7 @@ class ConfigPageHandler(BaseHandler):
         formdata['qpdf'] = self.get_argument(u"qpdf", default="")
         formdata['use_pdf'] = (len(self.get_arguments("use_pdf"))!=0)
         formdata['use_cbw'] = (len(self.get_arguments("use_cbw"))!=0)
+        formdata['cbw_autodownload'] = (len(self.get_arguments("cbw_autodownload"))!=0)
         formdata['use_ebook'] = (len(self.get_arguments("use_ebook"))!=0)
         formdata['calibre'] = self.get_argument(u"calibre", default="")
         formdata['ebook_cache_location'] = self.get_argument(u"ebook_cache_location", default="")
@@ -1340,6 +1341,8 @@ class ConfigPageHandler(BaseHandler):
                 formdata['sqlite_database'] != self.application.config['database.sqlite']['database'] or
                 formdata['sqlite_location'] != self.application.config['database.sqlite']['location'] or
                 formdata['cbw_location'] != self.application.config['webcomic']['location'] or
+
+                formdata['cbw_autodownload'] != self.application.config['webcomic']['auto_download'] or
                 formdata['use_cbw'] != self.application.config['webcomic']['active'] or
                 formdata['use_pdf'] != self.application.config['pdf']['active'] or
                 formdata['pdf_resolution'] != self.application.config['pdf']['resolution'] or
@@ -1396,9 +1399,9 @@ class ConfigPageHandler(BaseHandler):
                 self.application.config['ebook.cache']['size'] = formdata['ebook_cache_size']
                 self.application.config['ebook']['active'] =  formdata['use_ebook']
                 
-                self.application.config['webcomic']['active'] =  formdata['use_cbw']
-                self.application.config['webcomic']['location'] =  formdata['cbw_location']
-
+                self.application.config['webcomic']['active'] = formdata['use_cbw']
+                self.application.config['webcomic']['location'] = formdata['cbw_location']
+                self.application.config['webcomic']['auto_download'] = formdata['cbw_autodownload']
                 self.application.config['pdf']['active'] =  formdata['use_pdf']
                 self.application.config['pdf']['resolution'] =  formdata['pdf_resolution']
                 self.application.config['ebook']['resolution'] = formdata['ebook_resolution']

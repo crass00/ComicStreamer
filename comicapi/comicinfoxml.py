@@ -198,11 +198,11 @@ class ComicInfoXml:
 		return tree
 				 
 
-	def convertXMLToMetadata( self, tree ):
+	def convertXMLToMetadata( self, tree, check = True ):
 			
 		root = tree.getroot()
 
-		if root.tag != 'ComicInfo':
+		if check and root.tag != 'ComicInfo':
 			raise 1
 			return None
 

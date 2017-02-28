@@ -58,6 +58,7 @@ class ComicStreamerConfig(ConfigObj):
             [webcomic]
             active=boolean(default="False")
             location=string(default="")
+            auto_download=boolean(default="False")
             [pdf]
             active=boolean(default="False")
             engine=string(default="mudraw")

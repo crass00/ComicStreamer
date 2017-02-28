@@ -106,7 +106,7 @@ class Monitor():
             #time.sleep(1)
             if self.quit:
                 break
-            
+    
         self.session.close()
         self.session = None
         self.observer.stop()
@@ -218,17 +218,7 @@ class Monitor():
             
             md.path = ca.path
             
-            # Lot of weidness going on between pageCount and page_count i did something wrong probably,
-            # maybe already fixed...
-            #
-            # original
-            #
-            #  md.page_count = ca.page_count
-
-            if style != MetaDataStyle.CBW:
-                md.page_count = ca.page_count
-            else:
-                md.page_count = md.pageCount
+            md.page_count = ca.page_count
             
             md.mod_ts = datetime.utcfromtimestamp(getmtime(ca.path))
             md.filesize = os.path.getsize(md.path)
