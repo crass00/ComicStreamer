@@ -1,0 +1,12 @@
+[Unit]
+Description=Comicstreamer Service
+After=network.target
+[Service]
+Type=simple
+#Replace the user and group with the correct values
+User=user
+Group=group
+#replace the "/opt/ComicStreamer/comicstreamer" with the correct path
+ExecStart=/usr/bin/env python2 /opt/ComicStreamer/comicstreamer
+[Install]
+WantedBy=multi-user.target
