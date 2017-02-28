@@ -1,0 +1,8 @@
+Simple systemd unit file for ComicStreamer
+1. Modify the file, changing the user, group, and path values to match your system's values
+2. Run the following commands. This assumes your current working directory is the dir this README file is located in.
+sudo cp comicstreamer.service /etc/systemd/service/
+sudo systemctl enable comicstreamer.service
+sudo systemctl start comicstreamer.service
+
+Now ComicStreamer will automatically start when your server restarts.
