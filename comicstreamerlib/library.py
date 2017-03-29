@@ -93,7 +93,7 @@ class Library:
                         print "Adding Firstpage"
                         file2 = open(os.path.join(z,str(hash2)), "w")
                         #file2.write("1")
-                        file2.write(image_cpver)
+                        file2.write(image_cover)
                         file2.close()
 
 
