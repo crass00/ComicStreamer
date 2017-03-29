@@ -196,12 +196,14 @@ class Monitor():
                 style = MetaDataStyle.COMET
             elif ca.hasMetadata( MetaDataStyle.CBW ):
                 style = MetaDataStyle.CBW
-            elif ca.hasMetadata( MetaDataStyle.CALIBRE ):
-                style = MetaDataStyle.CALIBRE
-            elif ca.hasMetadata( MetaDataStyle.EPUB ):
-                style = MetaDataStyle.EPUB
             else:
-                style = None
+                logging.debug(u"Monitor: Scanning File Has No ComicMeta Data"))
+                if ca.hasMetadata( MetaDataStyle.CALIBRE ):
+                    style = MetaDataStyle.CALIBRE
+                elif ca.hasMetadata( MetaDataStyle.EPUB ):
+                    style = MetaDataStyle.EPUB
+                else:
+                    style = None
                 
             if style is not None:
                 md = ca.readMetadata(style)
