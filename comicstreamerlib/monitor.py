@@ -197,7 +197,7 @@ class Monitor():
             elif ca.hasMetadata( MetaDataStyle.CBW ):
                 style = MetaDataStyle.CBW
             else:
-                logging.debug(u"Monitor: Scanning File Has No ComicMeta Data"))
+                logging.debug(u"Monitor: Scanning File Has No ComicMeta Data")
                 if ca.hasMetadata( MetaDataStyle.CALIBRE ):
                     style = MetaDataStyle.CALIBRE
                 elif ca.hasMetadata( MetaDataStyle.EPUB ):
