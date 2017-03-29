@@ -356,6 +356,7 @@ class Monitor():
         self.status = u"SCANNING"
         md_list = []
         self.read_count = 0
+        commitlength = 10
         for filename in filelist:
         
             md = self.getComicMetadata(filename)
@@ -368,10 +369,11 @@ class Monitor():
                 return
             
             #every so often, commit to DB
-            if self.read_count % 10 == 0 and self.read_count != 0:
+            if self.read_count % commitlength == 0 and self.read_count != 0:
                 if len(md_list) > 0:
                     self.commitMetadataList(md_list)
                     md_list = []
+                commitlength = 200
         
         if len(md_list) > 0:
             self.commitMetadataList(md_list)
