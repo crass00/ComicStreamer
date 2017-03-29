@@ -78,9 +78,9 @@ class Library:
                 imc = Image.open(StringIO.StringIO(image_cover))
                 hash2 = utils.hash(image_cover)
                 im2 = Image.open(StringIO.StringIO(image_page2))
-                w,h = imc.size
+                w1,h1 = imc.size
                 w2,h2 = im2.size
-                if h <= w and h2 > w2 and not self.checkHashBlacklist(hash2):
+                if h1 <= w1 and h2 > w2 and not self.checkHashBlacklist(hash2):
                     if os.path.isfile(os.path.join(z,str(hash2))):
                         if os.path.isfile(os.path.join(w,str(hash2))):
                             print "Double Already Exists"
