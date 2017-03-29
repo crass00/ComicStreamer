@@ -46,10 +46,16 @@ class Library:
         query = self.getSession.query(Comic)
         x = os.path.join(AppFolders.appBlacklistPages(),"lastpage")
         y = os.path.join(AppFolders.appBlacklistPages(),"lastpage_double")
+        z = os.path.join(AppFolders.appBlacklistPages(),"firstpage")
+        w = os.path.join(AppFolders.appBlacklistPages(),"firstpage_double")
         if not os.path.isdir(x):
             os.makedirs(x)
         if not os.path.isdir(y):
             os.makedirs(y)
+        if not os.path.isdir(z):
+            os.makedirs(z)
+        if not os.path.isdir(w):
+            os.makedirs(w)
         c = 0
         for row in query:
             print('Extracting last page from ' + str(c) + ' '  + row.path)
@@ -64,6 +70,36 @@ class Library:
             #w,h = im.size
             #if h > w:
             #    continue
+            
+            
+            image_cover = ca.getPage(0)
+            image_page2 = ca.getPage(1)
+            if image_page2:
+                imc = Image.open(StringIO.StringIO(image_cover))
+                hash2 = utils.hash(image_cover)
+                im2 = Image.open(StringIO.StringIO(image_page2))
+                w,h = imc.size
+                w2,h2 = im2.size
+                 if h <= w and h2 > w2 and not self.checkHashBlacklist(hash2):
+                    if os.path.isfile(os.path.join(z,str(hash2))):
+                    if os.path.isfile(os.path.join(w,str(hash2))):
+                        print "Double Already Exists"
+                    else:
+                        print "Adding Double"
+                        file2 = open(os.path.join(w,str(hash2)), "w")
+                        file2.write(image_cover)
+                        file2.close()
+                else:
+                    print "Adding Firstpage"
+                    file2 = open(os.path.join(z,str(hash2)), "w")
+                    #file2.write("1")
+                    file2.write(image_cpver)
+                    file2.close()
+
+
+            
+            
+        """
             
             if self.checkHashBlacklist(hash):
                 continue
@@ -81,6 +117,7 @@ class Library:
                 #file.write("1")
                 file.write(image_data)
             file.close()
+        """
 
     def createBlacklistFromFolder(self,file):
         # loop over files in blacklist folder
