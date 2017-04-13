@@ -119,7 +119,7 @@ function myAttributeWriter(record)
           
         if (record.hasOwnProperty("alternateseries") && record.alternateseries.length != 0) {
             alternateserie = record.alternateseries.join("")
-            val  = val + ' (<a href="{{handler.webroot}}/comiclist/browse?alternateseries=' + alternateserie + '"> - ' + alternateserie + '</a>)'
+            val  = val + ' (<a href="{{handler.webroot}}/comiclist/browse?alternateseries=' + alternateserie + '">' + alternateserie + '</a>)'
         }
     }
 
