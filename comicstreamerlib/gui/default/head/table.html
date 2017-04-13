@@ -59,31 +59,37 @@ function populateComicDetails(cd, comic)
     $(cd).find(".cd_pagecount").text("[" + comic.page_count + " pages]") ;
     
     comments = comic.comments
-    if (comments != null && comments.length > 500)
+    if (comments != null && comments.length > 1000)
     {
-        comments = comments.substring(0,500) + "..."
+        comments = comments.substring(0,1000) + "..."
     }
     
     $(cd).find(".cd_comments").text(comments);
     
     for (var property in comic.credits) {
-        $(cd).find('.cd_credits').append('<tr><td>' + property + '</td><td>' + comic.credits[property].join(", ") + '</td></tr>');
+        var credits = comic.credits[property].map( function(item) { return '<a href="{{handler.webroot}}/comiclist/browse?credit=' + item + '">' + item + '</a>'; } );
+        $(cd).find('.cd_credits').append('<tr><td>' + property + '</td><td>' + credits.join(", ") + '</td></tr>');
     }
     
     if (comic.hasOwnProperty("characters") && comic.characters.length != 0) {
-        $(cd).find('.cd_lists').append('<tr><td>Characters</td><td>' + comic.characters.join(", ") + '</td></tr>');
+        var characters = comic.characters.map( function(item) { return '<a href="{{handler.webroot}}/comiclist/browse?character=' + item + '">' + item + '</a>'; } );
+        $(cd).find('.cd_lists').append('<tr><td>Characters</td><td>' + characters.join(", ") + '</td></tr>');
     }
     if (comic.hasOwnProperty("teams") && comic.teams.length != 0) {
-        $(cd).find('.cd_lists').append('<tr><td>Teams</td><td>' + comic.teams.join(", ") + '</td></tr>');
+        var teams = comic.teams.map( function(item) { return '<a href="{{handler.webroot}}/comiclist/browse?team=' + item + '">' + item + '</a>'; } );
+        $(cd).find('.cd_lists').append('<tr><td>Teams</td><td>' + teams.join(", ") + '</td></tr>');
     }
     if (comic.hasOwnProperty("locations") && comic.locations.length != 0) {
-        $(cd).find('.cd_lists').append('<tr><td>Locations</td><td>' + comic.locations.join(", ") + '</td></tr>');
+        var locations = comic.locations.map( function(item) { return '<a href="{{handler.webroot}}/comiclist/browse?location=' + item + '">' + item + '</a>'; } );
+        $(cd).find('.cd_lists').append('<tr><td>Locations</td><td>' + locations.join(", ") + '</td></tr>');
     }
     if (comic.hasOwnProperty("storyarcs") && comic.storyarcs.length != 0) {
-        $(cd).find('.cd_lists').append('<tr><td>Story Arcs</td><td>' + comic.storyarcs.join(", ") + '</td></tr>');
+        var storyarcs = comic.storyarcs.map( function(item) { return '<a href="{{handler.webroot}}/comiclist/browse?storyarc=' + item + '">' + item + '</a>'; } );
+        $(cd).find('.cd_lists').append('<tr><td>Story Arcs</td><td>' + storyarcs.join(", ") + '</td></tr>');
     }
     if (comic.hasOwnProperty("tags") && comic.tags.length != 0) {
-        $(cd).find('.cd_lists').append('<tr><td>Tags</td><td>' + comic.tags.join(", ") + '</td></tr>');
+        var tags = comic.tags.map( function(item) { return '<a href="{{handler.webroot}}/comiclist/browse?tag=' + item + '">' + item + '</a>'; } );
+        $(cd).find('.cd_lists').append('<tr><td>Tags</td><td>' + tags.join(", ") + '</td></tr>');
     }
     return cd;
 }
@@ -100,20 +106,20 @@ function myAttributeWriter(record)
     if (this.id == 'series')
     {
 
-        val = '<a href="{{handler.webroot}}/entities/browse/series/'+ record.series +'">'+ record.series +'</a>';
+        val = '<a href="{{handler.webroot}}/comiclist/browse?series='+ record.series +'">'+ record.series +'</a>';
     }
 
     if (this.id == 'publisher')
     {
 
-        val = '<a href="{{handler.webroot}}/entities/browse/publishers/'+ record.publisher +'">'+ record.publisher +'</a>';
+        val = '<a href="{{handler.webroot}}/comiclist/browse?publishers/'+ record.publisher +'">'+ record.publisher +'</a>';
     }
 
 
     if (this.id == 'language')
     {
 
-        val = '<a href="{{handler.webroot}}/entities/browse/language/'+ record.language +'">'+ record.language +'</a>';
+        val = '<a href="{{handler.webroot}}/comiclist/browse?language/'+ record.language +'">'+ record.language +'</a>';
     }
     
     if (this.id == 'datex')
