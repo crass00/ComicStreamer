@@ -17,12 +17,23 @@ function populateComicDetails(cd, comic)
     $(cd).find(".cd_file_link").attr('href', download_url);
     $(cd).find(".cd_json_link").attr('href', json_url);
     
-    str = comic.series;
+    str = '<a href="{{handler.webroot}}/comiclist/browse?series='+ comic.series + '">' + comic.series + '</a>';
+    
+    // alternateserie should not be a sub table.... (alas poor me)
+    
+    if (comic.hasOwnProperty("alternateseries") && comic.alternateseries.length != 0) {
+       alternateserie = comic.alternateseries.join("")
+       str = str + ' (<a href="{{handler.webroot}}/comiclist/browse?alternateseries=' + alternateserie + '">' + alternateserie + '</a>)'
+    }
+    
     if (comic.issue !== "") {
         str = str + ' #' + comic.issue;
     }
     
-    $(cd).find(".cd_issue").html('<a href="{{handler.webroot}}/comiclist/browse?series='+ comic.series + '">' + str + '</a>' );
+    
+    AlternateSeries
+    
+    $(cd).find(".cd_issue").html((<a href="{{handler.webroot}}/comiclist/browse?series='+ comic.series + '">' + str + '</a>' );
     
     if (comic.year !== "") {
         str = comic.year.toString();
