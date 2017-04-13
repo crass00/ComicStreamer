@@ -16,8 +16,8 @@ function populateComicDetails(cd, comic)
     
     $(cd).find(".cd_file_link").attr('href', download_url);
     $(cd).find(".cd_json_link").attr('href', json_url);
-    
-    str = '<a href="{{handler.webroot}}/comiclist/browse?series='+ comic.series '">' + comic.series + '</a>';
+    //'<a href="{{handler.webroot}}/comiclist/browse?series='+ comic.series '">' + + '</a>'
+    str = comic.series;
     if (comic.issue !== "") {
         str = str + ' #' + comic.issue;
     }
