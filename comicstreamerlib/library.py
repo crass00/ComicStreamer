@@ -699,6 +699,7 @@ class Library:
 
         keyphrase_filter = criteria.get(u"keyphrase", None)
         series_filter = criteria.get(u"series", None)
+        alternateseries = criteria.get(u"alternateseries", None)
         path_filter = criteria.get(u"path", None)
         folder_filter = criteria.get(u"folder", "")
         title_filter = criteria.get(u"title", None)
@@ -743,16 +744,19 @@ class Library:
         if hasValue(keyphrase_filter):
             keyphrase_filter = unicode(keyphrase_filter).replace("*", "%")
             keyphrase_filter = "%" + keyphrase_filter + "%"
+            
             query = query.filter( Comic.series.ilike(keyphrase_filter)
+                                | Comic.alternateseries_raw.ilike(AlternateSeries.name.ilike(keyphrase_filter))
                                 | Comic.title.ilike(keyphrase_filter)
                                 | Comic.publisher.ilike(keyphrase_filter)
                                 | Comic.language.ilike(keyphrase_filter)
                                 | Comic.path.ilike(keyphrase_filter)
                                 | Comic.comments.ilike(keyphrase_filter)
-                                #| Comic.characters_raw.any(Character.name.ilike(keyphrase_filter))
-                                #| Comic.teams_raw.any(Team.name.ilike(keyphrase_filter))
-                                #| Comic.locations_raw.any(Location.name.ilike(keyphrase_filter))
-                                #| Comic.storyarcs_raw.any(StoryArc.name.ilike(keyphrase_filter))
+                                | Comic.characters_raw.any(Character.name.ilike(keyphrase_filter))
+                                | Comic.teams_raw.any(Team.name.ilike(keyphrase_filter))
+                                | Comic.generictags_raw.any(GenericTag.name.ilike(keyphrase_filter))
+                                | Comic.locations_raw.any(Location.name.ilike(keyphrase_filter))
+                                | Comic.storyarcs_raw.any(StoryArc.name.ilike(keyphrase_filter))
                                 | Comic.persons_raw.any(Person.name.ilike(keyphrase_filter))
                             )
 
@@ -776,6 +780,7 @@ class Library:
         query = addQueryOnScalar(query, Comic.folder, folder_filter)
         query = addQueryOnScalar(query, Comic.publisher, publisher)
         query = addQueryOnScalar(query, Comic.language, language_filter)
+        query = addQueryOnList(query, Comic.alternateseries_raw, AlternateSeries.name, alternateseries)
         query = addQueryOnList(query, Comic.characters_raw, Character.name, character)
         query = addQueryOnList(query, Comic.generictags_raw, GenericTag.name, tag)
         query = addQueryOnList(query, Comic.teams_raw, Team.name, team)

@@ -121,7 +121,7 @@ class GenericMetadata:
 		if not new_md.isEmpty:
 			self.isEmpty = False
 				
-		assign( 'series',            new_md.series )
+		assign( "series",            new_md.series )
 		assign( "issue",             new_md.issue )
 		assign( "issueCount",        new_md.issueCount )
 		assign( "title",             new_md.title )
