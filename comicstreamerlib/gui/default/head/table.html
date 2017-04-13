@@ -116,6 +116,11 @@ function myAttributeWriter(record)
     {
 
         val = '<a href="{{handler.webroot}}/comiclist/browse?series='+ record.series +'">'+ record.series +'</a>';
+          
+        if (record.hasOwnProperty("alternateseries") && record.alternateseries.length != 0) {
+            alternateserie = record.alternateseries.join("")
+            val  = val + ' (<a href="{{handler.webroot}}/comiclist/browse?alternateseries=' + alternateserie + '"> - ' + alternateserie + '</a>)'
+        }
     }
 
     if (this.id == 'publisher')
