@@ -204,7 +204,7 @@ class JSONResultAPIHandler(GenericAPIHandler):
                                 | Comic.generictags_raw.any(GenericTag.name.ilike(keyphrase_filter))
                                 | Comic.locations_raw.any(Location.name.ilike(keyphrase_filter))
                                 | Comic.storyarcs_raw.any(StoryArc.name.ilike(keyphrase_filter))
-                                | Comic.persons_raw.any(Person.name.ilike(keyphrase_filter))
+                            #    | Comic.persons_raw.any(Person.name.ilike(keyphrase_filter))
                             )
 
         def addQueryOnScalar(query, obj_prop, filt):

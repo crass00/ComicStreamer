@@ -245,6 +245,19 @@ class Comic(Base):
         blacklist_raw = relationship('Blacklist', secondary=comics_blacklist_table,
                                     cascade="save-update,delete") #, backref='comics')
   
+    persons_raw = relationship("Person",
+                secondary="join(Credit, Person, Credit.person_id == Person.id)",
+                primaryjoin="and_(Comic.id == Credit.comic_id)",
+                #passive_updates=False,
+                viewonly=True
+                )
+    roles_raw = relationship("Role",
+                secondary="join(Credit, Role, Credit.role_id == Role.id)",
+                primaryjoin="and_(Comic.id == Credit.comic_id)",
+                #passive_updates=False,
+                viewonly=True               
+                )
+
 
     filesize = Column(BigInteger)
     id = Column(Integer, primary_key=True)
@@ -275,18 +288,6 @@ class Comic(Base):
     genres_raw = relationship('Genre', secondary=comics_genres_table,cascade="save-update, delete", backref='comics')
     """
 
-    persons_raw = relationship("Person",
-                secondary="join(Credit, Person, Credit.person_id == Person.id)",
-                primaryjoin="and_(Comic.id == Credit.comic_id)",
-                #passive_updates=False,
-                viewonly=True
-                )
-    roles_raw = relationship("Role",
-                secondary="join(Credit, Role, Credit.role_id == Role.id)",
-                primaryjoin="and_(Comic.id == Credit.comic_id)",
-                #passive_updates=False,
-                viewonly=True               
-                )
 
     #credits = association_proxy('credits_raw', 'person_role_dict')
     alternateseries = association_proxy('alternateseries_raw', 'name')
