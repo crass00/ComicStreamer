@@ -746,7 +746,7 @@ class Library:
             keyphrase_filter = "%" + keyphrase_filter + "%"
             
             query = query.filter( Comic.series.ilike(keyphrase_filter)
-                                | Comic.alternateseries_raw.ilike(AlternateSeries.name.ilike(keyphrase_filter))
+                                | Comic.alternateseries_raw.any(AlternateSeries.name.ilike(keyphrase_filter))
                                 | Comic.title.ilike(keyphrase_filter)
                                 | Comic.publisher.ilike(keyphrase_filter)
                                 | Comic.language.ilike(keyphrase_filter)
@@ -757,7 +757,7 @@ class Library:
                                 | Comic.generictags_raw.any(GenericTag.name.ilike(keyphrase_filter))
                                 | Comic.locations_raw.any(Location.name.ilike(keyphrase_filter))
                                 | Comic.storyarcs_raw.any(StoryArc.name.ilike(keyphrase_filter))
-                           #     | Comic.persons_raw.any(Person.name.ilike(keyphrase_filter))
+                                | Comic.persons_raw.any(Person.name.ilike(keyphrase_filter))
                             )
 
         def addQueryOnScalar(query, obj_prop, filt):
