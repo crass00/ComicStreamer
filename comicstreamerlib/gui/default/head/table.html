@@ -22,7 +22,7 @@ function populateComicDetails(cd, comic)
         str = str + ' #' + comic.issue;
     }
     
-    $(cd).find(".cd_issue").text('<a href="{{handler.webroot}}/comiclist/browse?series='+ comic.series + '">' + str + '</a>' );
+    $(cd).find(".cd_issue").html('<a href="{{handler.webroot}}/comiclist/browse?series='+ comic.series + '">' + str + '</a>' );
     
     if (comic.year !== "") {
         str = comic.year.toString();
