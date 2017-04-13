@@ -3,9 +3,9 @@
 Improved ComicStreamer!
 
 Note: this is my personal working branch... for my Mac, I could break stuff at any time! Add hacked-in mac tested features...
-If something is not working __fork it, fix it, pull request it!__
+If something is not working __fork it, fix it, pull request it!__ (or use the original fork :-/ :-)
 
-With CBT, CB7 support, new interface, caching system, and a lot of bug fixes
+With CBT, CB7 support, new alpha interface, crude caching system, and a lot of bug fixes
 
 __Experimental__
 
@@ -15,11 +15,6 @@ PDF, EPUB, MOBI, AZW3, FB2, LIT, DJVU, CHM Support through calibre's ebook-conve
 
 WebComic support CBW (Hack version)... I got it to display and download CtrlAltDel :-) Currently rewritting the hack to something proper...
 
-__Experimental Old Packages__
-
-[MacOS](https://dl.dropboxusercontent.com/u/12474226/ComicStreamer/ComicStreamer-0.9.51.dmg)
-[Windows x64](https://dl.dropboxusercontent.com/u/12474226/ComicStreamer/ComicStreamer-0.9.51-x64.exe)
-[Windows x86](https://dl.dropboxusercontent.com/u/12474226/ComicStreamer/ComicStreamer-0.9.51.exe)
 
 ## Help wanted (fork it pull request it!)
 There is something missing... yes! 
@@ -46,6 +41,8 @@ Did I say I got stuck for a year now on MySQL and SQLAlchemy...
 ![screw](https://raw.githubusercontent.com/Tristan79/ComicStreamer/master/ad.png)
    
 ## Work done
+
+- Made the web hyperlinked (well somewhat)... i am missing alternative serie title... :-/ o well
 
 Tristan79 Work on this fork (januari 31 -february 12 2017)
 

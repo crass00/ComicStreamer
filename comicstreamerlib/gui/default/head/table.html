@@ -112,14 +112,14 @@ function myAttributeWriter(record)
     if (this.id == 'publisher')
     {
 
-        val = '<a href="{{handler.webroot}}/comiclist/browse?publishers/'+ record.publisher +'">'+ record.publisher +'</a>';
+        val = '<a href="{{handler.webroot}}/comiclist/browse?publisher='+ record.publisher +'">'+ record.publisher +'</a>';
     }
 
 
     if (this.id == 'language')
     {
 
-        val = '<a href="{{handler.webroot}}/comiclist/browse?language/'+ record.language +'">'+ record.language +'</a>';
+        val = '<a href="{{handler.webroot}}/comiclist/browse?language='+ record.language +'">'+ record.language +'</a>';
     }
     
     if (this.id == 'datex')
