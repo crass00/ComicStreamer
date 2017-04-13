@@ -30,10 +30,7 @@ function populateComicDetails(cd, comic)
         str = str + ' #' + comic.issue;
     }
     
-    
-    AlternateSeries
-    
-    $(cd).find(".cd_issue").html((<a href="{{handler.webroot}}/comiclist/browse?series='+ comic.series + '">' + str + '</a>' );
+    $(cd).find(".cd_issue").html( str);
     
     if (comic.year !== "") {
         str = comic.year.toString();
