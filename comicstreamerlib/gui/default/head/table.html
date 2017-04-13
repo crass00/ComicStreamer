@@ -22,8 +22,8 @@ function populateComicDetails(cd, comic)
     // alternateserie should not be a sub table.... (alas poor me)
     
     if (comic.hasOwnProperty("alternateseries") && comic.alternateseries.length != 0) {
-        var alternateserie = comic.alternateserie.map( function(item) { return '<a href="{{handler.webroot}}/comiclist/browse?alternateseries=' + item + '">' + item + '</a>'; } );
-        str = str + ' (' + alternateserie.join(", ") + ')'
+        var alternateseries = comic.alternateseries.map( function(item) { return '<a href="{{handler.webroot}}/comiclist/browse?alternateseries=' + item + '">' + item + '</a>'; } );
+        str = str + ' (' + alternateseries.join(", ") + ')'
     }
     
     if (comic.issue !== "") {
@@ -119,8 +119,8 @@ function myAttributeWriter(record)
           
         if (record.hasOwnProperty("alternateseries") && record.alternateseries.length != 0) {
 
-            var alternateserie = record.alternateserie.map( function(item) { return '<a href="{{handler.webroot}}/comiclist/browse?alternateseries=' + item + '">' + item + '</a>'; } );
-            val  = val + ' (' + alternateserie.join(", ") + ')'
+            var alternateseries = record.alternateseries.map( function(item) { return '<a href="{{handler.webroot}}/comiclist/browse?alternateseries=' + item + '">' + item + '</a>'; } );
+            val  = val + ' (' + alternateseries.join(", ") + ')'
         }
     }
 
