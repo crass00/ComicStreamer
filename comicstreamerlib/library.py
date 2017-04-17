@@ -38,6 +38,7 @@ class Library:
         self.namedEntities = {}
         self.hashEntities = {}
         self.cache_active = False
+        self.double = 0
         
 
 
@@ -631,12 +632,16 @@ class Library:
         for comic in comic_list:
             query = self.getSession().query(Comic).filter(Comic.fingerprint == comic.fingerprint).first()
             if query is not None:
-                print "Double:" + query.path
-            self.getSession().add(comic)
+                print "Double: " + comic.path
+                print "Double From: " + query.path
+                self.double += 1
+            else:
+                self.getSession().add(comic)
         if len(comic_list) > 0:
             self._dbUpdated()
         self.getSession().commit()
         self.getSession().expire_all()
+        print "Doubles: " + str(self.double)
 
 
     def deleteComics(self, comic_id_list):
