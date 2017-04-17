@@ -510,6 +510,9 @@ class Library:
         return resultset.all()
 
     def createComicFromMetadata(self, md):
+        """
+        Translate the metadata to actual DB data!
+        """
 
         comic = Comic()
         # store full path, and filename and folder separately, for search efficiency,
@@ -521,6 +524,7 @@ class Library:
         comic.mod_ts = md.mod_ts
         comic.hash = md.hash
         comic.filesize = md.filesize
+        comic.fingerprint = md.fingerprint
         comic.thumbnail = md.thumbnail
 
         if not md.isEmpty:
@@ -621,7 +625,13 @@ class Library:
         return self.namedEntities[key]
 
     def addComics(self, comic_list):
+        """
+        Add comics to the Database
+        """
         for comic in comic_list:
+            query = self.getSession().query(Comic).filter(Comic.fingerprint == comic.fingerprint).first()
+            if query is not None:
+                print "Double:" + query.path
             self.getSession().add(comic)
         if len(comic_list) > 0:
             self._dbUpdated()

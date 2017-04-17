@@ -1,28 +1,3 @@
-"""
- A python class for internal metadata storage
- 
- The goal of this class is to handle ALL the data that might come from various
- tagging schemes and databases, such as ComicVine or GCD.  This makes conversion 
- possible, however lossy it might be
- 
-"""
-
-"""
-Copyright 2012-2014  Anthony Beville
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-	http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-"""
-
 import utils
 
 # These page info classes are exactly the same as the CIX scheme, since it's unique
@@ -57,6 +32,7 @@ class GenericMetadata:
 		self.isEmpty = True
 		self.tagOrigin = None
 		
+		self.fingerprint        = None
 		self.series             = None
 		self.issue              = None
 		self.title              = None
@@ -121,6 +97,7 @@ class GenericMetadata:
 		if not new_md.isEmpty:
 			self.isEmpty = False
 				
+		assign( "fingerprint",       new_md.fingerprint )
 		assign( "series",            new_md.series )
 		assign( "issue",             new_md.issue )
 		assign( "issueCount",        new_md.issueCount )
@@ -253,6 +230,7 @@ class GenericMetadata:
 			val = getattr(self,tag)
 			add_string( tag, getattr(self,tag) )
 
+		add_attr_string( "fingerprint" )
 		add_attr_string( "series" )
 		add_attr_string( "issue" )
 		add_attr_string( "issueCount" )

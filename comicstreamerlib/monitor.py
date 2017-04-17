@@ -16,6 +16,7 @@ import watchdog
 from comicapi.comicarchive import *
 from comicapi.issuestring import *
 import utils
+import comicstreamerlib.utils
 
 from database import *
 from library import Library
@@ -218,6 +219,7 @@ class Monitor():
                 md.title = md.series
                 md.series = None
             
+            md.fingerprint = ca.fingerprint()
             md.path = ca.path
             
             md.page_count = ca.page_count

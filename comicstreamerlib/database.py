@@ -175,17 +175,19 @@ class Comic(Base):
     global mysql_active
     if mysql_active:
         path = Column(String(1000), unique=True)
+        fingerprint = Column(String(128))
         folder = Column(String(1000))
         file = Column(String(1000))
         series = Column(String(1000))
         issue = Column(String(100))
         comments = Column(Text)
-        publisher = Column(String(1000))
+        publisher = Column(String(256))
         title = Column(String(1000))
         imprint = Column(String(1000))
         weblink = Column(String(1000))
         hash = Column(String(1000))
         language = Column(String(100))
+        comicbookvine = Column(String(64))
         #thumbnail = Column(LargeBinary(1024*1024*10*10))
         thumbnail = deferred(Column(LargeBinary(1024*1024*3)))
         alternateIssue = Column(String(1000))
@@ -212,6 +214,7 @@ class Comic(Base):
 
     else:
         path = Column(String, unique=True)
+        fingerprint = Column(String)
         folder = Column(String)
         file = Column(String)
         series = Column(String)
@@ -225,6 +228,7 @@ class Comic(Base):
         language = Column(String)
         thumbnail = deferred(Column(LargeBinary))
         alternateIssue = Column(String)
+        comicbookvine = Column(String)
         alternateseries_raw = relationship('AlternateSeries', secondary=comics_alternateseries_table,
                                     cascade="save-update,delete") #, backref='comics')
 
@@ -260,6 +264,7 @@ class Comic(Base):
 
 
     filesize = Column(BigInteger)
+
     id = Column(Integer, primary_key=True)
     issue_num = Column(Float)
     date = Column(DateTime)  # will be a composite of month,year,day for sorting/filtering

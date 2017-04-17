@@ -31,6 +31,7 @@ from unrar import constants
 import xml.etree.ElementTree as ET
 
 from comicstreamerlib.config import ComicStreamerConfig
+from comicstreamerlib.utils import *
 
 config = ComicStreamerConfig()
 
@@ -1272,8 +1273,12 @@ class WebArchiver:
                                 mode = 0 # 0 = page, 1 = source, 2 = next, 3 = filename
                                 for line in (line for line in f if line.rstrip('\n')):
                                     data = line[:-1]
+                                    print str(mode) + " + " + data
                                     if mode == 0:
-                                        item_page = int(data[1:-1])
+                                        x = data[1:-1].strip()
+                                        print x
+                                        print "GOFVEFRDOME"
+                                        item_page = int(x)
                                         lc_item_page = item_page
                                         lc_item_next = item_next
                                         lc_item_filename = item_filename
@@ -1295,6 +1300,7 @@ class WebArchiver:
                                     elif mode == 3:
                                         item_next = data
                                         mode = 0
+                            #raw_input("abort")
                             if mode == 0:
 
                                 lc_item_page = item_page
@@ -1308,7 +1314,7 @@ class WebArchiver:
                                     cache += [item_filename]
                             elif mode == 3:
                                 if not firstt:
-                                    pages = item_page
+                                    pages = item_page - 1
                                     images += [item_source]
                                     cache += [item_filename]
                             else:
@@ -1324,6 +1330,8 @@ class WebArchiver:
                             
                             
                         except Exception, e:
+                            import traceback
+                            traceback.print_exc(file=sys.stdout)
                             print str(e)
                             print "FUCKING KUTOZII"
                             old_scrape = scrape
@@ -1383,9 +1391,9 @@ class WebArchiver:
                                     image_url = (urlparse.urljoin(scrape, '/') + image_url).replace("//","/").replace("http:/","http://")
                                 
                                 else:
-                                    print image_url
-                                    print "NOT IMPLEMENTED"
-                                    continue
+                                    print "COULD BE NOT IMPLEMENTED: " + image_url
+                                    image_url = (urlparse.urljoin(scrape, '/') + image_url).replace("//","/").replace("http:/","http://")
+                                
                             
                             
                                 try:
@@ -1419,7 +1427,7 @@ class WebArchiver:
                             np = np.replace('-','\-')
                             pat = re.compile(np)
                             n = pat.search(self.content)
-                            
+                            next_url = ""
                             if n:
                                 next_url = n.group(0).strip()
                                 print "DFDDFDF" + next_url
@@ -1471,17 +1479,19 @@ class WebArchiver:
                         print next_url
                         print imagefilename
 
-                        if mode == 3:
-                            thefile.write(old_scrape + "\n")
-                        lastpage = True
-                        thefile.write("[" + str(pages) + "]\n")
-                        if image_url != "":
-                            thefile.write(image_url + "\n")
-                            if imagefilename != "":
-                                thefile.write(imagefilename + "\n")
-                                if next_url != "":
-                                    thefile.write(next_url + "\n")
-                                    lastpage = False
+                        if mode == 3 and next_url != "":
+                            thefile.write(next_url + "\n")
+                            mode = 0
+                        
+                        else:
+                            thefile.write("[" + str(pages) + "]\n")
+                            if image_url != "":
+                                thefile.write(image_url + "\n")
+                                if imagefilename != "":
+                                    thefile.write(imagefilename + "\n")
+                                    if next_url != "":
+                                        thefile.write(next_url + "\n")
+                                        lastpage = False
                         thefile.close()
                          
 
@@ -1626,9 +1636,9 @@ class ComicArchive:
                 self.archiver = RarArchiver( self.path, rar_exe_path=self.rar_exe_path )
 
         elif ext == ".pdf":
-            # skip converted ebook
             self.archive_type = self.ArchiveType.Pdf
             self.archiver = PdfArchiver(self.path)
+        
         elif ext in ebook_extentions:
             if ext == ".epub":
                 self.has_epub = True
@@ -1657,6 +1667,22 @@ class ComicArchive:
             fname = self.default_image_path
             with open(fname, 'rb') as fd:
                 ComicArchive.logo_data = fd.read()
+
+    """
+    Fingerprint a comic file
+    """
+    def fingerprint( self ):
+        fp = []
+        # FIX: if type == pdf or web... epub etc... we need another fingerprint
+        if self.archive_type == self.ArchiveType.Ebook or self.archive_type == self.ArchiveType.Web or self.archive_type == self.ArchiveType.Pdf:
+            return hashfile(self.path)
+            # hash the complete file
+        else:
+            # hash all the pages sort them and hash that string :-)
+            for page in range(0,self.getNumberOfPages()):
+                fp += [hash(self.getPage(page))]
+        return hash(''.join(sorted(fp)))
+    
 
     # Clears the cached data
     def resetCache( self ):
@@ -1787,8 +1813,9 @@ class ComicArchive:
 
             ):
             return True
-        else:
+        else:  #### FIX THIS!!!!
             if self.isWeb():
+                self.getNumberOfPages()
                 return True
             return False
 
@@ -2158,7 +2185,7 @@ class ComicArchive:
 
         # parse page data now	
         pages_node = root.find( "Pages" )
-        if pages_node is not None:			
+        if pages_node is not None:        	
             for page in pages_node:
                 metadata.pages.append( page.attrib )
                 #print page.attrib
