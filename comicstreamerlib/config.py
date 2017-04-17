@@ -22,7 +22,16 @@ class ComicStreamerConfig(ConfigObj):
             install_id=string(default="")
             folder_list=string_list(default=list())
             launch_client=boolean(default="True")
+            fingerprint=boolean(default="False")
             first_run=boolean(default="True")
+            [metadata.comicvine]
+            active=boolean(default="False")
+            location=string(default="")
+            key=string(default="")
+            [metadata.zilverendolfijn]
+            active=boolean(default="False")
+            location=string(default="")
+            key=string(default="")
             [web]
             port=integer(default=32500)
             bind=string(default="")
@@ -55,11 +64,13 @@ class ComicStreamerConfig(ConfigObj):
             password=string(default="")
             host=string(default="localhost")
             port=integer(default=3306)
-            [webcomic]
+            [format.folders]
+            active=boolean(default="False")
+            [format.webcomic]
             active=boolean(default="False")
             location=string(default="")
             auto_download=boolean(default="False")
-            [pdf]
+            [format.pdf]
             active=boolean(default="False")
             engine=string(default="mudraw")
             mudraw=string(default="")
@@ -67,12 +78,11 @@ class ComicStreamerConfig(ConfigObj):
             pdf2png=string(default="")
             qpdf=string(default="")
             resolution=integer(default=200)
-            [ebook]
+            [format.ebook]
             margin=integer(default=72)
             active=boolean(default="False")
             resolution=integer(default=125)
             calibre=string(default="")
-            [ebook.cache]
             size=integer(default=0)
             free=integer(default=3000)
             location=string(default="")
@@ -105,11 +115,11 @@ class ComicStreamerConfig(ConfigObj):
         tmp.validate(validator,  copy=True)
        
        
-        if tmp['ebook']['calibre'] == '':
+        if tmp['format.ebook']['calibre'] == '':
             if platform.system() == "Darwin":
                 calibre = '/Applications/calibre.app/Contents/MacOS/ebook-convert'
                 if os.path.isfile(calibre):
-                    tmp['ebook']['calibre'] = calibre
+                    tmp['format.ebook']['calibre'] = calibre
 
         # set up the install ID
         if tmp['general']['install_id'] == '':

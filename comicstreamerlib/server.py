@@ -1050,6 +1050,12 @@ class ConfigPageHandler(BaseHandler):
 
         formdata['use_pdf'] = "checked" if formdata['use_pdf'] else ""
         formdata['use_cbw'] = "checked" if formdata['use_cbw'] else ""
+        formdata['use_folders'] = "checked" if formdata['use_folders'] else ""
+
+        formdata['use_zd'] = "checked" if formdata['use_zd'] else ""
+        formdata['use_comicvine'] = "checked" if formdata['use_comicvine'] else ""
+
+
         formdata['cbw_autodownload'] = "checked" if formdata['cbw_autodownload'] else ""
         formdata['use_ebook'] = "checked" if formdata['use_ebook'] else ""
 
@@ -1064,6 +1070,7 @@ class ConfigPageHandler(BaseHandler):
         formdata['use_cache'] = "checked" if formdata['use_cache'] else ""
         formdata['use_authentication'] = "checked" if formdata['use_authentication'] else ""
         formdata['launch_client'] = "checked" if formdata['launch_client'] else ""
+        formdata['fingerprint'] = "checked" if formdata['fingerprint'] else ""
         if (  self.application.config['security']['use_authentication'] ):
             formdata['password'] = ConfigPageHandler.fakepass
             formdata['password_confirm'] = ConfigPageHandler.fakepass
@@ -1102,6 +1109,7 @@ class ConfigPageHandler(BaseHandler):
         formdata['use_api_key'] = self.application.config['security']['use_api_key'] 
         formdata['api_key'] = self.application.config['security']['api_key']
         formdata['launch_client'] = self.application.config['general']['launch_client']
+        formdata['fingerprint'] = self.application.config['general']['fingerprint']
         formdata['use_mysql'] = self.application.config['database']['engine'] == 'mysql'
         formdata['use_sqlite'] = self.application.config['database']['engine'] == 'sqlite'
         formdata['sqlite_location'] = self.application.config['database.sqlite']['location']
@@ -1111,27 +1119,34 @@ class ConfigPageHandler(BaseHandler):
         formdata['mysql_password'] = utils.decode(self.application.config['general']['install_id'],self.application.config['database.mysql']['password'])
         formdata['mysql_host'] = self.application.config['database.mysql']['host']
         formdata['mysql_port'] = self.application.config['database.mysql']['port']
-        formdata['ebook_resolution'] = self.application.config['ebook']['resolution']
-        formdata['ebook_margin'] = self.application.config['ebook']['margin']
-        formdata['pdf_resolution'] = self.application.config['pdf']['resolution']
-        formdata['pdf_engine'] = self.application.config['pdf']['engine']
+        formdata['ebook_resolution'] = self.application.config['format.ebook']['resolution']
+        formdata['ebook_margin'] = self.application.config['format.ebook']['margin']
+        formdata['pdf_resolution'] = self.application.config['format.pdf']['resolution']
+        formdata['pdf_engine'] = self.application.config['format.pdf']['engine']
         
         formdata['use_mudraw'] = formdata['pdf_engine'] == 'mudraw'
         formdata['use_mutool'] = formdata['pdf_engine'] == 'mutool'
         formdata['use_pdf2png'] = formdata['pdf_engine'] == 'pdf2png'
-        formdata['qpdf'] = self.application.config['pdf']['qpdf']
-        formdata['mudraw'] = self.application.config['pdf']['mudraw']
-        formdata['mutool'] = self.application.config['pdf']['mutool']
-        formdata['pdf2png'] = self.application.config['pdf']['pdf2png']
-        formdata['cbw_location'] = self.application.config['webcomic']['location']
-        formdata['use_cbw'] = self.application.config['webcomic']['active']
-        formdata['cbw_autodownload'] = self.application.config['webcomic']['auto_download']
-        formdata['use_pdf'] = self.application.config['pdf']['active']
-        formdata['use_ebook'] = self.application.config['ebook']['active']
-        formdata['calibre'] = self.application.config['ebook']['calibre']
-        formdata['ebook_cache_location'] = self.application.config['ebook.cache']['location']
-        formdata['ebook_cache_free'] = self.application.config['ebook.cache']['free']
-        formdata['ebook_cache_size'] = self.application.config['ebook.cache']['size']
+        formdata['qpdf'] = self.application.config['format.pdf']['qpdf']
+        formdata['mudraw'] = self.application.config['format.pdf']['mudraw']
+        formdata['mutool'] = self.application.config['format.pdf']['mutool']
+        formdata['pdf2png'] = self.application.config['format.pdf']['pdf2png']
+        formdata['cbw_location'] = self.application.config['format.webcomic']['location']
+
+        formdata['use_zd'] = self.application.config['metadata.zilverendolfijn']['active']
+        formdata['use_comicvine'] = self.application.config['metadata.comicvine']['active']
+        formdata['comicvine_key'] = self.application.config['metadata.comicvine']['key']
+        formdata['comicvine_location'] = self.application.config['metadata.comicvine']['location']
+        formdata['zilverendolfijn_location'] = self.application.config['metadata.zilverendolfijn']['location']
+        formdata['use_folders'] = self.application.config['format.folders']['active']
+        formdata['use_cbw'] = self.application.config['format.webcomic']['active']
+        formdata['cbw_autodownload'] = self.application.config['format.webcomic']['auto_download']
+        formdata['use_pdf'] = self.application.config['format.pdf']['active']
+        formdata['use_ebook'] = self.application.config['format.ebook']['active']
+        formdata['calibre'] = self.application.config['format.ebook']['calibre']
+        formdata['ebook_cache_location'] = self.application.config['format.ebook']['location']
+        formdata['ebook_cache_free'] = self.application.config['format.ebook']['free']
+        formdata['ebook_cache_size'] = self.application.config['format.ebook']['size']
         self.render_config(formdata)
 
     @tornado.web.authenticated
@@ -1156,6 +1171,7 @@ class ConfigPageHandler(BaseHandler):
         formdata['use_api_key'] = (len(self.get_arguments("use_api_key"))!=0)
         formdata['api_key'] = self.get_argument(u"api_key", default="")
         formdata['launch_client'] = (len(self.get_arguments("launch_client"))!=0)
+        formdata['fingerprint'] = (len(self.get_arguments("fingerprint"))!=0)
         formdata['db_engine'] = self.get_arguments("db_engine")[0]
         formdata['use_mysql'] = formdata['db_engine'] == 'mysql'
         formdata['use_sqlite'] = formdata['db_engine'] == 'sqlite'
@@ -1165,6 +1181,12 @@ class ConfigPageHandler(BaseHandler):
         formdata['mysql_host'] = self.get_argument(u"mysql_host", default="")
         formdata['mysql_port'] = self.get_argument(u"mysql_port", default="")
         formdata['mysql_password'] = self.get_argument(u"mysql_password", default="")
+
+
+        formdata['comicvine_key'] = self.get_argument(u"comicvine_location", default="")
+        formdata['comicvine_location'] = self.get_argument(u"comicvine_key", default="")
+        formdata['zilverendolfijn_location'] = self.get_argument(u"zilverendolfijn_location", default="")
+
         formdata['sqlite_location'] = self.get_argument(u"sqlite_location", default="")
         formdata['sqlite_database'] = self.get_argument(u"sqlite_database", default="")
         formdata['pdf_resolution'] = self.get_argument(u"pdf_resolution", default="")
@@ -1184,6 +1206,9 @@ class ConfigPageHandler(BaseHandler):
         formdata['qpdf'] = self.get_argument(u"qpdf", default="")
         formdata['use_pdf'] = (len(self.get_arguments("use_pdf"))!=0)
         formdata['use_cbw'] = (len(self.get_arguments("use_cbw"))!=0)
+        formdata['use_folders'] = (len(self.get_arguments("use_folders"))!=0)
+        formdata['use_comicvine'] = (len(self.get_arguments("use_comicvine"))!=0)
+        formdata['use_zd'] = (len(self.get_arguments("use_zd"))!=0)
         formdata['cbw_autodownload'] = (len(self.get_arguments("cbw_autodownload"))!=0)
         formdata['use_ebook'] = (len(self.get_arguments("use_ebook"))!=0)
         formdata['calibre'] = self.get_argument(u"calibre", default="")
@@ -1342,25 +1367,35 @@ class ConfigPageHandler(BaseHandler):
                 formdata['mysql_host'] != self.application.config['database.mysql']['host'] or
                 formdata['sqlite_database'] != self.application.config['database.sqlite']['database'] or
                 formdata['sqlite_location'] != self.application.config['database.sqlite']['location'] or
-                formdata['cbw_location'] != self.application.config['webcomic']['location'] or
 
-                formdata['cbw_autodownload'] != self.application.config['webcomic']['auto_download'] or
-                formdata['use_cbw'] != self.application.config['webcomic']['active'] or
-                formdata['use_pdf'] != self.application.config['pdf']['active'] or
-                formdata['pdf_resolution'] != self.application.config['pdf']['resolution'] or
-                formdata['ebook_margin'] != self.application.config['ebook']['margin'] or
-                formdata['ebook_resolution'] != self.application.config['ebook']['resolution'] or
-                formdata['pdf_engine'] != self.application.config['pdf']['engine'] or
-                formdata['mudraw'] != self.application.config['pdf']['mudraw'] or
-                formdata['mutool'] != self.application.config['pdf']['mutool'] or
-                formdata['pdf2png'] != self.application.config['pdf']['pdf2png'] or
-                formdata['qpdf'] != self.application.config['pdf']['qpdf'] or
-                formdata['use_ebook'] != self.application.config['ebook']['active'] or
-                formdata['calibre'] != self.application.config['ebook']['calibre'] or
-                formdata['ebook_cache_location'] != self.application.config['ebook.cache']['location'] or
-                formdata['ebook_cache_free'] != self.application.config['ebook.cache']['free'] or
-                formdata['ebook_cache_size'] != self.application.config['ebook.cache']['size'] or
+                formdata['comicvine_location'] != self.application.config['metadata.comicvine']['location'] or
+                formdata['comicvine_key'] != self.application.config['metadata.comicvine']['key'] or
+                formdata['zilverendolfijn_location'] != self.application.config['metadata.zilverendolfijn']['location'] or
+
+                formdata['cbw_location'] != self.application.config['format.webcomic']['location'] or
+
+                formdata['cbw_autodownload'] != self.application.config['format.webcomic']['auto_download'] or
+                formdata['use_comicvine'] != self.application.config['metadata.comicvine']['active'] or
+                formdata['use_zd'] != self.application.config['metadata.zilverendolfijn']['active'] or
+
+                formdata['use_cbw'] != self.application.config['format.webcomic']['active'] or
+                formdata['use_folders'] != self.application.config['format.folders']['active'] or
+                formdata['use_pdf'] != self.application.config['format.pdf']['active'] or
+                formdata['pdf_resolution'] != self.application.config['format.pdf']['resolution'] or
+                formdata['ebook_margin'] != self.application.config['format.ebook']['margin'] or
+                formdata['ebook_resolution'] != self.application.config['format.ebook']['resolution'] or
+                formdata['pdf_engine'] != self.application.config['format.pdf']['engine'] or
+                formdata['mudraw'] != self.application.config['format.pdf']['mudraw'] or
+                formdata['mutool'] != self.application.config['format.pdf']['mutool'] or
+                formdata['pdf2png'] != self.application.config['format.pdf']['pdf2png'] or
+                formdata['qpdf'] != self.application.config['format.pdf']['qpdf'] or
+                formdata['use_ebook'] != self.application.config['format.ebook']['active'] or
+                formdata['calibre'] != self.application.config['format.ebook']['calibre'] or
+                formdata['ebook_cache_location'] != self.application.config['format.ebook']['location'] or
+                formdata['ebook_cache_free'] != self.application.config['format.ebook']['free'] or
+                formdata['ebook_cache_size'] != self.application.config['format.ebook']['size'] or
                 formdata['launch_client'] != self.application.config['general']['launch_client'] or
+                formdata['fingerprint'] != self.application.config['general']['fingerprint'] or
                 formdata['use_cache'] != self.application.config['cache']['active'] or
                 formdata['cache_size'] != self.application.config['cache']['size'] or
                 formdata['cache_free'] != self.application.config['cache']['free'] or
@@ -1384,6 +1419,7 @@ class ConfigPageHandler(BaseHandler):
                     self.application.config['security']['api_key'] = ""
                     formdata['api_key'] = ""
                 self.application.config['general']['launch_client'] = formdata['launch_client']
+                self.application.config['general']['fingerprint'] = formdata['fingerprint']
 
                 self.application.config['web.ssl']['port'] = formdata['secure_port']
                 self.application.config['web.ssl']['active'] = formdata['use_https']
@@ -1395,25 +1431,34 @@ class ConfigPageHandler(BaseHandler):
                 self.application.config['cache']['free'] = formdata['cache_free']
                 self.application.config['cache']['location'] = formdata['cache_location']
 
-                self.application.config['ebook']['calibre'] = formdata['calibre']
-                self.application.config['ebook.cache']['location'] = formdata['ebook_cache_location']
-                self.application.config['ebook.cache']['free'] = formdata['ebook_cache_free']
-                self.application.config['ebook.cache']['size'] = formdata['ebook_cache_size']
-                self.application.config['ebook']['active'] =  formdata['use_ebook']
+                self.application.config['format.ebook']['calibre'] = formdata['calibre']
+                self.application.config['format.ebook']['location'] = formdata['ebook_cache_location']
+                self.application.config['format.ebook']['free'] = formdata['ebook_cache_free']
+                self.application.config['format.ebook']['size'] = formdata['ebook_cache_size']
+                self.application.config['format.ebook']['active'] =  formdata['use_ebook']
                 
-                self.application.config['webcomic']['active'] = formdata['use_cbw']
-                self.application.config['webcomic']['location'] = formdata['cbw_location']
-                self.application.config['webcomic']['auto_download'] = formdata['cbw_autodownload']
-                self.application.config['pdf']['active'] =  formdata['use_pdf']
-                self.application.config['pdf']['resolution'] =  formdata['pdf_resolution']
-                self.application.config['ebook']['resolution'] = formdata['ebook_resolution']
-                self.application.config['ebook']['margin'] = formdata['ebook_margin']
+                self.application.config['format.webcomic']['active'] = formdata['use_cbw']
+                self.application.config['format.folders']['active'] = formdata['use_folders']
+                self.application.config['format.webcomic']['location'] = formdata['cbw_location']
+                self.application.config['format.webcomic']['auto_download'] = formdata['cbw_autodownload']
+                self.application.config['format.pdf']['active'] =  formdata['use_pdf']
+                self.application.config['format.pdf']['resolution'] =  formdata['pdf_resolution']
+                self.application.config['format.ebook']['resolution'] = formdata['ebook_resolution']
+                self.application.config['format.ebook']['margin'] = formdata['ebook_margin']
 
-                self.application.config['pdf']['engine'] = formdata['pdf_engine']
-                self.application.config['pdf']['mudraw'] = formdata['mudraw']
-                self.application.config['pdf']['mutool'] = formdata['mutool']
-                self.application.config['pdf']['pdf2png'] = formdata['pdf2png']
-                self.application.config['pdf']['qpdf'] = formdata['qpdf']
+
+                self.application.config['metadata.comicvine']['location'] = formdata['comicvine_location']
+                self.application.config['metadata.comicvine']['key'] = formdata['comicvine_key']
+                self.application.config['metadata.zilverendolfijn']['location'] = formdata['zilverendolfijn_location']
+
+                self.application.config['metadata.comicvine']['active'] =  formdata['use_comicvine']
+                self.application.config['metadata.zilverendolfijn']['active'] =  formdata['use_zd']
+
+                self.application.config['format.pdf']['engine'] = formdata['pdf_engine']
+                self.application.config['format.pdf']['mudraw'] = formdata['mudraw']
+                self.application.config['format.pdf']['mutool'] = formdata['mutool']
+                self.application.config['format.pdf']['pdf2png'] = formdata['pdf2png']
+                self.application.config['format.pdf']['qpdf'] = formdata['qpdf']
           
                 self.application.config['database']['engine'] = formdata['db_engine']
                 

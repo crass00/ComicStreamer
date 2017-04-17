@@ -766,10 +766,10 @@ class PdfArchiver:
     def setArchiveComment( self, comment ):
         return False
     def readArchiveFile( self, page_num ):
-        resolution = config['pdf']['resolution']
+        resolution = config['format.pdf']['resolution']
         #resolution = 150
    
-        cache_location = config['ebook.cache']['location']
+        cache_location = config['format.ebook']['location']
         if cache_location == "" or not os.path.exists(cache_location):
             cache_location = AppFolders.appCacheEbooks()
         cache = os.path.join(cache_location,os.path.basename(self.path)+u".decrypted.cache.pdf")
@@ -820,7 +820,7 @@ class PdfArchiver:
             if os.path.isfile(os.path.join(os.path.dirname(self.path),'cover.jpg')):
                 out.append("0.png")
         
-            cache_location = config['ebook.cache']['location']
+            cache_location = config['format.ebook']['location']
             if cache_location == "" or not os.path.exists(cache_location):
                 cache_location = AppFolders.appCacheEbooks()
 
@@ -896,7 +896,7 @@ class EbookArchiver(PdfArchiver):
         if ext in ebook_extentions:
             if not self.convert(): return
 
-        resolution = config['ebook']['resolution']
+        resolution = config['format.ebook']['resolution']
         #resolution = 72
         
         if page_num == '0.png':
@@ -929,14 +929,14 @@ class EbookArchiver(PdfArchiver):
             return subprocess.check_output(['./mudraw', '-r', str(resolution), '-o','-', self.cache_file, str(int(os.path.basename(page_num)[:-4]))])
 
     def convert( self ):
-        cache_location = config['ebook.cache']['location']
+        cache_location = config['format.ebook']['location']
         if cache_location == "" or not os.path.exists(cache_location):
             cache_location = AppFolders.appCacheEbooks()
         self.cache_file = os.path.join(cache_location,os.path.basename(self.path)+u".cache.pdf")
         corrected_path_temp = self.cache_file + u".tmp.pdf"
         if not os.path.isfile(self.cache_file):
             try:
-                margin = config['ebook']['margin']
+                margin = config['format.ebook']['margin']
                 format_arg = ["--pdf-page-numbers","--margin-top",str(margin),"--margin-bottom",str(margin),"--margin-left",str(margin),"--margin-right",str(margin),"--pdf-add-toc"]
                 if platform.system() == "Windows":
                     subprocess.check_output(['%PROGRAMFILES%\calibre\ebook-convert.exe', self.path, corrected_path_temp] + format_arg)
@@ -1002,7 +1002,7 @@ class WebArchiver:
         return False
 
     def readArchiveFile( self, page_num ):
-        cache_location = config['webcomic']['location']
+        cache_location = config['format.webcomic']['location']
         if cache_location == "" or not os.path.exists(cache_location):
             cache_location = AppFolders.appWebComic()
         cache_folder = os.path.join(cache_location,os.path.basename(self.path))
@@ -1114,7 +1114,7 @@ class WebArchiver:
         old_scrape = ""
         scrape = ""
         
-        cache_location = config['webcomic']['location']
+        cache_location = config['format.webcomic']['location']
         if cache_location == "" or not os.path.exists(cache_location):
             cache_location = AppFolders.appWebComic()
         cache_folder = os.path.join(cache_location,os.path.basename(self.path))
@@ -2193,7 +2193,7 @@ class ComicArchive:
         metadata.isEmpty = False
 
         print "HERExddd"
-        cache_location = config['webcomic']['location']
+        cache_location = config['format.webcomic']['location']
         if cache_location == "" or not os.path.exists(cache_location):
             cache_location = AppFolders.appWebComic()
         cache_folder = os.path.join(cache_location,os.path.basename(self.path))

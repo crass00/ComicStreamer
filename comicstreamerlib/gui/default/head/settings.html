@@ -92,6 +92,8 @@ body {
                       use_pdf_toggle();
                       use_cbw_toggle();
                       use_ebook_toggle();
+                      use_comicvine_toggle();
+                      use_zd_toggle();
                       }
                       );
                       function create_key()
@@ -215,6 +217,39 @@ function use_cbw_toggle()
     }
 }
  
+
+function use_comcvine_toggle()
+{
+   if ( !($("#use_cbw").is(':checked'))) {
+            document.getElementById("settings_cbw").style.display = "none";
+    }
+    else {
+        document.getElementById("settings_cbw").style.display = "inline";
+    }
+}
+
+function use_zd_toggle()
+{
+   if ( !($("#use_zd").is(':checked'))) {
+            document.getElementById("settings_zilverendolfijn").style.display = "none";
+    }
+    else {
+        document.getElementById("settings_zilverendolfijn").style.display = "inline";
+    }
+}
+
+function use_comicvine_toggle()
+{
+   if ( !($("#use_comicvine").is(':checked'))) {
+            document.getElementById("settings_comicvine").style.display = "none";
+    }
+    else {
+        document.getElementById("settings_comicvine").style.display = "inline";
+    }
+}
+
+
+
 
 function use_mudraw_toggle()
 {
