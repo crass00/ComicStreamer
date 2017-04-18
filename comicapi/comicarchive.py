@@ -1683,7 +1683,6 @@ class ComicArchive:
             # hash all the pages sort them and hash that string :-)
             for page in range(0,s):
                 fp += [hash(self.getPage(page))]
-        print fp
         if sort:
             return hash(str()+''.join(sorted(fp)))
         else:
