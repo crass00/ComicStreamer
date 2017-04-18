@@ -753,8 +753,8 @@ class Library:
         self.getSession().expire_all()
         print "Doubles: " + str(self.double)
         print "Simular: " + str(self.simular)
-        self.double = 0
-        self.simular = 0
+        #self.double = 0
+        #self.simular = 0
 
 
     def deleteComics(self, comic_id_list):
