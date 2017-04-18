@@ -1678,13 +1678,16 @@ class ComicArchive:
             return hashfile(self.path)
             # hash the complete file
         else:
+            s = self.getNumberOfPages()
+            fp += [str(s)]
             # hash all the pages sort them and hash that string :-)
-            for page in range(0,self.getNumberOfPages()):
+            for page in range(0,s):
                 fp += [hash(self.getPage(page))]
+        print fp
         if sort:
-            return hash(''.join(sorted(fp)))
+            return hash(str()+''.join(sorted(fp)))
         else:
-            return hash(''.join(fp))
+            return hash(str()+''.join(fp))
 
     
     # Clears the cached data
