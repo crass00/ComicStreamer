@@ -1671,7 +1671,7 @@ class ComicArchive:
     """
     Fingerprint a comic file
     """
-    def fingerprint( self ):
+    def fingerprint( self , sort=True):
         fp = []
         # FIX: if type == pdf or web... epub etc... we need another fingerprint
         if self.archive_type == self.ArchiveType.Ebook or self.archive_type == self.ArchiveType.Web or self.archive_type == self.ArchiveType.Pdf:
@@ -1681,9 +1681,12 @@ class ComicArchive:
             # hash all the pages sort them and hash that string :-)
             for page in range(0,self.getNumberOfPages()):
                 fp += [hash(self.getPage(page))]
-        return hash(''.join(sorted(fp)))
-    
+        if sort:
+            return hash(''.join(sorted(fp)))
+        else:
+            return hash(''.join(fp))
 
+    
     # Clears the cached data
     def resetCache( self ):
         self.has_cix = None

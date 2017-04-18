@@ -21,14 +21,6 @@ import comicstreamerlib.utils
 from database import *
 from library import Library
 
-
-def getmtime(file_):
-    try:
-        res = os.path.getmtime(file_)
-        return res
-    except:
-        return time.time()
-
 class  MonitorEventHandler(watchdog.events.FileSystemEventHandler):
     
     def __init__(self, monitor):
@@ -183,64 +175,11 @@ class Monitor():
 
     def getComicMetadata(self, path):
         logging.debug(u"Monitor: Scanning File {0} {1}\r".format(self.read_count, path))
-        ca = ComicArchive(path,  default_image_path=AppFolders.missingPath("page.png"))
         self.read_count += 1
-        
-        if ca.seemsToBeAComicArchive():
-            sys.stdout.flush()
+        sys.stdout.flush()
+        return self.library.getComicMetadata(path)
+    
 
-            if ca.hasMetadata( MetaDataStyle.CIX ):
-                style = MetaDataStyle.CIX
-            elif ca.hasMetadata( MetaDataStyle.CBI ):
-                style = MetaDataStyle.CBI
-            elif ca.hasMetadata( MetaDataStyle.COMET ):
-                style = MetaDataStyle.COMET
-            elif ca.hasMetadata( MetaDataStyle.CBW ):
-                style = MetaDataStyle.CBW
-            else:
-                logging.debug(u"Monitor: Scanning File Has No ComicMeta Data")
-                if ca.hasMetadata( MetaDataStyle.CALIBRE ):
-                    style = MetaDataStyle.CALIBRE
-                elif ca.hasMetadata( MetaDataStyle.EPUB ):
-                    style = MetaDataStyle.EPUB
-                else:
-                    style = None
-                
-            if style is not None:
-                md = ca.readMetadata(style)
-                if md.isEmpty:
-                     md = ca.metadataFromFilename()
-            else:
-                # No metadata in comic.  make some guesses from the filename
-                md = ca.metadataFromFilename()
-            
-            # patch version 2
-            if (md.title is None or md.title == "") and md.issue is None and not md.series is None:
-                md.title = md.series
-                md.series = None
-            
-            md.fingerprint = ca.fingerprint()
-            md.path = ca.path
-            
-            md.page_count = ca.page_count
-            
-            md.mod_ts = datetime.utcfromtimestamp(getmtime(ca.path))
-            md.filesize = os.path.getsize(md.path)
-            md.hash = ""
-
-            #thumbnail generation
-            image_data = ca.getPage(0, AppFolders.missingPath("cover.png"))
-            
-            #now resize it
-            thumb = StringIO.StringIO()
-            
-            try:
-                utils.resize(image_data, (400, 400), thumb)
-                md.thumbnail = thumb.getvalue()
-            except:
-                md.thumbnail = None
-            return md
-        return None
 
     def setStatusDetail(self, detail, level=logging.DEBUG):
         self.statusdetail = detail

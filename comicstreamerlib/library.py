@@ -3,6 +3,7 @@ from datetime import datetime
 import dateutil
 import os
 import random
+import datetime
 
 import logging
 import StringIO
@@ -27,9 +28,18 @@ from sqlalchemy.orm import load_only
 
 from config import ComicStreamerConfig
 from comicapi.comicarchive import ComicArchive
+from comicapi.comicarchive import *
 
 from comicapi.issuestring import IssueString
 
+
+def getmtime(file_):
+    try:
+        res = os.path.getmtime(file_)
+        return res
+    except:
+        return time.time()
+        
 class Library:
 
     def __init__(self, session_getter):
@@ -39,6 +49,7 @@ class Library:
         self.hashEntities = {}
         self.cache_active = False
         self.double = 0
+        self.simular = 0
         
 
 
@@ -625,16 +636,115 @@ class Library:
                 self.namedEntities[key] = cls(name=name)
         return self.namedEntities[key]
 
+
+    def getComicMetadata(self, path):
+        ca = ComicArchive(path,  default_image_path=AppFolders.missingPath("page.png"))
+
+        
+        if ca.seemsToBeAComicArchive():
+
+            if ca.hasMetadata( MetaDataStyle.CIX ):
+                style = MetaDataStyle.CIX
+            elif ca.hasMetadata( MetaDataStyle.CBI ):
+                style = MetaDataStyle.CBI
+            elif ca.hasMetadata( MetaDataStyle.COMET ):
+                style = MetaDataStyle.COMET
+            elif ca.hasMetadata( MetaDataStyle.CBW ):
+                style = MetaDataStyle.CBW
+            else:
+                logging.warning(u"Library: File Has No ComicMeta Data")
+                if ca.hasMetadata( MetaDataStyle.CALIBRE ):
+                    style = MetaDataStyle.CALIBRE
+                elif ca.hasMetadata( MetaDataStyle.EPUB ):
+                    style = MetaDataStyle.EPUB
+                else:
+                    style = None
+                
+            if style is not None:
+                md = ca.readMetadata(style)
+                if md.isEmpty:
+                     md = ca.metadataFromFilename()
+            else:
+                # No metadata in comic.  make some guesses from the filename
+                md = ca.metadataFromFilename()
+            
+            # patch version 2
+            if (md.title is None or md.title == "") and md.issue is None and not md.series is None:
+                md.title = md.series
+                md.series = None
+            
+            md.fingerprint = ca.fingerprint()
+            md.path = ca.path
+            
+            md.page_count = ca.page_count
+            
+            md.mod_ts = datetime.utcfromtimestamp(getmtime(ca.path))
+            md.filesize = os.path.getsize(md.path)
+            md.hash = ""
+
+            #thumbnail generation
+            image_data = ca.getPage(0, AppFolders.missingPath("cover.png"))
+            
+            #now resize it
+            thumb = StringIO.StringIO()
+            
+            try:
+                utils.resize(image_data, (400, 400), thumb)
+                md.thumbnail = thumb.getvalue()
+            except:
+                md.thumbnail = None
+            return md
+        return None
+
+
+    def compare( self , comic_filename, comic_compare_filename):
+        """
+        Compare a comic file
+        """
+
+        """
+        md = self.getComicMetadata(comic_filename)
+        md_compare = self.getComicMetadata(comic_compare_filename)
+        if md_compare is not None:
+            compare_comic = self.createComicFromMetadata(md_compare)
+        if md is not None:
+            comic = self.createComicFromMetadata(md)
+        if comic is None or compare_comic is None:
+            return False
+        """
+
+        # preform metadata check....
+        # FIX
+
+        fingerprint_compare = ComicArchive(comic_filename,  default_image_path=AppFolders.missingPath("page.png")).fingerprint(sort=False)
+        fingerprint = ComicArchive(comic_compare_filename,  default_image_path=AppFolders.missingPath("page.png")).fingerprint(sort=False)
+
+        if fingerprint == fingerprint_compare:
+            return True
+        return False
+
+
     def addComics(self, comic_list):
         """
         Add comics to the Database
         """
+        
+        # FIX self.double
         for comic in comic_list:
             query = self.getSession().query(Comic).filter(Comic.fingerprint == comic.fingerprint).first()
             if query is not None:
-                print "Double: " + comic.path
-                print "Double From: " + query.path
-                self.double += 1
+                
+
+                if self.compare(query.path,comic.path):
+                    print "Double: " + comic.path
+                    print "Double From: " + query.path
+                    # Do something...
+                    #os.rename(comic.path, comic.path+ ".DOUBLE")
+                    self.double += 1
+                else:
+                    print "Simular: " + comic.path
+                    print "Simular From: " + query.path
+                    self.simular += 1
             else:
                 self.getSession().add(comic)
         if len(comic_list) > 0:
@@ -642,6 +752,9 @@ class Library:
         self.getSession().commit()
         self.getSession().expire_all()
         print "Doubles: " + str(self.double)
+        print "Simular: " + str(self.simular)
+        self.double = 0
+        self.simular = 0
 
 
     def deleteComics(self, comic_id_list):
