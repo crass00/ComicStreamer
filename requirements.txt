@@ -11,7 +11,7 @@ PyYAML==3.11
 six==1.9.0
 SQLAlchemy>=1.0.8
 tornado>=4.2.1
-unrar>=0.3
+rarfile>=3.0
 watchdog>=0.8.3
 paver==1.2.4
 pylzma>=0.4.8

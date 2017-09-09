@@ -19,14 +19,11 @@ from lxml import etree
 
 
 from natsort import natsorted
-from unrar import rarfile
-from unrar import unrarlib
-import unrar.constants
 import ctypes
 import io
 import pylzma
 from py7zlib import Archive7z
-from unrar import constants
+import rarfile
 
 import xml.etree.ElementTree as ET
 
